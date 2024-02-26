@@ -1,0 +1,37 @@
+﻿<UserControl
+    x:Class="CrudGenerator.Components.DefaultValuesGrid"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Name="defaultValuesGrid">
+    <Grid Grid.Row="0" MinHeight="300">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="Default Values" />
+
+        <DataGrid
+            Grid.Row="1"
+            MaxHeight="150"
+            AutoGenerateColumns="False"
+            IsReadOnly="True"
+            ItemsSource="{Binding Path=DefaultValues, Mode=OneWay, ElementName=defaultValuesGrid, UpdateSourceTrigger=PropertyChanged}">
+            <DataGrid.Columns>
+                <DataGridTextColumn
+                    Binding="{Binding Path=Name, Mode=OneWay}"
+                    Header="Name"
+                    IsReadOnly="True" />
+                <DataGridTextColumn
+                    Binding="{Binding Path=DbType, Mode=OneWay}"
+                    Header="DbType"
+                    IsReadOnly="True" />
+                <DataGridTextColumn
+                    Binding="{Binding Path=DefaultValue, Mode=OneWay}"
+                    Header="Default Value"
+                    IsReadOnly="True" />
+            </DataGrid.Columns>
+        </DataGrid>
+
+    </Grid>
+</UserControl>
