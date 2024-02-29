@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension"
+	 xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+
+  <!-- The URL for add/remove programs -->
+  <?define InfoURL="http://" ?>
+
+  <!--
+   Upgrade code HAS to be the same for all updates.
+   Once you've chosen it don't change it.
+   -->
+  <?define UpgradeCode="3D4F9622-FF35-4F09-8EF4-7F42811BB8A7" ?> <!--v1.0.0.0-->
+
+	<Product Id="35CE40BF-2F47-409E-BA49-4757F6A3F1DA" Name="!(loc.ApplicationName)" Language="!(loc.Language)" Version="1.0.0.0" Manufacturer="!(loc.ManufacturerFullName)" UpgradeCode="$(var.UpgradeCode)">
+	<Package Id="30EE239D-F5EA-4630-90CB-22AE1F31DCC4" InstallerVersion="200" Compressed="yes" InstallScope="perMachine" Description="!(loc.ProductDescription)"/>
+
+    <!-- License agreement text: dummy. Real text is set in WXS file -->
+    <!--<WixVariable Id="WixUILicenseRtf" Value="dummy" />-->
+
+    <!-- UI customization -->
+    <WixVariable Id="WixUIBannerBmp" Value="Dialog.bmp" />
+    <WixVariable Id="WixUIDialogBmp" Value="Dialog.bmp" />
+
+    <!-- Define icons (ID should not be longer than 18 chars and must end with ".exe") -->
+    <Icon Id="Icon.exe" SourceFile="wpf.ico" />
+
+    <!-- Set properties for add/remove programs -->
+    <Property Id="ARPPRODUCTICON" Value="Icon.exe" />
+    <Property Id="ARPHELPLINK" Value="$(var.InfoURL)" />
+    <Property Id="APPNOREPAIR" Value="yes" Secure="yes" />
+    <!-- Remove repair -->
+    <!--<Property Id="APPNOMODIFY" Value="yes" Secure="yes" />-->
+    <!-- Remove modify -->
+
+	<Media Id="1" Cabinet="product.cab" EmbedCab="yes"/>
+
+    <PropertyRef Id="WIX_IS_NETFRAMEWORK_472_OR_LATER_INSTALLED"/>
+	<Condition Message="!(loc.RequiresDotNetFramework472)">
+      <![CDATA[Installed OR WIX_IS_NETFRAMEWORK_472_OR_LATER_INSTALLED]]>
+    </Condition>
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLFOLDER" Name="!(loc.ApplicationName)" >
+
+          <Directory Id="LanguageENDir" Name="en" >
+            <Component Id="LanguageEN" Guid="33EE77FF-449F-4843-89C1-9776201DFD90" KeyPath="yes">
+              <File Id="Framework.resources.en" Source="..\CrudGenerator.Wpf\bin\Release\net472\en\Framework.resources.dll"/>
+              <File Id="View.Abstractions.resources.en" Source="..\CrudGenerator.Wpf\bin\Release\net472\en\View.Abstractions.resources.dll"/>
+              <File Id="View.Abstractions.Wpf.resources.en" Source="..\CrudGenerator.Wpf\bin\Release\net472\en\View.Abstractions.Wpf.resources.dll"/>
+            </Component>
+          </Directory>
+
+          <Directory Id="LanguageESDir" Name="es" >
+            <Component Id="LanguageES" Guid="B6CA41F6-1EBB-4ABF-9958-9A95DAF9C308" KeyPath="yes">
+              <File Id="Database.MySql.resources.es" Source="..\CrudGenerator.Wpf\bin\Release\net472\es\Database.MySql.resources.dll"/>
+              <File Id="Database.resources.es" Source="..\CrudGenerator.Wpf\bin\Release\net472\es\Database.resources.dll"/>
+              <File Id="Database.Sqlite.resources.es" Source="..\CrudGenerator.Wpf\bin\Release\net472\es\Database.Sqlite.resources.dll"/>
+              <File Id="Database.SqlServer.resources.es" Source="..\CrudGenerator.Wpf\bin\Release\net472\es\Database.SqlServer.resources.dll"/>
+              <File Id="DependencyInversion.resources.es" Source="..\CrudGenerator.Wpf\bin\Release\net472\es\DependencyInversion.resources.dll"/>
+              <File Id="Framework.resources.es" Source="..\CrudGenerator.Wpf\bin\Release\net472\es\Framework.resources.dll"/>
+              <File Id="View.Abstractions.resources.es" Source="..\CrudGenerator.Wpf\bin\Release\net472\es\View.Abstractions.resources.dll"/>
+              <File Id="View.Abstractions.Wpf.resources.es" Source="..\CrudGenerator.Wpf\bin\Release\net472\es\View.Abstractions.Wpf.resources.dll"/>
+              <File Id="Xceed.Wpf.AvalonDock.resources.es" Source="..\CrudGenerator.Wpf\bin\Release\net472\es\Xceed.Wpf.AvalonDock.resources.dll"/>
+            </Component>
+          </Directory>
+
+          <Directory Id="LanguageESARDir" Name="es-AR" >
+            <Component Id="LanguageESAR" Guid="C28CD35B-B3B9-4EC4-8FBE-B4EA39A3091C" KeyPath="yes">
+              <File Id="View.Abstractions.resources.esAR" Source="..\CrudGenerator.Wpf\bin\Release\net472\es-AR\View.Abstractions.resources.dll"/>
+              <File Id="View.Components.Wpf.resources.esAR" Source="..\CrudGenerator.Wpf\bin\Release\net472\es-AR\View.Components.Wpf.resources.dll"/>
+            </Component>
+          </Directory>
+
+          <Directory Id="LanguagePTDir" Name="pt" >
+            <Component Id="LanguagePT" Guid="2A2C206A-FB7D-4C9B-BEF4-BF18E3CCFD78" KeyPath="yes">
+              <File Id="Database.MySql.resources.pt" Source="..\CrudGenerator.Wpf\bin\Release\net472\pt\Database.MySql.resources.dll"/>
+              <File Id="Database.resources.pt" Source="..\CrudGenerator.Wpf\bin\Release\net472\pt\Database.resources.dll"/>
+              <File Id="Database.Sqlite.resources.pt" Source="..\CrudGenerator.Wpf\bin\Release\net472\pt\Database.Sqlite.resources.dll"/>
+              <File Id="Database.SqlServer.resources.pt" Source="..\CrudGenerator.Wpf\bin\Release\net472\pt\Database.SqlServer.resources.dll"/>
+              <File Id="Framework.resources.pt" Source="..\CrudGenerator.Wpf\bin\Release\net472\pt\Framework.resources.dll"/>
+              <File Id="View.Abstractions.resources.pt" Source="..\CrudGenerator.Wpf\bin\Release\net472\pt\View.Abstractions.resources.dll"/>
+              <File Id="View.Abstractions.Wpf.resources.pt" Source="..\CrudGenerator.Wpf\bin\Release\net472\pt\View.Abstractions.Wpf.resources.dll"/>
+            </Component>
+          </Directory>
+
+          <Directory Id="LanguagePTBRDir" Name="pt-BR" >
+            <Component Id="LanguagePTBR" Guid="994D6618-4911-452C-9130-DF7CEDF1FA29" KeyPath="yes">
+              <File Id="DependencyInversion.resources.ptBR" Source="..\CrudGenerator.Wpf\bin\Release\net472\pt-BR\DependencyInversion.resources.dll"/>
+              <File Id="View.Abstractions.resources.ptBR" Source="..\CrudGenerator.Wpf\bin\Release\net472\pt-BR\View.Abstractions.resources.dll"/>
+              <File Id="View.Components.Wpf.resources.ptBR" Source="..\CrudGenerator.Wpf\bin\Release\net472\pt-BR\View.Components.Wpf.resources.dll"/>
+              <File Id="Xceed.Wpf.AvalonDock.resources.ptBR" Source="..\CrudGenerator.Wpf\bin\Release\net472\pt-BR\Xceed.Wpf.AvalonDock.resources.dll"/>
+            </Component>
+          </Directory>
+
+          <Directory Id="SQLiteInteropX64Dir" Name="x64" >
+            <Component Id="SQLiteInteropX64" Guid="CF32087F-FAFB-45DC-A8C3-CFF26B6C11A7" KeyPath="yes">
+              <File Id="SQLite.InteropX64.dll" Source="..\CrudGenerator.Wpf\bin\Release\net472\x64\SQLite.Interop.dll"/>
+            </Component>
+          </Directory>
+
+          <Directory Id="SQLiteInteropX86Dir" Name="x86" >
+            <Component Id="SQLiteInteropX86" Guid="11A9461E-5C4C-4080-B4A2-4F6206FCBB53" KeyPath="yes">
+              <File Id="SQLite.InteropX86.dll" Source="..\CrudGenerator.Wpf\bin\Release\net472\x86\SQLite.Interop.dll"/>
+            </Component>
+          </Directory>
+
+          <Component Id="ProductComponents" Guid="F10443EE-5385-4240-890F-847E0992C592" KeyPath="yes">
+            <File Id="BouncyCastle.Cryptography" Source="..\CrudGenerator.Wpf\bin\Release\net472\BouncyCastle.Cryptography.dll"/>
+            <File Id="CrudGenerator.Core" Source="..\CrudGenerator.Wpf\bin\Release\net472\CrudGenerator.Core.dll"/>
+            <File Id="Database" Source="..\CrudGenerator.Wpf\bin\Release\net472\Database.dll"/>
+            <File Id="Database.MySql" Source="..\CrudGenerator.Wpf\bin\Release\net472\Database.MySql.dll"/>
+            <File Id="Database.Sqlite" Source="..\CrudGenerator.Wpf\bin\Release\net472\Database.Sqlite.dll"/>
+            <File Id="Database.SqlServer" Source="..\CrudGenerator.Wpf\bin\Release\net472\Database.SqlServer.dll"/>
+            <File Id="DependencyInversion" Source="..\CrudGenerator.Wpf\bin\Release\net472\DependencyInversion.dll"/>
+            <File Id="Domain.Model" Source="..\CrudGenerator.Wpf\bin\Release\net472\Domain.Model.dll"/>
+            <File Id="EntityFramework" Source="..\CrudGenerator.Wpf\bin\Release\net472\EntityFramework.dll"/>
+            <File Id="EntityFramework.SqlServer" Source="..\CrudGenerator.Wpf\bin\Release\net472\EntityFramework.SqlServer.dll"/>
+            <File Id="Framework" Source="..\CrudGenerator.Wpf\bin\Release\net472\Framework.dll"/>
+            <File Id="Google.Protobuf" Source="..\CrudGenerator.Wpf\bin\Release\net472\Google.Protobuf.dll"/>
+            <File Id="K4os.Compression.LZ4" Source="..\CrudGenerator.Wpf\bin\Release\net472\K4os.Compression.LZ4.dll"/>
+            <File Id="K4os.Compression.LZ4.Streams" Source="..\CrudGenerator.Wpf\bin\Release\net472\K4os.Compression.LZ4.Streams.dll"/>
+            <File Id="K4os.Hash.xxHash" Source="..\CrudGenerator.Wpf\bin\Release\net472\K4os.Hash.xxHash.dll"/>
+            <File Id="Microsoft.Bcl.AsyncInterfaces" Source="..\CrudGenerator.Wpf\bin\Release\net472\Microsoft.Bcl.AsyncInterfaces.dll"/>
+            <File Id="Microsoft.Bcl.HashCode" Source="..\CrudGenerator.Wpf\bin\Release\net472\Microsoft.Bcl.HashCode.dll"/>
+            <File Id="MySql.Data" Source="..\CrudGenerator.Wpf\bin\Release\net472\MySql.Data.dll"/>
+            <File Id="System.Collections.Immutable" Source="..\CrudGenerator.Wpf\bin\Release\net472\System.Collections.Immutable.dll"/>
+            <File Id="System.ComponentModel.Annotations" Source="..\CrudGenerator.Wpf\bin\Release\net472\System.ComponentModel.Annotations.dll"/>
+            <File Id="System.Configuration.ConfigurationManager" Source="..\CrudGenerator.Wpf\bin\Release\net472\System.Configuration.ConfigurationManager.dll"/>
+            <File Id="System.Data.SqlClient" Source="..\CrudGenerator.Wpf\bin\Release\net472\System.Data.SqlClient.dll"/>
+            <File Id="System.Data.SQLite" Source="..\CrudGenerator.Wpf\bin\Release\net472\System.Data.SQLite.dll"/>
+            <File Id="System.Data.SQLite.EF6" Source="..\CrudGenerator.Wpf\bin\Release\net472\System.Data.SQLite.EF6.dll"/>
+            <File Id="System.Data.SQLite.Linq" Source="..\CrudGenerator.Wpf\bin\Release\net472\System.Data.SQLite.Linq.dll"/>
+            <File Id="System.Diagnostics.DiagnosticSource" Source="..\CrudGenerator.Wpf\bin\Release\net472\System.Diagnostics.DiagnosticSource.dll"/>
+            <File Id="System.Drawing.Common" Source="..\CrudGenerator.Wpf\bin\Release\net472\System.Drawing.Common.dll"/>
+            <File Id="System.IO.Pipelines" Source="..\CrudGenerator.Wpf\bin\Release\net472\System.IO.Pipelines.dll"/>
+            <File Id="System.Memory" Source="..\CrudGenerator.Wpf\bin\Release\net472\System.Memory.dll"/>
+            <File Id="System.Numerics.Vectors" Source="..\CrudGenerator.Wpf\bin\Release\net472\System.Numerics.Vectors.dll"/>
+            <File Id="System.Runtime.CompilerServices.Unsafe" Source="..\CrudGenerator.Wpf\bin\Release\net472\System.Runtime.CompilerServices.Unsafe.dll"/>
+            <File Id="System.Threading.Tasks.Extensions" Source="..\CrudGenerator.Wpf\bin\Release\net472\System.Threading.Tasks.Extensions.dll"/>
+            <File Id="View.Abstractions" Source="..\CrudGenerator.Wpf\bin\Release\net472\View.Abstractions.dll"/>
+            <File Id="View.Abstractions.Wpf" Source="..\CrudGenerator.Wpf\bin\Release\net472\View.Abstractions.Wpf.dll"/>
+            <File Id="View.Components" Source="..\CrudGenerator.Wpf\bin\Release\net472\View.Components.dll"/>
+            <File Id="View.Components.Wpf" Source="..\CrudGenerator.Wpf\bin\Release\net472\View.Components.Wpf.dll"/>
+            <File Id="Xceed.Wpf.AvalonDock" Source="..\CrudGenerator.Wpf\bin\Release\net472\Xceed.Wpf.AvalonDock.dll"/>
+            <File Id="Xceed.Wpf.Toolkit" Source="..\CrudGenerator.Wpf\bin\Release\net472\Xceed.Wpf.Toolkit.dll"/>
+            <File Id="ZstdSharp" Source="..\CrudGenerator.Wpf\bin\Release\net472\ZstdSharp.dll"/>
+            
+            <File Id="CrudGenerator" Source="..\CrudGenerator.Wpf\bin\Release\net472\CrudGenerator.exe"/>
+            <File Id="CrudGenerator.config" Source="..\CrudGenerator.Wpf\bin\Release\net472\CrudGenerator.exe.config"/>
+          </Component>
+        </Directory>
+      </Directory>
+
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="ProgramMenuSubfolder" Name="!(loc.ApplicationName)">
+          <Component Id="ApplicationShortcuts" Guid="00BEFA04-8814-4489-8846-AD9B9C0122E2">
+            <Shortcut Id="CrudGenerator_Shortcut" Name="!(loc.ApplicationName)" Description="!(loc.ProductDescription)" Target="[INSTALLFOLDER]CrudGenerator.exe" WorkingDirectory="INSTALLFOLDER" Icon="WpfIcon">
+              <Icon Id="WpfIcon" SourceFile="Wpf.ico" />
+            </Shortcut>
+            <RegistryValue Root="HKCU" Key="Software\AEMRural\CrudGeneratorProgramMenu" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+            <RemoveFolder Id="ProgramMenuSubfolder" On="uninstall"/>
+          </Component>
+        </Directory>
+      </Directory>
+
+      <Directory Id="DesktopFolder" Name="Desktop">
+        <Component Id="ApplicationShortcutDesktop" Guid="3285CAFE-A4EE-4F67-878C-3DC199899378">
+          <Shortcut Id="CrudGenerator_ShortcutDesktop" Name="!(loc.ApplicationName)" Description="!(loc.ProductDescription)" Target="[INSTALLFOLDER]CrudGenerator.exe" WorkingDirectory="INSTALLFOLDER" Icon="WpfIcon1">
+            <Icon Id="WpfIcon1" SourceFile="Wpf.ico" />
+          </Shortcut>
+          <RegistryValue Root="HKCU" Key="Software\SSPH\CrudGeneratorDesktop" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+          <RemoveFolder Id="DesktopFolder" On="uninstall"/>
+        </Component>
+      </Directory>
+
+    </Directory>
+
+    <Feature Id="ProductFeature" Title="!(loc.ApplicationName)" Level="1">
+      <ComponentRef Id="ApplicationShortcutDesktop" />
+      <ComponentRef Id="ApplicationShortcuts" />
+      <ComponentRef Id="ProductComponents" />
+      <ComponentRef Id="LanguageEN" />
+      <ComponentRef Id="LanguageES" />
+      <ComponentRef Id="LanguageESAR" />
+      <ComponentRef Id="LanguagePT" />
+      <ComponentRef Id="LanguagePTBR" />
+      <ComponentRef Id="SQLiteInteropX64" />
+      <ComponentRef Id="SQLiteInteropX86" />
+    </Feature>
+
+    <UI>
+      <!-- Define the installer UI -->
+      <UIRef Id="WixUICustom" />
+      <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+    </UI>
+
+  </Product>
+
+  <Fragment>
+    <DirectoryRef Id="LanguageENDir" />
+    <DirectoryRef Id="LanguageESDir" />
+    <DirectoryRef Id="LanguageESARDir" />
+    <DirectoryRef Id="LanguagePTDir" />
+    <DirectoryRef Id="LanguagePTBRDir" />
+    <DirectoryRef Id="SQLiteInteropX64Dir" />
+    <DirectoryRef Id="SQLiteInteropX86Dir" />
+  </Fragment>
+</Wix>

@@ -1550,6 +1550,7 @@ namespace {0}
 
             string containerBuilderClassName = $"{projectName}ContainerBuilder";
             string containerRegistrationsClassName = $"{projectName}ContainerRegistrations";
+            string formattedProjectName = projectName[0].ToString().ToUpper() + projectName.Skip(1).ToString();
 
             List<string> namespaceDependenciesList = new List<string>(
                 new string[]
@@ -1567,11 +1568,9 @@ namespace {0}
                     nameSpaceTemplate,
                     classNameSpace,
                     string.Format(
-                    createContainerBuilderTemplate,
-                        $"{projectName}ContainerBuilder"),
+                        createContainerBuilderTemplate,
+                        $"{formattedProjectName}ContainerBuilder"),
                     string.Join("\r\n", namespaceDependenciesList.OrderBy(ns => ns).Select(dependencyNamespace => $"using {dependencyNamespace};")));
-
-
 
             _generatedClassesList.Add(new GeneratedClass(
                 classNameSpace,
@@ -1597,7 +1596,7 @@ namespace {0}
                     classNameSpace,
                     string.Format(
                         createContainerRegistrationsTemplate,
-                        $"{projectName}ContainerRegistrations",
+                        $"{formattedProjectName}ContainerRegistrations",
                         string.Join("\r\n", _tableMappingClassNamesMap.Values.Select(tableMapping => $"            yield return CreateSingleton<{tableMapping}>();")),
                         string.Join("\r\n", _tableMappingClassNamesMap.Select(tableMappingPair => $"            yield return CreateSingleton<ModelTableMappingProvider<{_entityClassNamesMap[tableMappingPair.Key.ToLower()]}, {tableMappingPair.Value}>>();")),
                         string.Join("\r\n", _databaseAdapterClassNamesMap.Values.Select(databaseAdapter => $"            yield return CreateSingleton<{databaseAdapter}>();")),

@@ -1,0 +1,34 @@
+<project outputDir="C:\Meu GitHub\CrudGenerator\app\CrudGenerator.Wpf\bin\Release\net462\Confused" baseDir="C:\Meu GitHub\CrudGenerator\app\CrudGenerator.Wpf\bin\Release\net462" xmlns="http://confuser.codeplex.com">
+  <rule pattern="true" preset="maximum" inherit="false">
+    <protection id="anti debug" />
+    <protection id="anti dump" />
+    <protection id="anti ildasm" />
+    <protection id="anti tamper" />
+    <protection id="constants" />
+    <protection id="ctrl flow" />
+    <protection id="harden" />
+    <protection id="invalid metadata" />
+    <protection id="ref proxy" />
+    <protection id="resources" />
+    <protection id="typescramble" action="remove" />
+    <protection id="rename" action="remove" />
+    <protection id="watermark" />
+  </rule>
+  <packer id="compressor" />
+  <module path="ClassGenerator.Core.dll" />
+  <module path="ClassGenerator.exe" />
+  <module path="Database.dll" />
+  <module path="Database.MySql.dll" />
+  <module path="Database.PostgreSql.dll" />
+  <module path="Database.Sqlite.dll" />
+  <module path="Database.SqlServer.dll" />
+  <module path="DependencyInversion.dll" />
+  <module path="Domain.Model.dll" />
+  <module path="Framework.dll" />
+  <module path="View.Abstractions.dll" />
+  <module path="View.Abstractions.Wpf.dll" />
+  <module path="View.Components.dll" />
+  <module path="View.Components.Wpf.dll" />
+  <module path="Xceed.Wpf.AvalonDock.dll" />
+  <module path="Xceed.Wpf.Toolkit.dll" />
+</project>

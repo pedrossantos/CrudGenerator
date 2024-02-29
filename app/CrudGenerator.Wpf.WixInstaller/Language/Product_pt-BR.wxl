@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WixLocalization Culture="pt-br" Codepage="1252" xmlns="http://schemas.microsoft.com/wix/2006/localization">
+  <String Id="Language">1034</String>
+  <String Id="ApplicationName">Crud Generator</String>
+  <String Id="ManufacturerName">Pedro Henrique da Silva Santos</String>
+  <String Id="ManufacturerFullName">Pedro Henrique da Silva Santos</String>
+  <String Id="ProductDescription">Crud Generator</String>
+  <String Id="Comments">Instala Crud Generator</String>
+  <String Id="DowngradeError">Uma versão mais recente do Crud Generator já está instalada.</String>
+  <String Id="RequiresDotNetFramework472">Crud Generator necessita do .NET Framework 4.7.2. Instale o .NET Framework e execute este instalador novamente.</String>
+</WixLocalization>
