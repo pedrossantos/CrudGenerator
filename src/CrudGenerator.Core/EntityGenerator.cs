@@ -1550,7 +1550,7 @@ namespace {0}
 
             string containerBuilderClassName = $"{projectName}ContainerBuilder";
             string containerRegistrationsClassName = $"{projectName}ContainerRegistrations";
-            string formattedProjectName = projectName[0].ToString().ToUpper() + projectName.Skip(1).ToString();
+            string formattedProjectName = projectName[0].ToString().ToUpper() + string.Join("", projectName.Skip(1));
 
             List<string> namespaceDependenciesList = new List<string>(
                 new string[]
