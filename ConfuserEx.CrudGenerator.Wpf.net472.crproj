@@ -1,4 +1,4 @@
-<project outputDir="C:\Meu GitHub\CrudGenerator\app\CrudGenerator.Wpf\bin\Release\net462\Confused" baseDir="C:\Meu GitHub\CrudGenerator\app\CrudGenerator.Wpf\bin\Release\net462" xmlns="http://confuser.codeplex.com">
+<project outputDir="C:\MeuGitHub\CrudGenerator\app\CrudGenerator.Wpf\bin\Release\net472\Confused" baseDir="C:\MeuGitHub\CrudGenerator\app\CrudGenerator.Wpf\bin\Release\net472" xmlns="http://confuser.codeplex.com">
   <rule pattern="true" preset="maximum" inherit="false">
     <protection id="anti debug" />
     <protection id="anti dump" />
@@ -14,16 +14,13 @@
     <protection id="rename" action="remove" />
     <protection id="watermark" />
   </rule>
-  <packer id="compressor" />
-  <module path="ClassGenerator.Core.dll" />
-  <module path="ClassGenerator.exe" />
+  <module path="CrudGenerator.Core.dll" />
+  <module path="CrudGenerator.Wpf.exe" />
   <module path="Database.dll" />
   <module path="Database.MySql.dll" />
-  <module path="Database.PostgreSql.dll" />
   <module path="Database.Sqlite.dll" />
   <module path="Database.SqlServer.dll" />
   <module path="DependencyInversion.dll" />
-  <module path="Domain.Model.dll" />
   <module path="Framework.dll" />
   <module path="View.Abstractions.dll" />
   <module path="View.Abstractions.Wpf.dll" />

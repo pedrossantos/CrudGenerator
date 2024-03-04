@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Fragment>
+
+    <UI Id="WixUICustom">
+      <TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
+      <TextStyle Id="WixUI_Font_Bigger" FaceName="Tahoma" Size="12" />
+      <TextStyle Id="WixUI_Font_Title" FaceName="Tahoma" Size="9" Bold="yes" />
+
+      <Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
+      <Property Id="WixUI_Mode" Value="InstallDir" />
+
+      <DialogRef Id="BrowseDlg" />
+      <DialogRef Id="ErrorDlg" />
+      <DialogRef Id="FatalError" />
+      <DialogRef Id="FilesInUse" />
+      <DialogRef Id="MsiRMFilesInUse" />
+      <DialogRef Id="PrepareDlg" />
+      
+
+      <!--   Make sure to include custom dialogs in the installer database via a DialogRef command, 
+               especially if they are not included explicitly in the publish chain below -->
+      <DialogRef Id="ResumeDlgCustom" />
+      <DialogRef Id="UserExitCustom" />
+      <DialogRef Id="ProgressDlgCustom" />
+      <DialogRef Id="LicenseAgreementDlgCustom"/>
+      <DialogRef Id="WelcomeDlgCustom"/>
+      <DialogRef Id="MaintenanceWelcomeDlgCustom"/>
+      <DialogRef Id="InstallDirDlgCustom"/>
+      <DialogRef Id="VerifyReadyDlgCustom"/>
+      <DialogRef Id="MaintenanceTypeDlgCustom"/>
+      <DialogRef Id="ExitDialogCustom"/>
+
+      <Publish Dialog="BrowseDlg" Control="OK" Event="DoAction" Value="WixUIValidatePath" Order="3">1</Publish>
+      <Publish Dialog="BrowseDlg" Control="OK" Event="SpawnDialog" Value="InvalidDirDlg" Order="4"><![CDATA[NOT WIXUI_DONTVALIDATEPATH AND WIXUI_INSTALLDIR_VALID<>"1"]]></Publish>
+
+      <Publish Dialog="ExitDialogCustom" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
+
+      <Publish Dialog="WelcomeDlgCustom" Control="Next" Event="NewDialog" Value="LicenseAgreementDlgCustom">NOT Installed</Publish>
+      <Publish Dialog="WelcomeDlgCustom" Control="Next" Event="NewDialog" Value="VerifyReadyDlgCustom">Installed</Publish>
+
+      <Publish Dialog="LicenseAgreementDlgCustom" Control="Back" Event="NewDialog" Value="WelcomeDlgCustom">1</Publish>
+      <Publish Dialog="LicenseAgreementDlgCustom" Control="Next" Event="NewDialog" Value="InstallDirDlgCustom">LicenseAccepted = "1"</Publish>
+
+      <Publish Dialog="InstallDirDlgCustom" Control="Back" Event="NewDialog" Value="LicenseAgreementDlgCustom">1</Publish>
+      <Publish Dialog="InstallDirDlgCustom" Control="Next" Event="SetTargetPath" Value="[WIXUI_INSTALLDIR]" Order="1">1</Publish>
+      <Publish Dialog="InstallDirDlgCustom" Control="Next" Event="DoAction" Value="WixUIValidatePath" Order="2">NOT WIXUI_DONTVALIDATEPATH</Publish>
+      <Publish Dialog="InstallDirDlgCustom" Control="Next" Event="SpawnDialog" Value="InvalidDirDlg" Order="3"><![CDATA[NOT WIXUI_DONTVALIDATEPATH AND WIXUI_INSTALLDIR_VALID<>"1"]]></Publish>
+      <Publish Dialog="InstallDirDlgCustom" Control="Next" Event="NewDialog" Value="VerifyReadyDlgCustom" Order="4">WIXUI_DONTVALIDATEPATH OR WIXUI_INSTALLDIR_VALID="1"</Publish>
+      <Publish Dialog="InstallDirDlgCustom" Control="ChangeFolder" Property="_BrowseProperty" Value="[WIXUI_INSTALLDIR]" Order="1">1</Publish>
+      <Publish Dialog="InstallDirDlgCustom" Control="ChangeFolder" Event="SpawnDialog" Value="BrowseDlg" Order="2">1</Publish>
+
+      <Publish Dialog="VerifyReadyDlgCustom" Control="Back" Event="NewDialog" Value="InstallDirDlgCustom" Order="1">NOT Installed</Publish>
+      <Publish Dialog="VerifyReadyDlgCustom" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlgCustom" Order="2">Installed AND NOT PATCH</Publish>
+      <Publish Dialog="VerifyReadyDlgCustom" Control="Back" Event="NewDialog" Value="WelcomeDlgCustom" Order="2">Installed AND PATCH</Publish>
+
+      <Publish Dialog="MaintenanceWelcomeDlgCustom" Control="Next" Event="NewDialog" Value="MaintenanceTypeDlgCustom">1</Publish>
+
+      <Publish Dialog="MaintenanceTypeDlgCustom" Control="RepairButton" Event="NewDialog" Value="VerifyReadyDlgCustom">1</Publish>
+      <Publish Dialog="MaintenanceTypeDlgCustom" Control="RemoveButton" Event="NewDialog" Value="VerifyReadyDlgCustom">1</Publish>
+      <Publish Dialog="MaintenanceTypeDlgCustom" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlgCustom">1</Publish>
+
+      <Property Id="ARPNOMODIFY" Value="1" />
+    </UI>
+
+    <UIRef Id="WixUI_Common" />
+  </Fragment>
+</Wix>

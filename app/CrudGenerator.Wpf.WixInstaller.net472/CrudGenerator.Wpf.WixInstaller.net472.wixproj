@@ -4,10 +4,11 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>3.10</ProductVersion>
-    <ProjectGuid>657034ac-df65-4800-9348-212a6140ddd4</ProjectGuid>
+    <ProjectGuid>{db126b78-6346-4df4-9a56-6ab4a1c5ccf5}</ProjectGuid>
     <SchemaVersion>2.0</SchemaVersion>
-    <OutputName>GICCloud</OutputName>
+    <OutputName>CrudGenerator</OutputName>
     <OutputType>Package</OutputType>
+    <Name>CrudGenerator.Wpf.WixInstaller.net462</Name>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <OutputPath>bin\$(Configuration)\</OutputPath>
@@ -63,27 +64,16 @@
       <Name>WixNetFxExtension</Name>
     </WixExtension>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Verion.Desktop.GIC\Verion.Desktop.GIC.csproj">
-      <Name>Verion.Desktop.GIC</Name>
-      <Project>{a156fd30-d992-46f3-a400-18dd4a27ea90}</Project>
-      <Private>True</Private>
-      <DoNotHarvest>True</DoNotHarvest>
-      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
-      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(WixTargetsPath)" Condition=" '$(WixTargetsPath)' != '' " />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets" Condition=" '$(WixTargetsPath)' == '' AND Exists('$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets') " />
   <Target Name="EnsureWixToolsetInstalled" Condition=" '$(WixTargetsImported)' != 'true' ">
     <Error Text="The WiX Toolset v3.11 (or newer) build tools must be installed to build this project. To download the WiX Toolset, see http://wixtoolset.org/releases/" />
   </Target>
-  <Target Condition=" '$(ConfigurationName)' == 'Release' " Name="Obfuscator" AfterTargets="ConfuserExScript">
-    <Exec Command="$(SolutionDir)..\ConfuserEx-CLI\Confuser.CLI.exe $(SolutionDir)ConfuserEx.CrudGenerator.Wpf.net462.crproj" />
-	<Exec Command="$(SolutionDir)..\ConfuserEx-CLI\Confuser.CLI.exe $(SolutionDir)ConfuserEx.CrudGenerator.Wpf.net472.crproj" />
-  </Target>
   <PropertyGroup>
     <PostBuildEvent>xcopy /y "$(ProjectDir)index.html" "$(ProjectDir)bin/$(ConfigurationName)"</PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>$(SolutionDir)..\ConfuserEx-CLI\Confuser.CLI.exe $(SolutionDir)ConfuserEx.CrudGenerator.Wpf.net472.crproj</PreBuildEvent>
   </PropertyGroup>
   <!--
 	To modify your build process, add your task inside one of the targets below and uncomment it.

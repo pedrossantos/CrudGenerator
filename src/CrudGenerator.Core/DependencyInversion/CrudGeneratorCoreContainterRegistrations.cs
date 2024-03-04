@@ -2,6 +2,7 @@
 using DependencyInversion;
 using Framework;
 using System.Collections.Generic;
+using View.Abstractions.IO;
 
 namespace CrudGenerator.Core.DependencyInversion
 {
@@ -26,7 +27,9 @@ namespace CrudGenerator.Core.DependencyInversion
             // TODO: Caso necessário utilizar banco de dados fixo, alterar códigos abaixo
             yield return CreateSingleton(container =>
             {
-                Database.Sqlite.DataAccess.EnvironmentBasedSqliteFilePath filePath = new Database.Sqlite.DataAccess.EnvironmentBasedSqliteFilePath("teste.db3", "C:\\Meu GitHub\\Database\\examples");
+                IApplicationMetadata applicationMetadata = container.Resolve<IApplicationMetadata>();
+                IApplicationPaths applicationPaths = container.Resolve<IApplicationPaths>();
+                Database.Sqlite.DataAccess.EnvironmentBasedSqliteFilePath filePath = new Database.Sqlite.DataAccess.EnvironmentBasedSqliteFilePath("teste.db3", applicationPaths.ApplicationData);
                 return new System.Data.SQLite.SQLiteConnectionStringBuilder($"Data Source={filePath.FullPath};Version=3;DateTimeFormat=Ticks;foreign keys=false;");
             });
 

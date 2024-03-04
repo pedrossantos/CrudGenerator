@@ -108,16 +108,8 @@
 
           <Component Id="ProductComponents" Guid="F10443EE-5385-4240-890F-847E0992C592" KeyPath="yes">
             <File Id="BouncyCastle.Cryptography" Source="..\CrudGenerator.Wpf\bin\Release\net472\BouncyCastle.Cryptography.dll"/>
-            <File Id="CrudGenerator.Core" Source="..\CrudGenerator.Wpf\bin\Release\net472\CrudGenerator.Core.dll"/>
-            <File Id="Database" Source="..\CrudGenerator.Wpf\bin\Release\net472\Database.dll"/>
-            <File Id="Database.MySql" Source="..\CrudGenerator.Wpf\bin\Release\net472\Database.MySql.dll"/>
-            <File Id="Database.Sqlite" Source="..\CrudGenerator.Wpf\bin\Release\net472\Database.Sqlite.dll"/>
-            <File Id="Database.SqlServer" Source="..\CrudGenerator.Wpf\bin\Release\net472\Database.SqlServer.dll"/>
-            <File Id="DependencyInversion" Source="..\CrudGenerator.Wpf\bin\Release\net472\DependencyInversion.dll"/>
-            <File Id="Domain.Model" Source="..\CrudGenerator.Wpf\bin\Release\net472\Domain.Model.dll"/>
             <File Id="EntityFramework" Source="..\CrudGenerator.Wpf\bin\Release\net472\EntityFramework.dll"/>
             <File Id="EntityFramework.SqlServer" Source="..\CrudGenerator.Wpf\bin\Release\net472\EntityFramework.SqlServer.dll"/>
-            <File Id="Framework" Source="..\CrudGenerator.Wpf\bin\Release\net472\Framework.dll"/>
             <File Id="Google.Protobuf" Source="..\CrudGenerator.Wpf\bin\Release\net472\Google.Protobuf.dll"/>
             <File Id="K4os.Compression.LZ4" Source="..\CrudGenerator.Wpf\bin\Release\net472\K4os.Compression.LZ4.dll"/>
             <File Id="K4os.Compression.LZ4.Streams" Source="..\CrudGenerator.Wpf\bin\Release\net472\K4os.Compression.LZ4.Streams.dll"/>
@@ -125,6 +117,7 @@
             <File Id="Microsoft.Bcl.AsyncInterfaces" Source="..\CrudGenerator.Wpf\bin\Release\net472\Microsoft.Bcl.AsyncInterfaces.dll"/>
             <File Id="Microsoft.Bcl.HashCode" Source="..\CrudGenerator.Wpf\bin\Release\net472\Microsoft.Bcl.HashCode.dll"/>
             <File Id="MySql.Data" Source="..\CrudGenerator.Wpf\bin\Release\net472\MySql.Data.dll"/>
+            <File Id="System.Buffers" Source="..\CrudGenerator.Wpf\bin\Release\net472\System.Buffers.dll"/>
             <File Id="System.Collections.Immutable" Source="..\CrudGenerator.Wpf\bin\Release\net472\System.Collections.Immutable.dll"/>
             <File Id="System.ComponentModel.Annotations" Source="..\CrudGenerator.Wpf\bin\Release\net472\System.ComponentModel.Annotations.dll"/>
             <File Id="System.Configuration.ConfigurationManager" Source="..\CrudGenerator.Wpf\bin\Release\net472\System.Configuration.ConfigurationManager.dll"/>
@@ -139,16 +132,24 @@
             <File Id="System.Numerics.Vectors" Source="..\CrudGenerator.Wpf\bin\Release\net472\System.Numerics.Vectors.dll"/>
             <File Id="System.Runtime.CompilerServices.Unsafe" Source="..\CrudGenerator.Wpf\bin\Release\net472\System.Runtime.CompilerServices.Unsafe.dll"/>
             <File Id="System.Threading.Tasks.Extensions" Source="..\CrudGenerator.Wpf\bin\Release\net472\System.Threading.Tasks.Extensions.dll"/>
-            <File Id="View.Abstractions" Source="..\CrudGenerator.Wpf\bin\Release\net472\View.Abstractions.dll"/>
-            <File Id="View.Abstractions.Wpf" Source="..\CrudGenerator.Wpf\bin\Release\net472\View.Abstractions.Wpf.dll"/>
-            <File Id="View.Components" Source="..\CrudGenerator.Wpf\bin\Release\net472\View.Components.dll"/>
-            <File Id="View.Components.Wpf" Source="..\CrudGenerator.Wpf\bin\Release\net472\View.Components.Wpf.dll"/>
-            <File Id="Xceed.Wpf.AvalonDock" Source="..\CrudGenerator.Wpf\bin\Release\net472\Xceed.Wpf.AvalonDock.dll"/>
-            <File Id="Xceed.Wpf.Toolkit" Source="..\CrudGenerator.Wpf\bin\Release\net472\Xceed.Wpf.Toolkit.dll"/>
             <File Id="ZstdSharp" Source="..\CrudGenerator.Wpf\bin\Release\net472\ZstdSharp.dll"/>
-            
-            <File Id="CrudGenerator" Source="..\CrudGenerator.Wpf\bin\Release\net472\CrudGenerator.exe"/>
-            <File Id="CrudGenerator.config" Source="..\CrudGenerator.Wpf\bin\Release\net472\CrudGenerator.exe.config"/>
+
+            <File Id="CrudGenerator.Wpf.config" Source="..\CrudGenerator.Wpf\bin\Release\net472\CrudGenerator.Wpf.exe.config"/>
+
+            <File Id="CrudGenerator.Wpf" Source="..\CrudGenerator.Wpf\bin\Release\net472\Confused\CrudGenerator.Wpf.exe"/>
+            <File Id="CrudGenerator.Core" Source="..\CrudGenerator.Wpf\bin\Release\net472\Confused\CrudGenerator.Core.dll"/>
+            <File Id="Database" Source="..\CrudGenerator.Wpf\bin\Release\net472\Confused\Database.dll"/>
+            <File Id="Database.MySql" Source="..\CrudGenerator.Wpf\bin\Release\net472\Confused\Database.MySql.dll"/>
+            <File Id="Database.Sqlite" Source="..\CrudGenerator.Wpf\bin\Release\net472\Confused\Database.Sqlite.dll"/>
+            <File Id="Database.SqlServer" Source="..\CrudGenerator.Wpf\bin\Release\net472\Confused\Database.SqlServer.dll"/>
+            <File Id="DependencyInversion" Source="..\CrudGenerator.Wpf\bin\Release\net472\Confused\DependencyInversion.dll"/>
+            <File Id="Framework" Source="..\CrudGenerator.Wpf\bin\Release\net472\Confused\Framework.dll"/>
+            <File Id="View.Abstractions" Source="..\CrudGenerator.Wpf\bin\Release\net472\Confused\View.Abstractions.dll"/>
+            <File Id="View.Abstractions.Wpf" Source="..\CrudGenerator.Wpf\bin\Release\net472\Confused\View.Abstractions.Wpf.dll"/>
+            <File Id="View.Components" Source="..\CrudGenerator.Wpf\bin\Release\net472\Confused\View.Components.dll"/>
+            <File Id="View.Components.Wpf" Source="..\CrudGenerator.Wpf\bin\Release\net472\Confused\View.Components.Wpf.dll"/>
+            <File Id="Xceed.Wpf.AvalonDock" Source="..\CrudGenerator.Wpf\bin\Release\net472\Confused\Xceed.Wpf.AvalonDock.dll"/>
+            <File Id="Xceed.Wpf.Toolkit" Source="..\CrudGenerator.Wpf\bin\Release\net472\Confused\Xceed.Wpf.Toolkit.dll"/>
           </Component>
         </Directory>
       </Directory>
@@ -156,10 +157,10 @@
       <Directory Id="ProgramMenuFolder">
         <Directory Id="ProgramMenuSubfolder" Name="!(loc.ApplicationName)">
           <Component Id="ApplicationShortcuts" Guid="00BEFA04-8814-4489-8846-AD9B9C0122E2">
-            <Shortcut Id="CrudGenerator_Shortcut" Name="!(loc.ApplicationName)" Description="!(loc.ProductDescription)" Target="[INSTALLFOLDER]CrudGenerator.exe" WorkingDirectory="INSTALLFOLDER" Icon="WpfIcon">
+            <Shortcut Id="CrudGeneratorWpf_Shortcut" Name="!(loc.ApplicationName)" Description="!(loc.ProductDescription)" Target="[INSTALLFOLDER]CrudGenerator.Wpf.exe" WorkingDirectory="INSTALLFOLDER" Icon="WpfIcon">
               <Icon Id="WpfIcon" SourceFile="Wpf.ico" />
             </Shortcut>
-            <RegistryValue Root="HKCU" Key="Software\AEMRural\CrudGeneratorProgramMenu" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+            <RegistryValue Root="HKCU" Key="Software\AEMRural\CrudGeneratorWpfProgramMenu" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
             <RemoveFolder Id="ProgramMenuSubfolder" On="uninstall"/>
           </Component>
         </Directory>
@@ -167,10 +168,10 @@
 
       <Directory Id="DesktopFolder" Name="Desktop">
         <Component Id="ApplicationShortcutDesktop" Guid="3285CAFE-A4EE-4F67-878C-3DC199899378">
-          <Shortcut Id="CrudGenerator_ShortcutDesktop" Name="!(loc.ApplicationName)" Description="!(loc.ProductDescription)" Target="[INSTALLFOLDER]CrudGenerator.exe" WorkingDirectory="INSTALLFOLDER" Icon="WpfIcon1">
+          <Shortcut Id="CrudGeneratorWpf_ShortcutDesktop" Name="!(loc.ApplicationName)" Description="!(loc.ProductDescription)" Target="[INSTALLFOLDER]CrudGenerator.Wpf.exe" WorkingDirectory="INSTALLFOLDER" Icon="WpfIcon1">
             <Icon Id="WpfIcon1" SourceFile="Wpf.ico" />
           </Shortcut>
-          <RegistryValue Root="HKCU" Key="Software\SSPH\CrudGeneratorDesktop" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+          <RegistryValue Root="HKCU" Key="Software\SSPH\CrudGeneratorWpfDesktop" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
           <RemoveFolder Id="DesktopFolder" On="uninstall"/>
         </Component>
       </Directory>
