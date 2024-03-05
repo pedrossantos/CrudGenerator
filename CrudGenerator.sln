@@ -45,8 +45,6 @@ Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "CrudGenerator.App.Wpf.WixIn
 		{7627FCCB-4565-4018-AF36-B02F56291F11} = {7627FCCB-4565-4018-AF36-B02F56291F11}
 	EndProjectSection
 EndProject
-Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "CrudGenerator.App.Wpf.WixInstaller.net6.0-windows", "app\CrudGenerator.App.Wpf.WixInstaller.net6.0-windows\CrudGenerator.App.Wpf.WixInstaller.net6.0-windows.wixproj", "{DB126B78-6346-4DF4-9A56-6AB4A1C5CCF5}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -260,17 +258,6 @@ Global
 		{657034AC-DF65-4800-9348-212A6140DDD4}.Release|x64.Build.0 = Release|x86
 		{657034AC-DF65-4800-9348-212A6140DDD4}.Release|x86.ActiveCfg = Release|x86
 		{657034AC-DF65-4800-9348-212A6140DDD4}.Release|x86.Build.0 = Release|x86
-		{DB126B78-6346-4DF4-9A56-6AB4A1C5CCF5}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{DB126B78-6346-4DF4-9A56-6AB4A1C5CCF5}.Debug|x64.ActiveCfg = Debug|x86
-		{DB126B78-6346-4DF4-9A56-6AB4A1C5CCF5}.Debug|x64.Build.0 = Debug|x86
-		{DB126B78-6346-4DF4-9A56-6AB4A1C5CCF5}.Debug|x86.ActiveCfg = Debug|x86
-		{DB126B78-6346-4DF4-9A56-6AB4A1C5CCF5}.Debug|x86.Build.0 = Debug|x86
-		{DB126B78-6346-4DF4-9A56-6AB4A1C5CCF5}.Release|Any CPU.ActiveCfg = Release|x86
-		{DB126B78-6346-4DF4-9A56-6AB4A1C5CCF5}.Release|Any CPU.Build.0 = Release|x86
-		{DB126B78-6346-4DF4-9A56-6AB4A1C5CCF5}.Release|x64.ActiveCfg = Release|x86
-		{DB126B78-6346-4DF4-9A56-6AB4A1C5CCF5}.Release|x64.Build.0 = Release|x86
-		{DB126B78-6346-4DF4-9A56-6AB4A1C5CCF5}.Release|x86.ActiveCfg = Release|x86
-		{DB126B78-6346-4DF4-9A56-6AB4A1C5CCF5}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -293,7 +280,6 @@ Global
 		{69D25CF4-1B6E-422D-9746-48619CE29263} = {528631D4-8A7C-4E59-8A60-291BCB98FC9F}
 		{7627FCCB-4565-4018-AF36-B02F56291F11} = {A215DB22-0E27-4375-9C69-D778C515EB50}
 		{657034AC-DF65-4800-9348-212A6140DDD4} = {A215DB22-0E27-4375-9C69-D778C515EB50}
-		{DB126B78-6346-4DF4-9A56-6AB4A1C5CCF5} = {A215DB22-0E27-4375-9C69-D778C515EB50}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {64FAF583-7900-44F0-8450-B0B15CE21677}
