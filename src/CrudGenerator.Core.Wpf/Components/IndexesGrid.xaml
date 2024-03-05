@@ -1,0 +1,51 @@
+﻿<UserControl
+    x:Class="CrudGenerator.Core.Wpf.Components.IndexesGrid"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:classGeneratorConverters="clr-namespace:CrudGenerator.Core.Wpf.Converters"
+    x:Name="indexesGrid">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <classGeneratorConverters:StringListToJoinedStringConverter x:Key="stringListToJoinedStringConverter" />
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid
+        Grid.Row="2"
+        MinHeight="300"
+        Margin="0,10,0,0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock
+            Grid.Row="0"
+            Margin="0"
+            Text="Indexes" />
+        <DataGrid
+            Grid.Row="1"
+            MaxHeight="300"
+            AutoGenerateColumns="False"
+            IsReadOnly="True"
+            ItemsSource="{Binding Path=Indexes, Mode=OneWay, ElementName=indexesGrid, UpdateSourceTrigger=PropertyChanged}">
+            <DataGrid.Columns>
+                <DataGridTextColumn
+                    Binding="{Binding Path=Name, Mode=OneWay}"
+                    Header="Index Name"
+                    IsReadOnly="True" />
+
+                <DataGridCheckBoxColumn
+                    Binding="{Binding Path=Unique, Mode=OneWay}"
+                    Header="Is Unique"
+                    IsReadOnly="True" />
+
+                <DataGridTextColumn
+                    Binding="{Binding Path=ColumnNames, Mode=OneWay, Converter={StaticResource stringListToJoinedStringConverter}, ConverterParameter='; '}"
+                    Header="Indexed Columns"
+                    IsReadOnly="True" />
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>

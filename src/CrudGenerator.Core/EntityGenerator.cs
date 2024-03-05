@@ -1,5 +1,4 @@
-﻿using CrudGenerator.Core;
-using Database.DataAccess;
+﻿using Database.DataAccess;
 using Database.DataMapping;
 using Framework.Validation;
 using System;
@@ -11,7 +10,7 @@ using System.Data;
 using System.Globalization;
 using System.Linq;
 
-namespace CrudGenerator
+namespace CrudGenerator.Core
 {
     public class EntityGenerator : INotifyPropertyChanged, IDisposable
     {
@@ -603,7 +602,7 @@ namespace {0}
                     ColumnInfo primaryKeyColumn = primaryKeyColumns[0];
                     primaryKeyColumns.RemoveAt(0);
 
-                    string columnType = DbTypeConverter.ResolveSystemTypeName(primaryKeyColumn);
+                    string columnType = primaryKeyColumn.ResolveSystemTypeName();
                     ForeignKeyValueColletion foreignKeyValueColletion = schemaInformationTableMapping.Value.ForeignKeyValues.FirstOrDefault(fkv => fkv.ForeignKeyValueList.Where(fkm => fkm.ForeignColunmnsToReferencedColumns.Any(fctrc => fctrc.ForeignColumn == primaryKeyColumn.Name.ToLower())).Any());
 
                     if (foreignKeyValueColletion != null)
@@ -614,7 +613,7 @@ namespace {0}
                         if (foreignKeyValue != null)
                         {
                             string referencedTableName = foreignKeyValue.ForeignColunmnsToReferencedColumns.Select(fctrc => fctrc.ReferencedTableName).FirstOrDefault()?.ToLower();
-                            if ((referencedTableName != null) && _schemaInformation.SchemaTableMappings.ContainsKey(referencedTableName.ToLower()))
+                            if (referencedTableName != null && _schemaInformation.SchemaTableMappings.ContainsKey(referencedTableName.ToLower()))
                             {
                                 SchemaInformationTableMapping referencedSchemaInformationTableMapping = _schemaInformation.SchemaTableMappings[referencedTableName.ToLower()];
 
@@ -804,7 +803,7 @@ namespace {0}
                 {
                     ColumnInfo entityColumn = entityColumns[0];
 
-                    string columnType = DbTypeConverter.ResolveSystemTypeName(entityColumn);
+                    string columnType = entityColumn.ResolveSystemTypeName();
                     ForeignKeyValueColletion foreignKeyValueColletion = schemaInformationTableMapping.Value.ForeignKeyValues.FirstOrDefault(fkv => fkv.ForeignKeyValueList.Where(fkv => fkv.ForeignColunmnsToReferencedColumns.Any(fctrc => fctrc.ForeignColumn == entityColumn.Name.ToLower())).Any());
 
                     if (foreignKeyValueColletion != null)
@@ -815,7 +814,7 @@ namespace {0}
                         if (foreignKeyValue != null)
                         {
                             string referencedTableName = foreignKeyValue.ForeignColunmnsToReferencedColumns.Select(fctrc => fctrc.ReferencedTableName).FirstOrDefault()?.ToLower();
-                            if ((referencedTableName != null) && _schemaInformation.SchemaTableMappings.ContainsKey(referencedTableName.ToLower()))
+                            if (referencedTableName != null && _schemaInformation.SchemaTableMappings.ContainsKey(referencedTableName.ToLower()))
                             {
                                 SchemaInformationTableMapping referencedSchemaInformationTableMapping = _schemaInformation.SchemaTableMappings[referencedTableName.ToLower()];
 
@@ -1094,7 +1093,7 @@ namespace {0}
                                 ColumnInfo? referencedColumnInfo = _schemaInformation.SchemaTableMappings[foreignColunmnToReferencedColumn.ReferencedTableName].Columns
                                     .FirstOrDefault(col => col.Name.ToLower() == foreignColunmnToReferencedColumn.ReferencedColumn.ToLower());
 
-                                if ((referencedColumnInfo != null) && referencedColumnInfo.Value.IsPrimaryKey)
+                                if (referencedColumnInfo != null && referencedColumnInfo.Value.IsPrimaryKey)
                                     isForeignKey = isForeignKey || true;
                             }
 
@@ -1204,7 +1203,7 @@ namespace {0}
                     ColumnInfo primaryKeyColumn = primaryKeyColumns[0];
                     primaryKeyColumns.RemoveAt(0);
 
-                    string columnType = DbTypeConverter.ResolveSystemTypeName(primaryKeyColumn);
+                    string columnType = primaryKeyColumn.ResolveSystemTypeName();
                     ForeignKeyValueColletion foreignKeyValueColletion = schemaInformationTableMapping.ForeignKeyValues.FirstOrDefault(fkv => fkv.ForeignKeyValueList.Where(fkv => fkv.ForeignColunmnsToReferencedColumns.Any(fctrc => fctrc.ForeignColumn == primaryKeyColumn.Name.ToLower())).Any());
 
                     if (foreignKeyValueColletion != null)
@@ -1215,7 +1214,7 @@ namespace {0}
                         if (foreignKeyValue != null)
                         {
                             string referencedTableName = foreignKeyValue.ForeignColunmnsToReferencedColumns.Select(fctrc => fctrc.ReferencedTableName).FirstOrDefault()?.ToLower();
-                            if ((referencedTableName != null) && _schemaInformation.SchemaTableMappings.ContainsKey(referencedTableName.ToLower()))
+                            if (referencedTableName != null && _schemaInformation.SchemaTableMappings.ContainsKey(referencedTableName.ToLower()))
                             {
                                 SchemaInformationTableMapping referencedSchemaInformationTableMapping = _schemaInformation.SchemaTableMappings[referencedTableName.ToLower()];
 
@@ -1281,7 +1280,7 @@ namespace {0}
                     otherColumns.RemoveAt(0);
 
                     // TODO: Corrigir para chaves estrangeiras que não compõem chave primária
-                    string columnType = DbTypeConverter.ResolveSystemTypeName(otherColumn);
+                    string columnType = otherColumn.ResolveSystemTypeName();
                     ForeignKeyValueColletion foreignKeyValueColletion = schemaInformationTableMapping.ForeignKeyValues.FirstOrDefault(fkv => fkv.ForeignKeyValueList.Where(fkv => fkv.ForeignColunmnsToReferencedColumns.Any(fctrc => fctrc.ForeignColumn == otherColumn.Name.ToLower())).Any());
 
                     if (foreignKeyValueColletion != null)
@@ -1292,7 +1291,7 @@ namespace {0}
                         if (foreignKeyValue != null)
                         {
                             string referencedTableName = foreignKeyValue.ForeignColunmnsToReferencedColumns.Select(fctrc => fctrc.ReferencedTableName).FirstOrDefault()?.ToLower();
-                            if ((referencedTableName != null) && _schemaInformation.SchemaTableMappings.ContainsKey(referencedTableName.ToLower()))
+                            if (referencedTableName != null && _schemaInformation.SchemaTableMappings.ContainsKey(referencedTableName.ToLower()))
                             {
                                 SchemaInformationTableMapping referencedSchemaInformationTableMapping = _schemaInformation.SchemaTableMappings[referencedTableName.ToLower()];
 
@@ -1423,7 +1422,7 @@ namespace {0}
                         ColumnInfo primaryKeyColumn = primaryKeyColumns[0];
                         primaryKeyColumns.RemoveAt(0);
 
-                        string columnType = DbTypeConverter.ResolveSystemTypeName(primaryKeyColumn);
+                        string columnType = primaryKeyColumn.ResolveSystemTypeName();
                         ForeignKeyValueColletion foreignKeyValueColletion = schemaInformationTableMapping.ForeignKeyValues.FirstOrDefault(fkv => fkv.ForeignKeyValueList.Where(fkv => fkv.ForeignColunmnsToReferencedColumns.Any(fctrc => fctrc.ForeignColumn == primaryKeyColumn.Name.ToLower())).Any());
 
                         if (foreignKeyValueColletion == null)
@@ -1442,7 +1441,7 @@ namespace {0}
                             if (foreignKeyValue != null)
                             {
                                 string referencedTableName = foreignKeyValue.ForeignColunmnsToReferencedColumns.Select(fctrc => fctrc.ReferencedTableName).FirstOrDefault()?.ToLower();
-                                if ((referencedTableName != null) && _schemaInformation.SchemaTableMappings.ContainsKey(referencedTableName.ToLower()))
+                                if (referencedTableName != null && _schemaInformation.SchemaTableMappings.ContainsKey(referencedTableName.ToLower()))
                                 {
                                     SchemaInformationTableMapping referencedSchemaInformationTableMapping = _schemaInformation.SchemaTableMappings[referencedTableName.ToLower()];
 
