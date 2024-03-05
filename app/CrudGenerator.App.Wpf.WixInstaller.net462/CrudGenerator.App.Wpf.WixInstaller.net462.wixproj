@@ -17,7 +17,7 @@
     <Cultures>pt-BR</Cultures>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <OutputPath>$(SolutionDir)installer\net462\</OutputPath>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
   </PropertyGroup>
   <ItemGroup>
@@ -70,10 +70,10 @@
     <Error Text="The WiX Toolset v3.11 (or newer) build tools must be installed to build this project. To download the WiX Toolset, see http://wixtoolset.org/releases/" />
   </Target>
   <PropertyGroup>
-    <PostBuildEvent>xcopy /y "$(ProjectDir)index.html" "$(ProjectDir)bin/$(ConfigurationName)"</PostBuildEvent>
+    <PreBuildEvent>$(SolutionDir)..\ConfuserEx-CLI\Confuser.CLI.exe $(SolutionDir)ConfuserEx.CrudGenerator.App.Wpf.net462.crproj</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PreBuildEvent>$(SolutionDir)..\ConfuserEx-CLI\Confuser.CLI.exe $(SolutionDir)ConfuserEx.CrudGenerator.App.Wpf.net462.crproj</PreBuildEvent>
+    <PostBuildEvent>xcopy /y "$(ProjectDir)index.html" "$(SolutionDir)installer\net462\"</PostBuildEvent>
   </PropertyGroup>
   <!--
 	To modify your build process, add your task inside one of the targets below and uncomment it.

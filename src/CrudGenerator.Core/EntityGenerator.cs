@@ -1602,6 +1602,11 @@ namespace {0}
                         string.Join("\r\n", _databaseRepositoryClassNamesMap.Values.Select(repository => $"            yield return CreateSingleton<{repository}>();"))),
                     string.Join("\r\n", namespaceDependenciesList.OrderBy(ns => ns).Select(dependencyNamespace => $"using {dependencyNamespace};")));
 
+            if (!_generatedDependencyInversionClassesDictionary.ContainsKey(containerRegistrationsClassName))
+                _generatedDependencyInversionClassesDictionary.Add(containerRegistrationsClassName, generatedContainerBuilderClass);
+            else
+                _generatedDependencyInversionClassesDictionary[containerRegistrationsClassName] = generatedContainerBuilderClass;
+
             _generatedClassesList.Add(new GeneratedClass(
                 classNameSpace,
                 containerRegistrationsClassName,
