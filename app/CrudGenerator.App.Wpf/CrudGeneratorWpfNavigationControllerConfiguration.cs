@@ -5,9 +5,9 @@ namespace CrudGenerator.App.Wpf
 {
     internal class CrudGeneratorWpfNavigationControllerConfiguration : INavigationControllerConfiguration
     {
-        public double Height => 720;
+        public double Height => 576;
 
-        public double Width => 1280;
+        public double Width => 1024;
 
         public bool IsExclusive => false;
 

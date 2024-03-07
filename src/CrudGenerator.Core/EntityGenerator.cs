@@ -364,9 +364,22 @@ namespace CrudGenerator.Core
     }}";
 
         /// <summary>
-        /// {dependency identity class type}, {dependency entity class type}, {dependency identity parameter}, {identity type}, {identity field type}
+        /// {identity type}, {identity field type}
         /// </summary>
         private const string createDatabaseIdentityFunctionTemplate = @"
+        public async Task<{0}> CreateNewIdentity(IWorkContext context = null)
+        {{
+            {1} value = await IdentityGenerator
+                .NextId()
+                .NoSync();
+
+            return new {0}(value);
+        }}";
+
+        /// <summary>
+        /// {dependency identity class type}, {dependency entity class type}, {dependency identity parameter}, {identity type}, {identity field type}
+        /// </summary>
+        private const string createDatabaseIdentityWithScopeFunctionTemplate = @"
         public async Task<{3}> CreateNewIdentity(
             {0},
             IWorkContext context = null)
@@ -1465,6 +1478,28 @@ namespace {0}
                         }
                     }
                 }
+                else
+                {
+                    // TODO: Corrigir quando chave primária é composta por mais de dois valores
+                    //while (primaryKeyColumns.Count > 0)
+                    //{
+                    //    ColumnInfo primaryKeyColumn = primaryKeyColumns[0];
+                    //    primaryKeyColumns.RemoveAt(0);
+
+                    //    string columnType = primaryKeyColumn.ResolveSystemTypeName();
+                    //    ForeignKeyValueColletion foreignKeyValueColletion = schemaInformationTableMapping.ForeignKeyValues.FirstOrDefault(fkv => fkv.ForeignKeyValueList.Where(fkv => fkv.ForeignColunmnsToReferencedColumns.Any(fctrc => fctrc.ForeignColumn == primaryKeyColumn.Name.ToLower())).Any());
+
+                    //    if (foreignKeyValueColletion == null)
+                    //    {
+                    //        if (IsColumnNumeric(primaryKeyColumn) && string.IsNullOrEmpty(identityFieldType))
+                    //        {
+                    //            identityFieldType = columnType;
+                    //            identityGeneratorType = $"IDatabase{primaryKeyColumn.DbType}IdentityGenerator";
+                    //            break;
+                    //        }
+                    //    }
+                    //}
+                }
 
                 string generatedDatabaseRepositoryClass =
                     string.IsNullOrEmpty(identityFieldType)
@@ -1479,9 +1514,12 @@ namespace {0}
                         identityFieldType,
                         identityGeneratorType,
                         string.IsNullOrEmpty(createNewIdentityScopeEntityName)
-                            ? string.Empty
-                            : string.Format(
+                            ? string.Format(
                                 $"\r\n{createDatabaseIdentityFunctionTemplate}",
+                                _identityClassNamesMap[tableName.ToLower()],
+                                identityFieldType)
+                            : string.Format(
+                                $"\r\n{createDatabaseIdentityWithScopeFunctionTemplate}",
                                 $"{createNewIdentityParameterType} {createNewIdentityParameterName}",
                                 createNewIdentityScopeEntityName,
                                 createNewIdentityParameterName,
@@ -1497,13 +1535,11 @@ namespace {0}
                     });
 
                 if (!string.IsNullOrEmpty(identityFieldType))
-                    namespaceDependenciesList.Add("Database.IdentityGeneration");
-
-                if (!string.IsNullOrEmpty(createNewIdentityScopeEntityName))
                 {
                     namespaceDependenciesList.AddRange(
                         new string[]
                         {
+                            "Database.IdentityGeneration",
                             "Domain.Model",
                             "Framework.Extensions",
                             "Framework.IdentityGeneration",
