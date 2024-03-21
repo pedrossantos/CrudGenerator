@@ -8,12 +8,14 @@
 
   <ItemGroup>
     <PackageReference Include="MySql.Data" Version="8.3.0" />
+    <PackageReference Include="Npgsql" Version="8.0.2" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.118" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Database\src\Database.MySql\Database.MySql.csproj" />
+    <ProjectReference Include="..\..\..\Database\src\Database.PostgreSql\Database.PostgreSql.csproj" />
     <ProjectReference Include="..\..\..\Database\src\Database.Sqlite\Database.Sqlite.csproj" />
     <ProjectReference Include="..\..\..\Database\src\Database.SqlServer\Database.SqlServer.csproj" />
     <ProjectReference Include="..\..\..\Database\src\Database\Database.csproj" />

@@ -1,7 +1,7 @@
-﻿using CrudGenerator.Core;
-using CrudGenerator.Core.ViewModels;
+﻿using CrudGenerator.Core.ViewModels;
 using Database.DataMapping;
 using Database.MySql.DataAccess;
+using Database.PostgreSql.DataAccess;
 using Database.Sqlite.DataAccess;
 using Database.SqlServer.DataAccess;
 using Framework.NotifyChanges;
@@ -28,6 +28,13 @@ namespace CrudGenerator.Core.Wpf.Components
                 typeof(MySqlSchemaInformation),
                 typeof(ProjectGeneratorControl),
                 new FrameworkPropertyMetadata(null, OnMySqlSchemaInformationChanged));
+
+        public static readonly DependencyProperty PostgreSqlSchemaInformationProperty =
+            DependencyProperty.Register(
+                nameof(PostgreSqlSchemaInformation),
+                typeof(PostgreSqlSchemaInformation),
+                typeof(ProjectGeneratorControl),
+                new FrameworkPropertyMetadata(null, OnPostgreSqlSchemaInformationChanged));
 
         public static readonly DependencyProperty SqliteSchemaInformationProperty =
             DependencyProperty.Register(
@@ -126,6 +133,7 @@ namespace CrudGenerator.Core.Wpf.Components
 
         public ProjectGeneratorControl(
             MySqlSchemaInformation mySqlSchemaInformation,
+            PostgreSqlSchemaInformation postgreSqlSchemaInformation,
             SqliteSchemaInformation sqliteSchemaInformation,
             SqlServerSchemaInformation sqlServerSchemaInformation,
             IMessageDialog messageDialog,
@@ -137,6 +145,7 @@ namespace CrudGenerator.Core.Wpf.Components
 
             ProjectGeneratorViewModel = new ProjectGeneratorViewModel(
                 mySqlSchemaInformation,
+                postgreSqlSchemaInformation,
                 sqliteSchemaInformation,
                 sqlServerSchemaInformation,
                 messageDialog,
@@ -196,6 +205,12 @@ namespace CrudGenerator.Core.Wpf.Components
         {
             get { return GetValue(MySqlSchemaInformationProperty) as MySqlSchemaInformation; }
             set { SetValue(MySqlSchemaInformationProperty, value); }
+        }
+
+        public PostgreSqlSchemaInformation PostgreSqlSchemaInformation
+        {
+            get { return GetValue(PostgreSqlSchemaInformationProperty) as PostgreSqlSchemaInformation; }
+            set { SetValue(PostgreSqlSchemaInformationProperty, value); }
         }
 
         public SqliteSchemaInformation SqliteSchemaInformation
@@ -260,6 +275,7 @@ namespace CrudGenerator.Core.Wpf.Components
                     newProjectGeneratorViewModel.PropertyChanged += projectGeneratorControl.ProjectGeneratorViewModelPropertyChanged;
 
                     projectGeneratorControl.MySqlSchemaInformation = newProjectGeneratorViewModel.MySqlSchemaInformation;
+                    projectGeneratorControl.PostgreSqlSchemaInformation = newProjectGeneratorViewModel.PostgreSqlSchemaInformation;
                     projectGeneratorControl.SqliteSchemaInformation = newProjectGeneratorViewModel.SqliteSchemaInformation;
                     projectGeneratorControl.SqlServerSchemaInformation = newProjectGeneratorViewModel.SqlServerSchemaInformation;
                     projectGeneratorControl.SelectedDatabaseType = newProjectGeneratorViewModel.SelectedDatabaseType;
@@ -280,6 +296,17 @@ namespace CrudGenerator.Core.Wpf.Components
                     projectGeneratorControl.ProjectGeneratorViewModel.MySqlSchemaInformation = projectGeneratorControl.MySqlSchemaInformation;
 
                 projectGeneratorControl._propertyChangedDispatcher.Notify(nameof(MySqlSchemaInformation));
+            }
+        }
+
+        private static void OnPostgreSqlSchemaInformationChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if ((d is ProjectGeneratorControl projectGeneratorControl) && (e.OldValue != e.NewValue))
+            {
+                if (projectGeneratorControl.ProjectGeneratorViewModel != null)
+                    projectGeneratorControl.ProjectGeneratorViewModel.PostgreSqlSchemaInformation = projectGeneratorControl.PostgreSqlSchemaInformation;
+
+                projectGeneratorControl._propertyChangedDispatcher.Notify(nameof(PostgreSqlSchemaInformation));
             }
         }
 

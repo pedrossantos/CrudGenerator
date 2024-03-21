@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Database\src\Database.MySql\Database.MySql.csproj" />
+    <ProjectReference Include="..\..\..\Database\src\Database.PostgreSql\Database.PostgreSql.csproj" />
     <ProjectReference Include="..\..\..\Database\src\Database.Sqlite\Database.Sqlite.csproj" />
     <ProjectReference Include="..\..\..\Database\src\Database.SqlServer\Database.SqlServer.csproj" />
     <ProjectReference Include="..\..\..\Database\src\Database\Database.csproj" />

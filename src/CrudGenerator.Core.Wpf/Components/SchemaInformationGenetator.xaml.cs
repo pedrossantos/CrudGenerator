@@ -1,6 +1,7 @@
 ﻿using CrudGenerator.Core.ViewModels;
 using Database.DataMapping;
 using Database.MySql.DataAccess;
+using Database.PostgreSql.DataAccess;
 using Database.Sqlite.DataAccess;
 using Database.SqlServer.DataAccess;
 using Framework.NotifyChanges;
@@ -27,6 +28,13 @@ namespace CrudGenerator.Core.Wpf.Components
                 typeof(MySqlSchemaInformation),
                 typeof(SchemaInformationGenetator),
                 new FrameworkPropertyMetadata(null, OnMySqlSchemaInformationChanged));
+
+        public static readonly DependencyProperty PostgreSqlSchemaInformationProperty =
+            DependencyProperty.Register(
+                nameof(PostgreSqlSchemaInformation),
+                typeof(PostgreSqlSchemaInformation),
+                typeof(SchemaInformationGenetator),
+                new FrameworkPropertyMetadata(null, OnPostgreSqlSchemaInformationChanged));
 
         public static readonly DependencyProperty SqliteSchemaInformationProperty =
             DependencyProperty.Register(
@@ -74,6 +82,7 @@ namespace CrudGenerator.Core.Wpf.Components
 
         public SchemaInformationGenetator(
             MySqlSchemaInformation mySqlSchemaInformation,
+            PostgreSqlSchemaInformation postgreSqlSchemaInformation,
             SqliteSchemaInformation sqliteSchemaInformation,
             SqlServerSchemaInformation sqlServerSchemaInformation)
         {
@@ -81,6 +90,7 @@ namespace CrudGenerator.Core.Wpf.Components
 
             SchemaInformationGenetatorViewModel = new SchemaInformationGenetatorViewModel(
                 mySqlSchemaInformation,
+                postgreSqlSchemaInformation,
                 sqliteSchemaInformation,
                 sqlServerSchemaInformation);
 
@@ -126,6 +136,12 @@ namespace CrudGenerator.Core.Wpf.Components
             set { SetValue(MySqlSchemaInformationProperty, value); }
         }
 
+        public PostgreSqlSchemaInformation PostgreSqlSchemaInformation
+        {
+            get { return GetValue(PostgreSqlSchemaInformationProperty) as PostgreSqlSchemaInformation; }
+            set { SetValue(PostgreSqlSchemaInformationProperty, value); }
+        }
+
         public SqliteSchemaInformation SqliteSchemaInformation
         {
             get { return GetValue(SqliteSchemaInformationProperty) as SqliteSchemaInformation; }
@@ -158,6 +174,7 @@ namespace CrudGenerator.Core.Wpf.Components
                     newSchemaInformationGenetatorViewModel.PropertyChanged += schemaInformationGenetator.SchemaInformationGeneratorPropertyChanged;
 
                     schemaInformationGenetator.MySqlSchemaInformation = newSchemaInformationGenetatorViewModel.MySqlSchemaInformation;
+                    schemaInformationGenetator.PostgreSqlSchemaInformation = newSchemaInformationGenetatorViewModel.PostgreSqlSchemaInformation;
                     schemaInformationGenetator.SqliteSchemaInformation = newSchemaInformationGenetatorViewModel.SqliteSchemaInformation;
                     schemaInformationGenetator.SqlServerSchemaInformation = newSchemaInformationGenetatorViewModel.SqlServerSchemaInformation;
                     schemaInformationGenetator.SelectedDatabaseType = newSchemaInformationGenetatorViewModel.SelectedDatabaseType;
@@ -173,6 +190,17 @@ namespace CrudGenerator.Core.Wpf.Components
                     schemaInformationGenetator.SchemaInformationGenetatorViewModel.MySqlSchemaInformation = schemaInformationGenetator.MySqlSchemaInformation;
 
                 schemaInformationGenetator._propertyChangedDispatcher.Notify(nameof(MySqlSchemaInformation));
+            }
+        }
+
+        private static void OnPostgreSqlSchemaInformationChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if ((d is SchemaInformationGenetator schemaInformationGenetator) && (e.OldValue != e.NewValue))
+            {
+                if (schemaInformationGenetator.SchemaInformationGenetatorViewModel != null)
+                    schemaInformationGenetator.SchemaInformationGenetatorViewModel.PostgreSqlSchemaInformation = schemaInformationGenetator.PostgreSqlSchemaInformation;
+
+                schemaInformationGenetator._propertyChangedDispatcher.Notify(nameof(PostgreSqlSchemaInformation));
             }
         }
 

@@ -55,6 +55,7 @@
           <Directory Id="LanguageESDir" Name="es" >
             <Component Id="LanguageES" Guid="B6CA41F6-1EBB-4ABF-9958-9A95DAF9C308" KeyPath="yes">
               <File Id="Database.MySql.resources.es" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\es\Database.MySql.resources.dll"/>
+              <File Id="Database.PostgreSql.resources.es" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\es\Database.PostgreSql.resources.dll"/>
               <File Id="Database.resources.es" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\es\Database.resources.dll"/>
               <File Id="Database.Sqlite.resources.es" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\es\Database.Sqlite.resources.dll"/>
               <File Id="Database.SqlServer.resources.es" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\es\Database.SqlServer.resources.dll"/>
@@ -76,6 +77,7 @@
           <Directory Id="LanguagePTDir" Name="pt" >
             <Component Id="LanguagePT" Guid="2A2C206A-FB7D-4C9B-BEF4-BF18E3CCFD78" KeyPath="yes">
               <File Id="Database.MySql.resources.pt" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\pt\Database.MySql.resources.dll"/>
+              <File Id="Database.PostgreSql.resources.pt" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\pt\Database.PostgreSql.resources.dll"/>
               <File Id="Database.resources.pt" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\pt\Database.resources.dll"/>
               <File Id="Database.Sqlite.resources.pt" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\pt\Database.Sqlite.resources.dll"/>
               <File Id="Database.SqlServer.resources.pt" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\pt\Database.SqlServer.resources.dll"/>
@@ -117,6 +119,8 @@
             <File Id="Microsoft.Bcl.AsyncInterfaces" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\Microsoft.Bcl.AsyncInterfaces.dll"/>
             <File Id="Microsoft.Bcl.HashCode" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\Microsoft.Bcl.HashCode.dll"/>
             <File Id="MySql.Data" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\MySql.Data.dll"/>
+            <File Id="netstandard" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\netstandard.dll"/>
+            <File Id="Npgsql" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\Npgsql.dll"/>
             <File Id="System.Buffers" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Buffers.dll"/>
             <File Id="System.Collections.Immutable" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Collections.Immutable.dll"/>
             <File Id="System.ComponentModel.Annotations" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.ComponentModel.Annotations.dll"/>

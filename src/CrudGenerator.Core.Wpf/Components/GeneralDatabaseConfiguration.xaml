@@ -3,8 +3,8 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:classgenerator="clr-namespace:CrudGenerator.Core.Wpf"
-    xmlns:dataTemplateSelectors="clr-namespace:CrudGenerator.Core.Wpf.DataTemplateSelectors"
     xmlns:components="clr-namespace:CrudGenerator.Core.Wpf.Components"
+    xmlns:dataTemplateSelectors="clr-namespace:CrudGenerator.Core.Wpf.DataTemplateSelectors"
     xmlns:datamapping="clr-namespace:Database.DataMapping;assembly=Database"
     x:Name="generalDatabaseConfiguration">
 
@@ -30,6 +30,15 @@
                     SchemaInformation="{Binding Path=GeneralDatabaseConfigurationViewModel.MySqlConnectionConfigurationViewModel.SchemaInformation, Mode=OneWay, ElementName=generalDatabaseConfiguration, UpdateSourceTrigger=PropertyChanged}" />
             </DataTemplate>
 
+            <DataTemplate x:Key="PostgreSqlOptions">
+                <components:PostgreSqlConnectionConfiguration
+                    Margin="0"
+                    Padding="0"
+                    MessageDialog="{Binding Path=GeneralDatabaseConfigurationViewModel.MessageDialog, Mode=OneWay, ElementName=generalDatabaseConfiguration, UpdateSourceTrigger=PropertyChanged}"
+                    PostgreSqlConnectionConfigurationViewModel="{Binding Path=GeneralDatabaseConfigurationViewModel.PostgreSqlConnectionConfigurationViewModel, Mode=OneWay, ElementName=generalDatabaseConfiguration, UpdateSourceTrigger=PropertyChanged}"
+                    SchemaInformation="{Binding Path=GeneralDatabaseConfigurationViewModel.PostgreSqlConnectionConfigurationViewModel.SchemaInformation, Mode=OneWay, ElementName=generalDatabaseConfiguration, UpdateSourceTrigger=PropertyChanged}" />
+            </DataTemplate>
+
             <DataTemplate x:Key="SqliteOptions">
                 <components:SqliteConnectionConfiguration
                     Margin="0"
@@ -48,6 +57,7 @@
                 x:Key="databaseConnectionDataTemplateSelector"
                 MySql="{StaticResource MySqlOptions}"
                 None="{StaticResource NoneOptions}"
+                PostgreSql="{StaticResource PostgreSqlOptions}"
                 SqlServer="{StaticResource SqlServerOptions}"
                 Sqlite="{StaticResource SqliteOptions}" />
         </ResourceDictionary>

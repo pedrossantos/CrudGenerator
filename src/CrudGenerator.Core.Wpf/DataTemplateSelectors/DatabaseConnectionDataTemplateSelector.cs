@@ -10,6 +10,8 @@ namespace CrudGenerator.Core.Wpf.DataTemplateSelectors
 
         public DataTemplate MySql { get; set; }
 
+        public DataTemplate PostgreSql { get; set; }
+
         public DataTemplate Sqlite { get; set; }
 
         public DataTemplate SqlServer { get; set; }
@@ -20,20 +22,18 @@ namespace CrudGenerator.Core.Wpf.DataTemplateSelectors
             {
                 switch (databaseType)
                 {
-
-                    case DatabaseTypes.SqlServer:
-                        return SqlServer;
+                    case DatabaseTypes.PostgreSql:
+                        return PostgreSql;
 
                     case DatabaseTypes.MySql:
                         return MySql;
 
+                    case DatabaseTypes.SqlServer:
+                        return SqlServer;
+
                     case DatabaseTypes.Sqlite:
                         return Sqlite;
 
-                    case DatabaseTypes.None:
-                    case DatabaseTypes.OracleDb:
-                    case DatabaseTypes.PostgreSql:
-                    case DatabaseTypes.All:
                     default:
                         return None;
                 }

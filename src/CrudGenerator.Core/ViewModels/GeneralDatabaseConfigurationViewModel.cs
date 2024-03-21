@@ -1,7 +1,5 @@
 ﻿using Database.DataAccess;
 using Database.DataMapping;
-using Database.MySql.DataAccess;
-using Database.Sqlite.DataAccess;
 using DependencyInversion;
 using Framework.Validation;
 using System.Collections.Generic;
@@ -13,6 +11,7 @@ namespace CrudGenerator.Core.ViewModels
     public class GeneralDatabaseConfigurationViewModel : ViewModelBase
     {
         private MySqlConnectionConfigurationViewModel _mySqlConnectionConfigurationViewModel;
+        private PostgreSqlConnectionConfigurationViewModel _postgreSqlConnectionConfigurationViewModel;
         private SqliteConnectionConfigurationViewModel _sqliteConnectionConfigurationViewModel;
         private SqlServerConnectionConfigurationViewModel _sqlServerConnectionConfigurationViewModel;
 
@@ -30,12 +29,14 @@ namespace CrudGenerator.Core.ViewModels
         [Injectable]
         public GeneralDatabaseConfigurationViewModel(
             MySqlConnectionConfigurationViewModel mySqlConnectionConfigurationViewModel,
+            PostgreSqlConnectionConfigurationViewModel postgreSqlConnectionConfigurationViewModel,
             SqliteConnectionConfigurationViewModel sqliteConnectionConfigurationViewModel,
             SqlServerConnectionConfigurationViewModel sqlServerConnectionConfigurationViewModel,
             IMessageDialog messageDialog,
             IOpenFileDialog openFileDialog)
         {
             Requires.NotNull(mySqlConnectionConfigurationViewModel, nameof(mySqlConnectionConfigurationViewModel));
+            Requires.NotNull(postgreSqlConnectionConfigurationViewModel, nameof(postgreSqlConnectionConfigurationViewModel));
             Requires.NotNull(sqliteConnectionConfigurationViewModel, nameof(sqliteConnectionConfigurationViewModel));
             Requires.NotNull(sqlServerConnectionConfigurationViewModel, nameof(sqlServerConnectionConfigurationViewModel));
             Requires.NotNull(messageDialog, nameof(messageDialog));
@@ -46,6 +47,7 @@ namespace CrudGenerator.Core.ViewModels
             _nullSchemaInformation = new NullSchemaInformation();
 
             _mySqlConnectionConfigurationViewModel = mySqlConnectionConfigurationViewModel;
+            _postgreSqlConnectionConfigurationViewModel = postgreSqlConnectionConfigurationViewModel;
             _sqliteConnectionConfigurationViewModel = sqliteConnectionConfigurationViewModel;
             _sqlServerConnectionConfigurationViewModel = sqlServerConnectionConfigurationViewModel;
 
@@ -56,6 +58,7 @@ namespace CrudGenerator.Core.ViewModels
             {
                 DatabaseTypes.None,
                 DatabaseTypes.MySql,
+                DatabaseTypes.PostgreSql,
                 DatabaseTypes.Sqlite,
                 DatabaseTypes.SqlServer,
             };
@@ -85,6 +88,12 @@ namespace CrudGenerator.Core.ViewModels
         {
             get => _mySqlConnectionConfigurationViewModel;
             set => PropertyChangedDispatcher.SetProperty(ref _mySqlConnectionConfigurationViewModel, value);
+        }
+
+        public PostgreSqlConnectionConfigurationViewModel PostgreSqlConnectionConfigurationViewModel
+        {
+            get => _postgreSqlConnectionConfigurationViewModel;
+            set => PropertyChangedDispatcher.SetProperty(ref _postgreSqlConnectionConfigurationViewModel, value);
         }
 
         public SqliteConnectionConfigurationViewModel SqliteConnectionConfigurationViewModel
@@ -117,6 +126,7 @@ namespace CrudGenerator.Core.ViewModels
                     SchemaInformation.Clear();
                     PropertyChangedDispatcher.Notify(nameof(SchemaInformation));
                     PropertyChangedDispatcher.Notify(nameof(MySqlConnectionConfigurationViewModel));
+                    PropertyChangedDispatcher.Notify(nameof(PostgreSqlConnectionConfigurationViewModel));
                     PropertyChangedDispatcher.Notify(nameof(SqliteConnectionConfigurationViewModel));
                     PropertyChangedDispatcher.Notify(nameof(SqlServerConnectionConfigurationViewModel));
                 }
@@ -129,6 +139,8 @@ namespace CrudGenerator.Core.ViewModels
             {
                 if (SelectedDatabaseType == DatabaseTypes.MySql)
                     return MySqlConnectionConfigurationViewModel.SchemaInformation;
+                else if (SelectedDatabaseType == DatabaseTypes.PostgreSql)
+                    return PostgreSqlConnectionConfigurationViewModel.SchemaInformation;
                 else if (SelectedDatabaseType == DatabaseTypes.Sqlite)
                     return SqliteConnectionConfigurationViewModel.SchemaInformation;
                 else if (SelectedDatabaseType == DatabaseTypes.SqlServer)

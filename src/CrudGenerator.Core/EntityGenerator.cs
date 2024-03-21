@@ -409,6 +409,8 @@ namespace CrudGenerator.Core
             
             if (databaseType == DatabaseTypes.MySql)
                 yield return new Database.MySql.DependencyInversion.MySqlContainerBuilder();
+            else if (databaseType == DatabaseTypes.PostgreSql)
+                yield return new Database.PostgreSql.DependencyInversion.PostgreSqlContainerBuilder();
             else if (databaseType == DatabaseTypes.Sqlite)
                 yield return new Database.Sqlite.DependencyInversion.FileSqliteContainerBuilder();
             else if (databaseType == DatabaseTypes.SqlServer)

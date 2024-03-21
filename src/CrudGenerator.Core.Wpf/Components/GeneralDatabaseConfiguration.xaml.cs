@@ -37,6 +37,13 @@ namespace CrudGenerator.Core.Wpf.Components
                 typeof(GeneralDatabaseConfiguration),
                 new FrameworkPropertyMetadata(null, OnMySqlConnectionConfigurationViewModelChanged));
 
+        public static readonly DependencyProperty PostgreSqlConnectionConfigurationViewModelProperty =
+            DependencyProperty.Register(
+                nameof(PostgreSqlConnectionConfigurationViewModel),
+                typeof(PostgreSqlConnectionConfigurationViewModel),
+                typeof(GeneralDatabaseConfiguration),
+                new FrameworkPropertyMetadata(null, OnPostgreSqlConnectionConfigurationViewModelChanged));
+
         public static readonly DependencyProperty SqliteConnectionConfigurationViewModelProperty =
             DependencyProperty.Register(
                 nameof(SqliteConnectionConfigurationViewModel),
@@ -98,12 +105,14 @@ namespace CrudGenerator.Core.Wpf.Components
 
         public GeneralDatabaseConfiguration(
             MySqlConnectionConfigurationViewModel mySqlConnectionConfigurationViewModel,
+            PostgreSqlConnectionConfigurationViewModel postgreSqlConnectionConfigurationViewModel,
             SqliteConnectionConfigurationViewModel sqliteConnectionConfigurationViewModel,
             SqlServerConnectionConfigurationViewModel sqlServerConnectionConfigurationViewModel,
             IMessageDialog messageDialog,
             IOpenFileDialog openFileDialog)
         {
             Requires.NotNull(mySqlConnectionConfigurationViewModel, nameof(mySqlConnectionConfigurationViewModel));
+            Requires.NotNull(postgreSqlConnectionConfigurationViewModel, nameof(postgreSqlConnectionConfigurationViewModel));
             Requires.NotNull(sqliteConnectionConfigurationViewModel, nameof(sqliteConnectionConfigurationViewModel));
             Requires.NotNull(sqlServerConnectionConfigurationViewModel, nameof(sqlServerConnectionConfigurationViewModel));
             Requires.NotNull(messageDialog, nameof(messageDialog));
@@ -116,6 +125,7 @@ namespace CrudGenerator.Core.Wpf.Components
 
             GeneralDatabaseConfigurationViewModel = new GeneralDatabaseConfigurationViewModel(
                 mySqlConnectionConfigurationViewModel,
+                postgreSqlConnectionConfigurationViewModel,
                 sqliteConnectionConfigurationViewModel,
                 sqlServerConnectionConfigurationViewModel,
                 messageDialog,
@@ -167,6 +177,12 @@ namespace CrudGenerator.Core.Wpf.Components
         {
             get { return GetValue(MySqlConnectionConfigurationViewModelProperty) as MySqlConnectionConfigurationViewModel; }
             set { SetValue(MySqlConnectionConfigurationViewModelProperty, value); }
+        }
+
+        public PostgreSqlConnectionConfigurationViewModel PostgreSqlConnectionConfigurationViewModel
+        {
+            get { return GetValue(PostgreSqlConnectionConfigurationViewModelProperty) as PostgreSqlConnectionConfigurationViewModel; }
+            set { SetValue(PostgreSqlConnectionConfigurationViewModelProperty, value); }
         }
 
         public SqliteConnectionConfigurationViewModel SqliteConnectionConfigurationViewModel
@@ -241,6 +257,17 @@ namespace CrudGenerator.Core.Wpf.Components
                     generalDatabaseConfiguration.GeneralDatabaseConfigurationViewModel.MySqlConnectionConfigurationViewModel = generalDatabaseConfiguration.MySqlConnectionConfigurationViewModel;
 
                 generalDatabaseConfiguration._propertyChangedDispatcher.Notify(nameof(MySqlConnectionConfigurationViewModel));
+            }
+        }
+
+        private static void OnPostgreSqlConnectionConfigurationViewModelChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if ((d is GeneralDatabaseConfiguration generalDatabaseConfiguration) && (e.OldValue != e.NewValue))
+            {
+                if (generalDatabaseConfiguration.GeneralDatabaseConfigurationViewModel != null)
+                    generalDatabaseConfiguration.GeneralDatabaseConfigurationViewModel.PostgreSqlConnectionConfigurationViewModel = generalDatabaseConfiguration.PostgreSqlConnectionConfigurationViewModel;
+
+                generalDatabaseConfiguration._propertyChangedDispatcher.Notify(nameof(PostgreSqlConnectionConfigurationViewModel));
             }
         }
 

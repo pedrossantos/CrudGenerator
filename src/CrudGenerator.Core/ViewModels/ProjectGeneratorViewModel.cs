@@ -1,6 +1,7 @@
 ﻿using Database.DataAccess;
 using Database.DataMapping;
 using Database.MySql.DataAccess;
+using Database.PostgreSql.DataAccess;
 using Database.Sqlite.DataAccess;
 using Database.SqlServer.DataAccess;
 using DependencyInversion;
@@ -27,6 +28,7 @@ namespace CrudGenerator.Core.ViewModels
 
         private DatabaseTypes _selectedDatabaseType;
         private MySqlSchemaInformation _mySqlSchemaInformation;
+        private PostgreSqlSchemaInformation _postgreSqlSchemaInformation;
         private SqliteSchemaInformation _sqliteSchemaInformation;
         private SqlServerSchemaInformation _sqlServerSchemaInformation;
         private IMessageDialog _messageDialog;
@@ -45,6 +47,7 @@ namespace CrudGenerator.Core.ViewModels
         [Injectable]
         public ProjectGeneratorViewModel(
             MySqlSchemaInformation mySqlSchemaInformation,
+            PostgreSqlSchemaInformation postgreSqlSchemaInformation,
             SqliteSchemaInformation sqliteSchemaInformation,
             SqlServerSchemaInformation sqlServerSchemaInformation,
             IMessageDialog messageDialog,
@@ -52,6 +55,9 @@ namespace CrudGenerator.Core.ViewModels
         {
             _mySqlSchemaInformation = mySqlSchemaInformation;
             _mySqlSchemaInformation.SchemaTableMappingsObservableCollection.CollectionChanged -= SchemaTableMappingsObservableCollectionCollectionChanged;
+
+            _postgreSqlSchemaInformation = postgreSqlSchemaInformation;
+            _postgreSqlSchemaInformation.SchemaTableMappingsObservableCollection.CollectionChanged -= SchemaTableMappingsObservableCollectionCollectionChanged;
 
             _sqliteSchemaInformation = sqliteSchemaInformation;
             _sqliteSchemaInformation.SchemaTableMappingsObservableCollection.CollectionChanged -= SchemaTableMappingsObservableCollectionCollectionChanged;
@@ -69,6 +75,8 @@ namespace CrudGenerator.Core.ViewModels
             {
                 if (SelectedDatabaseType == DatabaseTypes.MySql)
                     return _mySqlSchemaInformation;
+                else if (SelectedDatabaseType == DatabaseTypes.PostgreSql)
+                    return _sqliteSchemaInformation;
                 else if (SelectedDatabaseType == DatabaseTypes.Sqlite)
                     return _sqliteSchemaInformation;
                 else if (SelectedDatabaseType == DatabaseTypes.SqlServer)
@@ -109,6 +117,24 @@ namespace CrudGenerator.Core.ViewModels
                 {
                     PropertyChangedDispatcher.SetProperty(ref _mySqlSchemaInformation, value);
                     if (_selectedDatabaseType == DatabaseTypes.MySql)
+                        PropertyChangedDispatcher.Notify(nameof(SchemaInformation));
+                }
+            }
+        }
+
+        public PostgreSqlSchemaInformation PostgreSqlSchemaInformation
+        {
+            get
+            {
+                return _postgreSqlSchemaInformation;
+            }
+
+            set
+            {
+                if (_postgreSqlSchemaInformation != value)
+                {
+                    PropertyChangedDispatcher.SetProperty(ref _postgreSqlSchemaInformation, value);
+                    if (_selectedDatabaseType == DatabaseTypes.PostgreSql)
                         PropertyChangedDispatcher.Notify(nameof(SchemaInformation));
                 }
             }

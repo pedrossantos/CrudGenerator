@@ -1,5 +1,7 @@
 ﻿using Database.MySql.DataAccess;
 using Database.MySql.Sql;
+using Database.PostgreSql.DataAccess;
+using Database.PostgreSql.Sql;
 using Database.Sqlite.DataAccess;
 using Database.Sqlite.Sql;
 using Database.SqlServer.DataAccess;
@@ -25,6 +27,14 @@ namespace CrudGenerator.App.Wpf.DependencyInversion
             yield return CreateSingleton<MySqlConnectionManager>();
             yield return CreateSingleton<MySqlSchemaInformation>();
             #endregion MySql
+
+            #region PostgreSql
+            yield return CreateSingleton(new PostgreSqlBuilderTemplate());
+            yield return CreateSingleton(c => new PostgreSqlNativeCommandBuilder(c.Resolve<PostgreSqlBuilderTemplate>()));
+            yield return CreateTransient<PostgreSqlConnectionManagerBuilder>();
+            yield return CreateSingleton<PostgreSqlConnectionManager>();
+            yield return CreateSingleton<PostgreSqlSchemaInformation>();
+            #endregion PostgreSql
 
             #region Sqlite
             yield return CreateSingleton(new SqliteBuilderTemplate());
