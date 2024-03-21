@@ -36,6 +36,7 @@ CREATE TABLE Funcionario
 	columnBoolean BOOLEAN DEFAULT(false),
 	columnDate DATE DEFAULT('2000-01-01'),
 	columnDateTime DATETIME DEFAULT('2000-01-01 12:00:00'),
+	columnDateTimeWithTimeZone DATETIME DEFAULT('2000-01-01 12:00:00 -03:00'),
 	columnInteger INTEGER DEFAULT(1),
 	columnNumeric NUMERIC DEFAULT(1),
 	columnReal REAL DEFAULT(1),

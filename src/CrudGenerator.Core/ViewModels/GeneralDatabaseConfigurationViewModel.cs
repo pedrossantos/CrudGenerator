@@ -64,6 +64,8 @@ namespace CrudGenerator.Core.ViewModels
             };
 
             _selectedDatabaseType = DatabaseTypes.None;
+
+            PropertyChanged += GeneralDatabaseConfigurationViewModelPropertyChanged;
         }
 
         public IMessageDialog MessageDialog
@@ -147,6 +149,17 @@ namespace CrudGenerator.Core.ViewModels
                     return SqlServerConnectionConfigurationViewModel.SchemaInformation;
 
                 return NullSchemaInformation;
+            }
+        }
+
+        private void GeneralDatabaseConfigurationViewModelPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(SelectedDatabaseType))
+            {
+                _mySqlConnectionConfigurationViewModel.SchemaInformation.Clear();
+                _postgreSqlConnectionConfigurationViewModel.SchemaInformation.Clear();
+                _sqliteConnectionConfigurationViewModel.SchemaInformation.Clear();
+                _sqlServerConnectionConfigurationViewModel.SchemaInformation.Clear();
             }
         }
     }

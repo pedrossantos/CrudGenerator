@@ -3,13 +3,13 @@ CREATE DATABASE TesteDatabaseLocal;
 USE TesteDatabaseLocal;
 GO
 
-DROP TABLE dbo.Funcionario;
+DROP TABLE IF EXISTS dbo.Funcionario;
 GO
 
-DROP TABLE dbo.Cargo;
+DROP TABLE IF EXISTS dbo.Cargo;
 GO
 
-DROP TABLE dbo.Empresa;
+DROP TABLE IF EXISTS dbo.Empresa;
 GO
 
 CREATE TABLE dbo.Empresa
@@ -62,10 +62,13 @@ CREATE TABLE dbo.Funcionario
 
 	columnDate DATE DEFAULT('2000-01-01'),
 	columnDateTimeOffset DATETIMEOFFSET DEFAULT('2000-01-01 12:00:00 +00:00'),
+	columnDateTimeOffsetWithTimeZone DATETIMEOFFSET DEFAULT('2000-01-01 12:00:00 -03:00'),
 	columnDateTime2 DATETIME2 DEFAULT('2000-01-01 12:00:00 +00:00'),
+	columnDateTime2WithTimeZone DATETIME2 DEFAULT('2000-01-01 12:00:00 -03:00'),
 	columnSmallDateTime SMALLDATETIME DEFAULT('2000-01-01 12:00:00'),
 	columnDateTime DATETIME DEFAULT('2000-01-01 12:00:00'),
 	columnTime TIME DEFAULT('15:00:00'),
+	columnTimeWithTimeZone TIME DEFAULT('15:00:00 -03:00'),
 
 	columnChar CHAR DEFAULT('A'),
 	columnCharWithLength CHAR(100) DEFAULT('A'),

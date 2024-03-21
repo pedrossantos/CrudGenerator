@@ -54,19 +54,21 @@ namespace CrudGenerator.Core.ViewModels
             ISelectFolderDialog selectFolderDialog)
         {
             _mySqlSchemaInformation = mySqlSchemaInformation;
-            _mySqlSchemaInformation.SchemaTableMappingsObservableCollection.CollectionChanged -= SchemaTableMappingsObservableCollectionCollectionChanged;
+            _mySqlSchemaInformation.SchemaTableMappingsObservableCollection.CollectionChanged += SchemaTableMappingsObservableCollectionCollectionChanged;
 
             _postgreSqlSchemaInformation = postgreSqlSchemaInformation;
-            _postgreSqlSchemaInformation.SchemaTableMappingsObservableCollection.CollectionChanged -= SchemaTableMappingsObservableCollectionCollectionChanged;
+            _postgreSqlSchemaInformation.SchemaTableMappingsObservableCollection.CollectionChanged += SchemaTableMappingsObservableCollectionCollectionChanged;
 
             _sqliteSchemaInformation = sqliteSchemaInformation;
-            _sqliteSchemaInformation.SchemaTableMappingsObservableCollection.CollectionChanged -= SchemaTableMappingsObservableCollectionCollectionChanged;
+            _sqliteSchemaInformation.SchemaTableMappingsObservableCollection.CollectionChanged += SchemaTableMappingsObservableCollectionCollectionChanged;
 
             _sqlServerSchemaInformation = sqlServerSchemaInformation;
-            _sqlServerSchemaInformation.SchemaTableMappingsObservableCollection.CollectionChanged -= SchemaTableMappingsObservableCollectionCollectionChanged;
+            _sqlServerSchemaInformation.SchemaTableMappingsObservableCollection.CollectionChanged += SchemaTableMappingsObservableCollectionCollectionChanged;
 
             _messageDialog = messageDialog;
             _selectFolderDialog = selectFolderDialog;
+
+            PropertyChanged += ProjectGeneratorViewModelPropertyChanged;
         }
 
         protected ISchemaInformation SchemaInformation
@@ -76,7 +78,7 @@ namespace CrudGenerator.Core.ViewModels
                 if (SelectedDatabaseType == DatabaseTypes.MySql)
                     return _mySqlSchemaInformation;
                 else if (SelectedDatabaseType == DatabaseTypes.PostgreSql)
-                    return _sqliteSchemaInformation;
+                    return _postgreSqlSchemaInformation;
                 else if (SelectedDatabaseType == DatabaseTypes.Sqlite)
                     return _sqliteSchemaInformation;
                 else if (SelectedDatabaseType == DatabaseTypes.SqlServer)
@@ -220,7 +222,7 @@ namespace CrudGenerator.Core.ViewModels
 
         public List<GeneratedClassGroupedByNamespace> GeneratedClasses =>
             new List<GeneratedClassGroupedByNamespace>(
-                _entityGenerator?.GeneratedClasses?
+                EntityGenerator?.GeneratedClasses?
                 .GroupBy(gc => gc.ClassNameSpace)
                 .Select(g => new GeneratedClassGroupedByNamespace(g)) ?? new GeneratedClassGroupedByNamespace[0]);
 
@@ -243,11 +245,11 @@ namespace CrudGenerator.Core.ViewModels
                 _threadGenerateClasses = null;
             }
 
-            if (_entityGenerator == null)
-            {
-                _entityGenerator = new EntityGenerator(SchemaInformation);
-                PropertyChangedDispatcher.Notify(nameof(EntityGenerator));
-            }
+            if (EntityGenerator != null)
+                EntityGenerator.Dispose();
+
+            EntityGenerator = new EntityGenerator(SchemaInformation);
+            PropertyChangedDispatcher.Notify(nameof(EntityGenerator));
 
             GeneratingClasses = true;
             _threadGenerateProject = new Thread(new ParameterizedThreadStart(DoGenerateClasses));
@@ -390,6 +392,19 @@ namespace CrudGenerator.Core.ViewModels
             {
                 if ((_entityGenerator != null) && (_entityGenerator.GeneratedClasses != null))
                     _entityGenerator.GeneratedClasses.Clear();
+            }
+        }
+
+        private void ProjectGeneratorViewModelPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(SelectedDatabaseType))
+            {
+                DefaultNamespace = string.Empty;
+                ProjectFolder = string.Empty;
+                ProjectName = string.Empty;
+
+                PropertyChangedDispatcher.Notify(nameof(SelectedGeneratedClass));
+                PropertyChangedDispatcher.Notify(nameof(GeneratedClasses));
             }
         }
     }
