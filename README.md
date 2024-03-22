@@ -6,6 +6,7 @@ Tecnologias .NET Framework e .NET Core foram utilizados para o desenvolvimento d
 Para possibilitar a implementação desta solução, foi necerssário desenvolver também um Framework próprio, no qual existem implementaçãoes que vão desde a abstração de ORM (Object-Relational Mapping), também próprio, à abstrações para a camada de apresentação (View's).
 Atualmente, o ORM desenvolvido dá suporte para leitura de definições de um determinado banco de dados, necessário para a geração de classes baseadas no Framework citado acima, e também, a partir de utilização do mesmo Framework, possibilita a implementação de modelos e repositórios em C# para interação com estes bancos de dados. Hoje, temos suporte para bancos de dados Sqlite, SqlServer, PostgreSql e Mysql. Suporte para os bancos de dados Orable e Firebird estão em desenvolvimento.
 
-Caso tenha interesse em saber mais sobre o Framework e esta solução, ou queira colaborar indicando ocorrência de bugs, entre em contato através do e-mail "ss.pedrohenrique@gmail.com".
+Também foi desenvolvido instaladores (pt-BR e en-US) para disponibilizar a aplicação para quem se interessar em conhecê-la. Para instaladores, acesse a pasta "installer/net462".
+Caso queira saber mais sobre o Framework e esta solução, ou queira colaborar indicando ocorrência de bugs, entre em contato através do e-mail "ss.pedrohenrique@gmail.com".
 
 Obrigado!
