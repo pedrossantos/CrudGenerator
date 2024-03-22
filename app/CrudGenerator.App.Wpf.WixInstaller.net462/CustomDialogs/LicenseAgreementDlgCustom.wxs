@@ -15,12 +15,6 @@
           <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
         </Control>
         <Control Id="BannerBitmap" Type="Bitmap" X="326" Y="0" Width="44" Height="44" TabSkip="no" Text="!(loc.LicenseAgreementDlgBannerBitmap)" />
-        
-          <!--<Control Id="LicenseText" Type="ScrollableText" X="20" Y="60"
-Width="330" Height="140" Sunken="yes" TabSkip="no">
-<Text SourceFile="!(loc.LicenseRtf)" />
-</Control>-->
-          
         <Control Id="LicenseText" Type="ScrollableText" X="20" Y="60" Width="330" Height="140" Sunken="yes" TabSkip="no">
           <Text SourceFile="!(loc.LicenseRtf)" />
         </Control>
