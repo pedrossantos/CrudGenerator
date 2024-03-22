@@ -22,9 +22,9 @@ namespace CrudGenerator.App.Wpf
             if (mainWindow == null)
             {
                 if (messageDialog != null)
-                    await messageDialog.ShowAsync($"Erro ao resolver objeto {nameof(IMessageDialog)}", "Erro");
+                    await messageDialog.ShowAsync(string.Format(Messages.ErrorToResolveObject, nameof(IMessageDialog)), Messages.ErrorTitle);
                 else
-                    MessageBox.Show($"Erro ao carregar {nameof(MainWindow)}", "Erro", MessageBoxButton.OK);
+                    MessageBox.Show($"Erro ao carregar {nameof(MainWindow)}", Messages.ErrorTitle, MessageBoxButton.OK);
 
                 Shutdown();
             }
@@ -33,7 +33,7 @@ namespace CrudGenerator.App.Wpf
                 WpfNavigationController wpfNavigationController = _serviceProvider.Resolve<INavigationController>() as WpfNavigationController;
                 if (wpfNavigationController == null)
                 {
-                    await messageDialog.ShowAsync($"Erro ao resolver objeto {nameof(WpfNavigationController)}", "Erro");
+                    await messageDialog.ShowAsync(string.Format(Messages.ErrorToResolveObject, nameof(WpfNavigationController)), Messages.ErrorTitle);
                     Shutdown();
                 }
                 else

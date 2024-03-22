@@ -24,7 +24,7 @@ namespace CrudGenerator.Core.ViewModels
             IMessageDialog messageDialog)
             : base(sqlServerSchemaInformation, messageDialog)
         {
-            PresenterTitle = "SqlServer Connection Configuration";
+            PresenterTitle = Messages.SqlServerDatabaseConnectionConfiguration;
         }
 
         public string SqlServerServerNameOrIpAddress
@@ -69,19 +69,19 @@ namespace CrudGenerator.Core.ViewModels
         {
             if (string.IsNullOrEmpty(SqlServerServerNameOrIpAddress))
             {
-                await MessageDialog.ShowAsync("Please enter the Server Name or Server IP Address!", "Error", EventLevel.Error);
+                await MessageDialog.ShowAsync(Messages.EnterServerNameOrIpAddres, Messages.ErrorTitle, EventLevel.Error);
                 return false;
             }
 
             if (string.IsNullOrEmpty(SqlServerDatabaseName))
             {
-                await MessageDialog.ShowAsync("Please enter the Database Name!", "Error", EventLevel.Error);
+                await MessageDialog.ShowAsync(Messages.EnterDatabaseName, Messages.ErrorTitle, EventLevel.Error);
                 return false;
             }
 
             if (string.IsNullOrEmpty(SqlServerUserId))
             {
-                await MessageDialog.ShowAsync("Please enter the User ID!", "Error", EventLevel.Error);
+                await MessageDialog.ShowAsync(Messages.EnterUserId, Messages.ErrorTitle, EventLevel.Error);
                 return false;
             }
 

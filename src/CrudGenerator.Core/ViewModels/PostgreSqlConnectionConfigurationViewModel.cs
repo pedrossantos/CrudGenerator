@@ -24,7 +24,7 @@ namespace CrudGenerator.Core.ViewModels
             IMessageDialog messageDialog)
             : base(sqlServerSchemaInformation, messageDialog)
         {
-            PresenterTitle = "PostgreSql Connection Configuration";
+            PresenterTitle = Messages.PostgreSqlDatabaseConnectionConfiguration;
         }
 
         public string PostgreSqlServerNameOrIpAddress
@@ -64,19 +64,19 @@ namespace CrudGenerator.Core.ViewModels
         {
             if (string.IsNullOrEmpty(PostgreSqlServerNameOrIpAddress))
             {
-                await MessageDialog.ShowAsync("Please enter the Server Name or Server IP Address!", "Error", EventLevel.Error);
+                await MessageDialog.ShowAsync(Messages.EnterServerNameOrIpAddres, Messages.ErrorTitle, EventLevel.Error);
                 return false;
             }
 
             if (string.IsNullOrEmpty(PostgreSqlDatabaseName))
             {
-                await MessageDialog.ShowAsync("Please enter the Database Name!", "Error", EventLevel.Error);
+                await MessageDialog.ShowAsync(Messages.EnterDatabaseName, Messages.ErrorTitle, EventLevel.Error);
                 return false;
             }
 
             if (string.IsNullOrEmpty(PostgreSqlUserId))
             {
-                await MessageDialog.ShowAsync("Please enter the User ID!", "Error", EventLevel.Error);
+                await MessageDialog.ShowAsync(Messages.EnterUserId, Messages.ErrorTitle, EventLevel.Error);
                 return false;
             }
 

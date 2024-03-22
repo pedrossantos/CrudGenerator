@@ -23,7 +23,7 @@ namespace CrudGenerator.Core.ViewModels
             IOpenFileDialog openFileDialog)
             : base(sqliteSchemaInformation, messageDialog)
         {
-            PresenterTitle = "Sqlite Connection Configuration";
+            PresenterTitle = Messages.SqliteDatabaseConnectionConfiguration;
 
             _openFileDialog = openFileDialog;
         }
@@ -64,7 +64,7 @@ namespace CrudGenerator.Core.ViewModels
         {
             if (string.IsNullOrEmpty(SqliteDatabasePath))
             {
-                await MessageDialog.ShowAsync("Please select the File Path!", "Error", EventLevel.Error);
+                await MessageDialog.ShowAsync(Messages.SelectFilePath, Messages.ErrorTitle, EventLevel.Error);
                 return false;
             }
 

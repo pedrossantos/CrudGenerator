@@ -6,6 +6,7 @@
     xmlns:classGeneratorConverters="clr-namespace:CrudGenerator.Core.Wpf.Converters"
     xmlns:components="clr-namespace:CrudGenerator.Core.Wpf.Components"
     xmlns:grids="clr-namespace:View.Components.Wpf.Grids;assembly=View.Components.Wpf"
+    xmlns:messages="clr-namespace:CrudGenerator.Core.Wpf"
     x:Name="schemasInformationGridView">
 
     <UserControl.Resources>
@@ -39,7 +40,7 @@
                                 </Grid.RowDefinitions>
 
                                 <TabControl>
-                                    <TabItem Header="Table Definition">
+                                    <TabItem Header="{x:Static messages:Messages.TableDefinitions}">
                                         <DataGrid
                                             Grid.Row="0"
                                             MaxHeight="300"
@@ -47,15 +48,15 @@
                                             ItemsSource="{Binding Path=Columns}" />
                                     </TabItem>
 
-                                    <TabItem Header="Default Values" Visibility="{Binding Path=ColumnsWithDefaultValue, Converter={StaticResource enumerableToVisibilityConverter}}">
+                                    <TabItem Header="{x:Static messages:Messages.DefaultValues}" Visibility="{Binding Path=ColumnsWithDefaultValue, Converter={StaticResource enumerableToVisibilityConverter}}">
                                         <components:DefaultValuesGrid Margin="10" DefaultValues="{Binding Path=ColumnsWithDefaultValue, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
                                     </TabItem>
 
-                                    <TabItem Header="Foreign Keys" Visibility="{Binding Path=ForeignKeyValues, Converter={StaticResource enumerableToVisibilityConverter}}">
+                                    <TabItem Header="{x:Static messages:Messages.ForeignKeys}" Visibility="{Binding Path=ForeignKeyValues, Converter={StaticResource enumerableToVisibilityConverter}}">
                                         <components:ForeignKeysGrid ForeignKeys="{Binding Path=ForeignKeyValues, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
                                     </TabItem>
 
-                                    <TabItem Header="Indexes" Visibility="{Binding Path=Indexes, Converter={StaticResource enumerableToVisibilityConverter}}">
+                                    <TabItem Header="{x:Static messages:Messages.IndexedColumns}" Visibility="{Binding Path=Indexes, Converter={StaticResource enumerableToVisibilityConverter}}">
                                         <components:IndexesGrid Indexes="{Binding Path=Indexes, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
                                     </TabItem>
                                 </TabControl>

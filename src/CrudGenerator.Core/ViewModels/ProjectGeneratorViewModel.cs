@@ -235,7 +235,7 @@ namespace CrudGenerator.Core.ViewModels
         {
             if (string.IsNullOrEmpty(ProjectName))
             {
-                await MessageDialog.ShowAsync("Please type the Project Name!", "Error", EventLevel.Error);
+                await MessageDialog.ShowAsync(Messages.SelectProjectName, Messages.ErrorTitle, EventLevel.Error);
                 return;
             }
 
@@ -266,13 +266,13 @@ namespace CrudGenerator.Core.ViewModels
         {
             if (string.IsNullOrEmpty(ProjectName))
             {
-                await MessageDialog.ShowAsync("Please type the Project Name!", "Error", EventLevel.Error);
+                await MessageDialog.ShowAsync(Messages.SelectProjectName, Messages.ErrorTitle, EventLevel.Error);
                 return;
             }
 
             if (string.IsNullOrEmpty(ProjectFolder))
             {
-                await MessageDialog.ShowAsync("Please select the Project Folder!", "Error", EventLevel.Error);
+                await MessageDialog.ShowAsync(Messages.SelectProjectFolder, Messages.ErrorTitle, EventLevel.Error);
                 return;
             }
 

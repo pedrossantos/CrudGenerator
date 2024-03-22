@@ -2,10 +2,10 @@
     x:Class="CrudGenerator.Core.Wpf.Components.GeneralDatabaseConfiguration"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:classgenerator="clr-namespace:CrudGenerator.Core.Wpf"
     xmlns:components="clr-namespace:CrudGenerator.Core.Wpf.Components"
     xmlns:dataTemplateSelectors="clr-namespace:CrudGenerator.Core.Wpf.DataTemplateSelectors"
     xmlns:datamapping="clr-namespace:Database.DataMapping;assembly=Database"
+    xmlns:messages="clr-namespace:CrudGenerator.Core.Wpf"
     x:Name="generalDatabaseConfiguration">
 
     <UserControl.Resources>
@@ -18,7 +18,7 @@
                     HorizontalAlignment="Center"
                     FontSize="22"
                     FontWeight="Bold"
-                    Text="Select the database type to proceed..." />
+                    Text="{x:Static messages:Messages.SelectTheDatabase}" />
             </DataTemplate>
 
             <DataTemplate x:Key="MySqlOptions">
@@ -91,7 +91,7 @@
                     VerticalAlignment="Center"
                     FontSize="16"
                     FontWeight="Bold"
-                    Text="Database Type: " />
+                    Text="{x:Static messages:Messages.DatabaseTypeTitle}" />
                 <ComboBox
                     Grid.Column="1"
                     Margin="10,5"
@@ -100,7 +100,7 @@
                     FontSize="16"
                     ItemsSource="{Binding Path=GeneralDatabaseConfigurationViewModel.AvaiableDatabaseTypes, ElementName=generalDatabaseConfiguration}"
                     SelectedItem="{Binding Path=GeneralDatabaseConfigurationViewModel.SelectedDatabaseType, Mode=TwoWay, ElementName=generalDatabaseConfiguration, UpdateSourceTrigger=PropertyChanged}"
-                    Text="Selected the Database Type" />
+                    Text="{x:Static messages:Messages.SelectedTheDatabaseTypeTitle}" />
             </Grid>
         </Border>
 

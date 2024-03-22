@@ -147,7 +147,7 @@ namespace CrudGenerator.Core.Wpf.Components
             catch (Exception ex)
             {
                 if (MessageDialog != null)
-                    await MessageDialog.ShowAsync($"Error to open database:\r\n{ex.Message}", "Error", EventLevel.Error);
+                    await MessageDialog.ShowAsync(string.Format(Messages.ErrorOnOpenSqliteDatabase, ex.Message), Messages.ErrorTitle, EventLevel.Error);
             }
         }
 

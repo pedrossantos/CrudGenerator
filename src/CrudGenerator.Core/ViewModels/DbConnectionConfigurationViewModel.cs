@@ -23,7 +23,7 @@ namespace CrudGenerator.Core.ViewModels
             IMessageDialog messageDialog)
             : base()
         {
-            PresenterTitle = "Sqlite Connection Configuration";
+            PresenterTitle = Messages.DatabaseConnectionConfiguration;
 
             _schemaInformation = schemaInformation;
             _messageDialog = messageDialog;

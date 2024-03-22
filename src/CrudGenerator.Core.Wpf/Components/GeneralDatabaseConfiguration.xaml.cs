@@ -3,7 +3,6 @@ using Database.DataMapping;
 using DependencyInversion;
 using Framework.NotifyChanges;
 using Framework.Validation;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;

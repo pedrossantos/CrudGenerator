@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:CrudGenerator.Core.Wpf.Components"
+    xmlns:messages="clr-namespace:CrudGenerator.Core.Wpf"
     xmlns:textboxes="clr-namespace:View.Components.Wpf.TextBoxes;assembly=View.Components.Wpf">
 
     <Grid
@@ -47,7 +48,7 @@
                 VerticalAlignment="Center"
                 FontSize="22"
                 FontWeight="Bold"
-                Text="MySql Database Connection Configuration" />
+                Text="{x:Static messages:Messages.MySqlDatabaseConnectionConfiguration}" />
 
             <TextBlock
                 Grid.Row="1"
@@ -56,7 +57,7 @@
                 VerticalAlignment="Center"
                 FontSize="16"
                 FontWeight="Bold"
-                Text="Server: " />
+                Text="{x:Static messages:Messages.ServerTitle}" />
 
             <textboxes:PlaceholderTextBox
                 Grid.Row="1"
@@ -65,7 +66,7 @@
                 HorizontalAlignment="Stretch"
                 VerticalContentAlignment="Center"
                 FontSize="16"
-                Placeholder="Please enter the Server Name or Server IP Addres..."
+                Placeholder="{x:Static messages:Messages.SelectedServerOrIpAddress}"
                 Text="{Binding Path=MySqlServerNameOrIpAddress, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=local:MySqlConnectionConfiguration}, UpdateSourceTrigger=PropertyChanged}" />
 
             <TextBlock
@@ -75,7 +76,7 @@
                 VerticalAlignment="Center"
                 FontSize="16"
                 FontWeight="Bold"
-                Text="Database Name: " />
+                Text="{x:Static messages:Messages.DatabaseNameTitle}" />
 
             <textboxes:PlaceholderTextBox
                 Grid.Row="2"
@@ -84,7 +85,7 @@
                 HorizontalAlignment="Stretch"
                 VerticalContentAlignment="Center"
                 FontSize="16"
-                Placeholder="Please enter the Database Name..."
+                Placeholder="{x:Static messages:Messages.SelectedDatabaseName}"
                 Text="{Binding Path=MySqlDatabaseName, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=local:MySqlConnectionConfiguration}, UpdateSourceTrigger=PropertyChanged}" />
 
             <TextBlock
@@ -94,7 +95,7 @@
                 VerticalAlignment="Center"
                 FontSize="16"
                 FontWeight="Bold"
-                Text="User ID: " />
+                Text="{x:Static messages:Messages.UserIdTitle}" />
 
             <textboxes:PlaceholderTextBox
                 Grid.Row="3"
@@ -103,7 +104,7 @@
                 HorizontalAlignment="Stretch"
                 VerticalContentAlignment="Center"
                 FontSize="16"
-                Placeholder="Please enter the User ID..."
+                Placeholder="{x:Static messages:Messages.SelectedUserId}"
                 Text="{Binding Path=MySqlUserId, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=local:MySqlConnectionConfiguration}, UpdateSourceTrigger=PropertyChanged}" />
 
             <TextBlock
@@ -113,7 +114,7 @@
                 VerticalAlignment="Center"
                 FontSize="16"
                 FontWeight="Bold"
-                Text="Password: " />
+                Text="{x:Static messages:Messages.PasswordTitle}" />
 
             <textboxes:PlaceholderPasswordBox
                 Grid.Row="4"
@@ -122,7 +123,7 @@
                 HorizontalAlignment="Stretch"
                 VerticalContentAlignment="Center"
                 FontSize="16"
-                Placeholder="Please enter the password..."
+                Placeholder="{x:Static messages:Messages.SelectedPassword}"
                 Text="{Binding Path=MySqlPassword, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=local:MySqlConnectionConfiguration}, UpdateSourceTrigger=PropertyChanged}" />
         </Grid>
 
@@ -134,7 +135,7 @@
             Padding="10,5"
             HorizontalAlignment="Right"
             Background="#FAFAFA"
-            Content="Test Connection"
+            Content="{x:Static messages:Messages.TestConnection}"
             FontSize="22"
             PreviewMouseLeftButtonUp="TestConnectionPreviewMouseLeftButtonUp" />
 

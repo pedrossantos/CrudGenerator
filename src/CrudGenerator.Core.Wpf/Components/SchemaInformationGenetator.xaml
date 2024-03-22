@@ -5,6 +5,7 @@
     xmlns:classGeneratorConverters="clr-namespace:CrudGenerator.Core.Wpf.Converters"
     xmlns:components="clr-namespace:CrudGenerator.Core.Wpf.Components"
     xmlns:converters="clr-namespace:View.Components.Wpf.Converters;assembly=View.Components.Wpf"
+    xmlns:messages="clr-namespace:CrudGenerator.Core.Wpf"
     x:Name="schemaInformationGenetator">
 
     <UserControl.Resources>
@@ -31,7 +32,7 @@
                     Margin="10"
                     Padding="10,5"
                     HorizontalAlignment="Right"
-                    Content="Read Entities"
+                    Content="{x:Static messages:Messages.ReadDatabaseInformations}"
                     FontSize="22"
                     IsEnabled="{Binding Path=SchemaInformationGenetatorViewModel.GeneratingSchemaInformations, Mode=OneWay, Converter={StaticResource booleanToOppositeBooleanConverter}, ElementName=schemaInformationGenetator, UpdateSourceTrigger=PropertyChanged}"
                     PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" />

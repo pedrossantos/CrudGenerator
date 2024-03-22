@@ -5,6 +5,7 @@
     xmlns:adornerControls="clr-namespace:View.Components.Wpf.Adorners;assembly=View.Components.Wpf"
     xmlns:crudGeneratorComponents="clr-namespace:CrudGenerator.Core.Wpf.Components;assembly=CrudGenerator.Core.Wpf"
     xmlns:loadingWait="clr-namespace:View.Components.Wpf;assembly=View.Components.Wpf"
+    xmlns:messages="clr-namespace:CrudGenerator.App.Wpf"
     x:Name="mainWindow"
     Background="#EAEAEA">
 
@@ -14,7 +15,7 @@
             <loadingWait:LoadingWait />
         </adornerControls:AdornedControl.AdornerContent>
         <TabControl Margin="10">
-            <TabItem Header="Database Connetion Configuration">
+            <TabItem Header="{x:Static messages:Messages.DatabaseConnectionConfiguration}">
                 <crudGeneratorComponents:GeneralDatabaseConfiguration
                     Margin="0"
                     Padding="0"

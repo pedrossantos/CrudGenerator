@@ -2,6 +2,7 @@
     x:Class="CrudGenerator.Core.Wpf.Components.ForeignKeysGrid"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:messages="clr-namespace:CrudGenerator.Core.Wpf"
     x:Name="foreignKeysGrid">
     <Grid
         Grid.Row="1"
@@ -12,7 +13,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Text="Foreign Keys" />
+        <TextBlock Grid.Row="0" Text="{x:Static messages:Messages.ForeignKeys}" />
         <DataGrid
             Grid.Row="1"
             MaxHeight="300"
@@ -22,10 +23,10 @@
             <DataGrid.Columns>
                 <DataGridTextColumn
                     Binding="{Binding Path=ReferencedTable, Mode=OneWay}"
-                    Header="Referenced Table"
+                    Header="{x:Static messages:Messages.ReferencedTable}"
                     IsReadOnly="True" />
 
-                <DataGridTemplateColumn Header="Columns" IsReadOnly="True">
+                <DataGridTemplateColumn Header="{x:Static messages:Messages.Columns}" IsReadOnly="True">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <DataGrid
@@ -34,7 +35,7 @@
                                 IsReadOnly="True"
                                 ItemsSource="{Binding Path=ForeignKeyValueList, Mode=OneWay}">
                                 <DataGrid.Columns>
-                                    <DataGridTemplateColumn Header="Foreign Columns">
+                                    <DataGridTemplateColumn Header="{x:Static messages:Messages.ForeignColumns}">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
                                                 <DataGrid
@@ -42,9 +43,9 @@
                                                     IsReadOnly="True"
                                                     ItemsSource="{Binding Path=ForeignColunmnsToReferencedColumns}">
                                                     <DataGrid.Columns>
-                                                        <DataGridTextColumn Binding="{Binding Path=ForeignColumn, Mode=OneWay}" Header="Foreign Column" />
-                                                        <DataGridTextColumn Binding="{Binding Path=ReferencedColumn, Mode=OneWay}" Header="Referenced Column" />
-                                                        <DataGridCheckBoxColumn Binding="{Binding Path=IsPrimaryKey, Mode=OneWay}" Header="Is Primary Key" />
+                                                        <DataGridTextColumn Binding="{Binding Path=ForeignColumn, Mode=OneWay}" Header="{x:Static messages:Messages.ForeignColumn}" />
+                                                        <DataGridTextColumn Binding="{Binding Path=ReferencedColumn, Mode=OneWay}" Header="{x:Static messages:Messages.ReferencedColumn}" />
+                                                        <DataGridCheckBoxColumn Binding="{Binding Path=IsPrimaryKey, Mode=OneWay}" Header="{x:Static messages:Messages.IsPrimaryKeyColumn}" />
                                                     </DataGrid.Columns>
                                                 </DataGrid>
                                             </DataTemplate>

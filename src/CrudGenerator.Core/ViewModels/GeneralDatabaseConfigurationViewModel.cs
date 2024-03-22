@@ -42,7 +42,7 @@ namespace CrudGenerator.Core.ViewModels
             Requires.NotNull(messageDialog, nameof(messageDialog));
             Requires.NotNull(openFileDialog, nameof(openFileDialog));
 
-            PresenterTitle = "General Connection Configuration";
+            PresenterTitle = Messages.DatabaseConnectionConfiguration;
 
             _nullSchemaInformation = new NullSchemaInformation();
 
