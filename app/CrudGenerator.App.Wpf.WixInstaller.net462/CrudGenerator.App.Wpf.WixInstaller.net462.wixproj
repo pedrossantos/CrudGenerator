@@ -36,6 +36,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="BannerTop.bmp" />
+    <Content Include="CrudGeneratorLicense-enUS.rtf" />
+    <Content Include="CrudGeneratorLicense-ptBR.rtf" />
     <Content Include="Dialog.bmp" />
     <Content Include="index.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

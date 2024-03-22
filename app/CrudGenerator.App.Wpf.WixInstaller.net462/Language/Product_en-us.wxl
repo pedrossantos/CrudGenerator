@@ -8,4 +8,5 @@
   <String Id="Comments">Installs Crud Generator</String>
   <String Id="DowngradeError">A newer version of Crud Generator is already installed.</String>
   <String Id="RequiresDotNetFramework462">Crud Generator requires .NET Framework 4.6.2. Please install the .NET Framework then run this installer again.</String>
+  <String Id="LicenseRtf">CrudGeneratorLicense-enUS.rtf</String>
 </WixLocalization>

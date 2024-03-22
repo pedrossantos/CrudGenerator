@@ -18,6 +18,7 @@
   <module path="CrudGenerator.Core.Wpf.dll" />
   <module path="Database.dll" />
   <module path="Database.MySql.dll" />
+  <module path="Database.PostgreSql.dll" />
   <module path="Database.Sqlite.dll" />
   <module path="Database.SqlServer.dll" />
   <module path="DependencyInversion.dll" />

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
      xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension"
-	 xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
 
   <!-- The URL for add/remove programs -->
   <?define InfoURL="http://" ?>
@@ -10,13 +10,13 @@
    Upgrade code HAS to be the same for all updates.
    Once you've chosen it don't change it.
    -->
-  <?define UpgradeCode="3D4F9622-FF35-4F09-8EF4-7F42811BB8A7" ?> <!--v1.0.0.0-->
+  <!--<?define UpgradeCode="3D4F9622-FF35-4F09-8EF4-7F42811BB8A7" ?> --><!--v1.0.0.0-->
+  <?define UpgradeCode="2659D47E-51FB-41DA-95EE-E17A2D1EBD4F" ?> <!--v1.1.0.0-->
 
-	<Product Id="35CE40BF-2F47-409E-BA49-4757F6A3F1DA" Name="!(loc.ApplicationName)" Language="!(loc.Language)" Version="1.0.0.0" Manufacturer="!(loc.ManufacturerFullName)" UpgradeCode="$(var.UpgradeCode)">
+	<Product Id="35CE40BF-2F47-409E-BA49-4757F6A3F1DA" Name="!(loc.ApplicationName)" Language="!(loc.Language)" Version="1.1.0.0" Manufacturer="!(loc.ManufacturerFullName)" UpgradeCode="$(var.UpgradeCode)">
 	<Package Id="30EE239D-F5EA-4630-90CB-22AE1F31DCC4" InstallerVersion="200" Compressed="yes" InstallScope="perMachine" Description="!(loc.ProductDescription)"/>
 
-    <!-- License agreement text: dummy. Real text is set in WXS file -->
-    <!--<WixVariable Id="WixUILicenseRtf" Value="dummy" />-->
+    <!--<WixVariable Id="WixUILicenseRtf" Value="!(loc.LicenseRtf)" />-->
 
     <!-- UI customization -->
     <WixVariable Id="WixUIBannerBmp" Value="Dialog.bmp" />
@@ -36,7 +36,7 @@
 	<Media Id="1" Cabinet="product.cab" EmbedCab="yes"/>
 
     <PropertyRef Id="WIX_IS_NETFRAMEWORK_462_OR_LATER_INSTALLED"/>
-	<Condition Message="!(loc.RequiresDotNetFramework462)">
+	  <Condition Message="!(loc.RequiresDotNetFramework462)">
       <![CDATA[Installed OR WIX_IS_NETFRAMEWORK_462_OR_LATER_INSTALLED]]>
     </Condition>
 
@@ -46,6 +46,9 @@
 
           <Directory Id="LanguageENDir" Name="en" >
             <Component Id="LanguageEN" Guid="33EE77FF-449F-4843-89C1-9776201DFD90" KeyPath="yes">
+              <File Id="CrudGenerator.App.Wpf.resources.en" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\en\CrudGenerator.App.Wpf.resources.dll"/>
+              <File Id="CrudGenerator.Core.resources.en" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\en\CrudGenerator.Core.resources.dll"/>
+              <File Id="CrudGenerator.Core.Wpf.resources.en" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\en\CrudGenerator.Core.Wpf.resources.dll"/>
               <File Id="Framework.resources.en" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\en\Framework.resources.dll"/>
               <File Id="View.Abstractions.resources.en" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\en\View.Abstractions.resources.dll"/>
               <File Id="View.Abstractions.Wpf.resources.en" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\en\View.Abstractions.Wpf.resources.dll"/>
@@ -54,6 +57,9 @@
 
           <Directory Id="LanguageESDir" Name="es" >
             <Component Id="LanguageES" Guid="B6CA41F6-1EBB-4ABF-9958-9A95DAF9C308" KeyPath="yes">
+              <File Id="CrudGenerator.App.Wpf.resources.es" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\en\CrudGenerator.App.Wpf.resources.dll"/>
+              <File Id="CrudGenerator.Core.resources.es" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\en\CrudGenerator.Core.resources.dll"/>
+              <File Id="CrudGenerator.Core.Wpf.resources.es" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\en\CrudGenerator.Core.Wpf.resources.dll"/>
               <File Id="Database.MySql.resources.es" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\es\Database.MySql.resources.dll"/>
               <File Id="Database.PostgreSql.resources.es" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\es\Database.PostgreSql.resources.dll"/>
               <File Id="Database.resources.es" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\es\Database.resources.dll"/>
@@ -76,6 +82,9 @@
 
           <Directory Id="LanguagePTDir" Name="pt" >
             <Component Id="LanguagePT" Guid="2A2C206A-FB7D-4C9B-BEF4-BF18E3CCFD78" KeyPath="yes">
+              <File Id="CrudGenerator.App.Wpf.resources.pt" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\en\CrudGenerator.App.Wpf.resources.dll"/>
+              <File Id="CrudGenerator.Core.resources.pt" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\en\CrudGenerator.Core.resources.dll"/>
+              <File Id="CrudGenerator.Core.Wpf.resources.pt" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\en\CrudGenerator.Core.Wpf.resources.dll"/>
               <File Id="Database.MySql.resources.pt" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\pt\Database.MySql.resources.dll"/>
               <File Id="Database.PostgreSql.resources.pt" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\pt\Database.PostgreSql.resources.dll"/>
               <File Id="Database.resources.pt" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\pt\Database.resources.dll"/>
@@ -118,24 +127,124 @@
             <File Id="K4os.Hash.xxHash" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\K4os.Hash.xxHash.dll"/>
             <File Id="Microsoft.Bcl.AsyncInterfaces" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\Microsoft.Bcl.AsyncInterfaces.dll"/>
             <File Id="Microsoft.Bcl.HashCode" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\Microsoft.Bcl.HashCode.dll"/>
+            <File Id="Microsoft.Extensions.DependencyInjection.Abstractions" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\Microsoft.Extensions.DependencyInjection.Abstractions.dll"/>
+            <File Id="Microsoft.Extensions.Logging.Abstractions" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\Microsoft.Extensions.Logging.Abstractions.dll"/>
+            <File Id="Microsoft.Win32.Primitives" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\Microsoft.Win32.Primitives.dll"/>
             <File Id="MySql.Data" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\MySql.Data.dll"/>
             <File Id="netstandard" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\netstandard.dll"/>
             <File Id="Npgsql" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\Npgsql.dll"/>
+            <File Id="System.AppContext" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.AppContext.dll"/>
             <File Id="System.Buffers" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Buffers.dll"/>
+            <File Id="System.Collections.Concurrent" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Collections.Concurrent.dll"/>
+            <File Id="System.Collections" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Collections.dll"/>
             <File Id="System.Collections.Immutable" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Collections.Immutable.dll"/>
+            <File Id="System.Collections.NonGeneric" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Collections.NonGeneric.dll"/>
+            <File Id="System.Collections.Specialized" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Collections.Specialized.dll"/>
             <File Id="System.ComponentModel.Annotations" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.ComponentModel.Annotations.dll"/>
+            <File Id="System.ComponentModel" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.ComponentModel.dll"/>
+            <File Id="System.ComponentModel.EventBasedAsync" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.ComponentModel.EventBasedAsync.dll"/>
+            <File Id="System.ComponentModel.Primitives" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.ComponentModel.Primitives.dll"/>
+            <File Id="System.ComponentModel.TypeConverter" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.ComponentModel.TypeConverter.dll"/>
             <File Id="System.Configuration.ConfigurationManager" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Configuration.ConfigurationManager.dll"/>
+            <File Id="System.Console" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Console.dll"/>
+            <File Id="System.Data.Common" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Data.Common.dll"/>
             <File Id="System.Data.SqlClient" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Data.SqlClient.dll"/>
             <File Id="System.Data.SQLite" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Data.SQLite.dll"/>
             <File Id="System.Data.SQLite.EF6" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Data.SQLite.EF6.dll"/>
             <File Id="System.Data.SQLite.Linq" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Data.SQLite.Linq.dll"/>
+            <File Id="System.Diagnostics.Contracts" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Diagnostics.Contracts.dll"/>
+            <File Id="System.Diagnostics.Debug" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Diagnostics.Debug.dll"/>
             <File Id="System.Diagnostics.DiagnosticSource" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Diagnostics.DiagnosticSource.dll"/>
+            <File Id="System.Diagnostics.FileVersionInfo" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Diagnostics.FileVersionInfo.dll"/>
+            <File Id="System.Diagnostics.Process" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Diagnostics.Process.dll"/>
+            <File Id="System.Diagnostics.StackTrace" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Diagnostics.StackTrace.dll"/>
+            <File Id="System.Diagnostics.TextWriterTraceListener" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Diagnostics.TextWriterTraceListener.dll"/>
+            <File Id="System.Diagnostics.Tools" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Diagnostics.Tools.dll"/>
+            <File Id="System.Diagnostics.TraceSource" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Diagnostics.TraceSource.dll"/>
+            <File Id="System.Diagnostics.Tracing" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Diagnostics.Tracing.dll"/>
             <File Id="System.Drawing.Common" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Drawing.Common.dll"/>
+            <File Id="System.Drawing.Primitives" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Drawing.Primitives.dll"/>
+            <File Id="System.Dynamic.Runtime" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Dynamic.Runtime.dll"/>
+            <File Id="System.Globalization.Calendars" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Globalization.Calendars.dll"/>
+            <File Id="System.Globalization" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Globalization.dll"/>
+            <File Id="System.Globalization.Extensions" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Globalization.Extensions.dll"/>
+            <File Id="System.IO.Compression" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.IO.Compression.dll"/>
+            <File Id="System.IO.Compression.ZipFile" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.IO.Compression.ZipFile.dll"/>
+            <File Id="System.IO" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.IO.dll"/>
+            <File Id="System.IO.FileSystem" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.IO.FileSystem.dll"/>
+            <File Id="System.IO.FileSystem.DriveInfo" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.IO.FileSystem.DriveInfo.dll"/>
+            <File Id="System.IO.FileSystem.Primitives" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.IO.FileSystem.Primitives.dll"/>
+            <File Id="System.IO.FileSystem.Watcher" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.IO.FileSystem.Watcher.dll"/>
+            <File Id="System.IO.IsolatedStorage" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.IO.IsolatedStorage.dll"/>
+            <File Id="System.IO.MemoryMappedFiles" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.IO.MemoryMappedFiles.dll"/>
             <File Id="System.IO.Pipelines" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.IO.Pipelines.dll"/>
+            <File Id="System.IO.Pipes" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.IO.Pipes.dll"/>
+            <File Id="System.IO.UnmanagedMemoryStream" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.IO.UnmanagedMemoryStream.dll"/>
+            <File Id="System.Linq" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Linq.dll"/>
+            <File Id="System.Linq.Expressions" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Linq.Expressions.dll"/>
+            <File Id="System.Linq.Parallel" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Linq.Parallel.dll"/>
+            <File Id="System.Linq.Queryable" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Linq.Queryable.dll"/>
             <File Id="System.Memory" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Memory.dll"/>
+            <File Id="System.Net.Http" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Net.Http.dll"/>
+            <File Id="System.Net.NameResolution" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Net.NameResolution.dll"/>
+            <File Id="System.Net.NetworkInformation" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Net.NetworkInformation.dll"/>
+            <File Id="System.Net.Ping" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Net.Ping.dll"/>
+            <File Id="System.Net.Primitives" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Net.Primitives.dll"/>
+            <File Id="System.Net.Requests" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Net.Requests.dll"/>
+            <File Id="System.Net.Security" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Net.Security.dll"/>
+            <File Id="System.Net.Sockets" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Net.Sockets.dll"/>
+            <File Id="System.Net.WebHeaderCollection" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Net.WebHeaderCollection.dll"/>
+            <File Id="System.Net.WebSockets.Client" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Net.WebSockets.Client.dll"/>
+            <File Id="System.Net.WebSockets" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Net.WebSockets.dll"/>
             <File Id="System.Numerics.Vectors" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Numerics.Vectors.dll"/>
+            <File Id="System.ObjectModel" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.ObjectModel.dll"/>
+            <File Id="System.Reflection" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Reflection.dll"/>
+            <File Id="System.Reflection.Extensions" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Reflection.Extensions.dll"/>
+            <File Id="System.Reflection.Primitives" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Reflection.Primitives.dll"/>
+            <File Id="System.Resources.Reader" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Resources.Reader.dll"/>
+            <File Id="System.Resources.ResourceManager" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Resources.ResourceManager.dll"/>
+            <File Id="System.Resources.Writer" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Resources.Writer.dll"/>
             <File Id="System.Runtime.CompilerServices.Unsafe" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Runtime.CompilerServices.Unsafe.dll"/>
+            <File Id="System.Runtime.CompilerServices.VisualC" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Runtime.CompilerServices.VisualC.dll"/>
+            <File Id="System.Runtime" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Runtime.dll"/>
+            <File Id="System.Runtime.Extensions" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Runtime.Extensions.dll"/>
+            <File Id="System.Runtime.Handles" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Runtime.Handles.dll"/>
+            <File Id="System.Runtime.InteropServices" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Runtime.InteropServices.dll"/>
+            <File Id="System.Runtime.InteropServices.RuntimeInformation" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Runtime.InteropServices.RuntimeInformation.dll"/>
+            <File Id="System.Runtime.Numerics" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Runtime.Numerics.dll"/>
+            <File Id="System.Runtime.Serialization.Formatters" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Runtime.Serialization.Formatters.dll"/>
+            <File Id="System.Runtime.Serialization.Json" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Runtime.Serialization.Json.dll"/>
+            <File Id="System.Runtime.Serialization.Primitives" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Runtime.Serialization.Primitives.dll"/>
+            <File Id="System.Runtime.Serialization.Xml" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Runtime.Serialization.Xml.dll"/>
+            <File Id="System.Security.Claims" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Security.Claims.dll"/>
+            <File Id="System.Security.Cryptography.Algorithms" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Security.Cryptography.Algorithms.dll"/>
+            <File Id="System.Security.Cryptography.Csp" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Security.Cryptography.Csp.dll"/>
+            <File Id="System.Security.Cryptography.Encoding" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Security.Cryptography.Encoding.dll"/>
+            <File Id="System.Security.Cryptography.Primitives" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Security.Cryptography.Primitives.dll"/>
+            <File Id="System.Security.Cryptography.X509Certificates" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Security.Cryptography.X509Certificates.dll"/>
+            <File Id="System.Security.Principal" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Security.Principal.dll"/>
+            <File Id="System.Security.SecureString" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Security.SecureString.dll"/>
+            <File Id="System.Text.Encoding" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Text.Encoding.dll"/>
+            <File Id="System.Text.Encoding.Extensions" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Text.Encoding.Extensions.dll"/>
+            <File Id="System.Text.Encodings.Web" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Text.Encodings.Web.dll"/>
+            <File Id="System.Text.Json" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Text.Json.dll"/>
+            <File Id="System.Text.RegularExpressions" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Text.RegularExpressions.dll"/>
+            <File Id="System.Threading.Channels" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Threading.Channels.dll"/>
+            <File Id="System.Threading" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Threading.dll"/>
+            <File Id="System.Threading.Overlapped" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Threading.Overlapped.dll"/>
+            <File Id="System.Threading.Tasks" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Threading.Tasks.dll"/>
             <File Id="System.Threading.Tasks.Extensions" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Threading.Tasks.Extensions.dll"/>
+            <File Id="System.Threading.Tasks.Parallel" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Threading.Tasks.Parallel.dll"/>
+            <File Id="System.Threading.Thread" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Threading.Thread.dll"/>
+            <File Id="System.Threading.ThreadPool" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Threading.ThreadPool.dll"/>
+            <File Id="System.Threading.Timer" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Threading.Timer.dll"/>
+            <File Id="System.ValueTuple" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.ValueTuple.dll"/>
+            <File Id="System.Xml.ReaderWriter" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Xml.ReaderWriter.dll"/>
+            <File Id="System.Xml.XDocument" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Xml.XDocument.dll"/>
+            <File Id="System.Xml.XmlDocument" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Xml.XmlDocument.dll"/>
+            <File Id="System.Xml.XmlSerializer" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Xml.XmlSerializer.dll"/>
+            <File Id="System.Xml.XPath" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Xml.XPath.dll"/>
+            <File Id="System.Xml.XPath.XDocument" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\System.Xml.XPath.XDocument.dll"/>
             <File Id="ZstdSharp" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\ZstdSharp.dll"/>
 
             <File Id="CrudGenerator.App.Wpf.config" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\CrudGenerator.App.Wpf.exe.config"/>
@@ -145,6 +254,7 @@
             <File Id="CrudGenerator.Core" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\Confused\CrudGenerator.Core.dll"/>
             <File Id="Database" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\Confused\Database.dll"/>
             <File Id="Database.MySql" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\Confused\Database.MySql.dll"/>
+            <File Id="Database.PostgreSql" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\Confused\Database.PostgreSql.dll"/>
             <File Id="Database.Sqlite" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\Confused\Database.Sqlite.dll"/>
             <File Id="Database.SqlServer" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\Confused\Database.SqlServer.dll"/>
             <File Id="DependencyInversion" Source="..\CrudGenerator.App.Wpf\bin\Release\net462\Confused\DependencyInversion.dll"/>
