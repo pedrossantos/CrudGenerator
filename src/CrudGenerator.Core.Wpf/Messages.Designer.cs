@@ -22,7 +22,7 @@ namespace CrudGenerator.Core.Wpf {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Messages {
+    public class Messages {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace CrudGenerator.Core.Wpf {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("CrudGenerator.Core.Wpf.Messages", typeof(Messages).Assembly);
@@ -51,7 +51,7 @@ namespace CrudGenerator.Core.Wpf {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +63,7 @@ namespace CrudGenerator.Core.Wpf {
         /// <summary>
         ///   Looks up a localized string similar to Default Value.
         /// </summary>
-        internal static string ColumnDefaultValue {
+        public static string ColumnDefaultValue {
             get {
                 return ResourceManager.GetString("ColumnDefaultValue", resourceCulture);
             }
@@ -72,7 +72,7 @@ namespace CrudGenerator.Core.Wpf {
         /// <summary>
         ///   Looks up a localized string similar to Column Name.
         /// </summary>
-        internal static string ColumnName {
+        public static string ColumnName {
             get {
                 return ResourceManager.GetString("ColumnName", resourceCulture);
             }
@@ -81,7 +81,7 @@ namespace CrudGenerator.Core.Wpf {
         /// <summary>
         ///   Looks up a localized string similar to Columns.
         /// </summary>
-        internal static string Columns {
+        public static string Columns {
             get {
                 return ResourceManager.GetString("Columns", resourceCulture);
             }
@@ -90,7 +90,7 @@ namespace CrudGenerator.Core.Wpf {
         /// <summary>
         ///   Looks up a localized string similar to Column Type.
         /// </summary>
-        internal static string ColumnType {
+        public static string ColumnType {
             get {
                 return ResourceManager.GetString("ColumnType", resourceCulture);
             }
@@ -99,7 +99,7 @@ namespace CrudGenerator.Core.Wpf {
         /// <summary>
         ///   Looks up a localized string similar to Database Name: .
         /// </summary>
-        internal static string DatabaseNameTitle {
+        public static string DatabaseNameTitle {
             get {
                 return ResourceManager.GetString("DatabaseNameTitle", resourceCulture);
             }
@@ -108,7 +108,7 @@ namespace CrudGenerator.Core.Wpf {
         /// <summary>
         ///   Looks up a localized string similar to Database Path: .
         /// </summary>
-        internal static string DatabasePathTitle {
+        public static string DatabasePathTitle {
             get {
                 return ResourceManager.GetString("DatabasePathTitle", resourceCulture);
             }
@@ -117,7 +117,7 @@ namespace CrudGenerator.Core.Wpf {
         /// <summary>
         ///   Looks up a localized string similar to Database Type: .
         /// </summary>
-        internal static string DatabaseTypeTitle {
+        public static string DatabaseTypeTitle {
             get {
                 return ResourceManager.GetString("DatabaseTypeTitle", resourceCulture);
             }
@@ -126,7 +126,7 @@ namespace CrudGenerator.Core.Wpf {
         /// <summary>
         ///   Looks up a localized string similar to Default Values.
         /// </summary>
-        internal static string DefaultValues {
+        public static string DefaultValues {
             get {
                 return ResourceManager.GetString("DefaultValues", resourceCulture);
             }
@@ -136,7 +136,7 @@ namespace CrudGenerator.Core.Wpf {
         ///   Looks up a localized string similar to Error to open database:
         ///{0}.
         /// </summary>
-        internal static string ErrorOnOpenSqliteDatabase {
+        public static string ErrorOnOpenSqliteDatabase {
             get {
                 return ResourceManager.GetString("ErrorOnOpenSqliteDatabase", resourceCulture);
             }
@@ -145,7 +145,7 @@ namespace CrudGenerator.Core.Wpf {
         /// <summary>
         ///   Looks up a localized string similar to Error.
         /// </summary>
-        internal static string ErrorTitle {
+        public static string ErrorTitle {
             get {
                 return ResourceManager.GetString("ErrorTitle", resourceCulture);
             }
@@ -154,7 +154,7 @@ namespace CrudGenerator.Core.Wpf {
         /// <summary>
         ///   Looks up a localized string similar to Foreign Column.
         /// </summary>
-        internal static string ForeignColumn {
+        public static string ForeignColumn {
             get {
                 return ResourceManager.GetString("ForeignColumn", resourceCulture);
             }
@@ -163,7 +163,7 @@ namespace CrudGenerator.Core.Wpf {
         /// <summary>
         ///   Looks up a localized string similar to Foreign Columns.
         /// </summary>
-        internal static string ForeignColumns {
+        public static string ForeignColumns {
             get {
                 return ResourceManager.GetString("ForeignColumns", resourceCulture);
             }
@@ -172,7 +172,7 @@ namespace CrudGenerator.Core.Wpf {
         /// <summary>
         ///   Looks up a localized string similar to Foreign Keys.
         /// </summary>
-        internal static string ForeignKeys {
+        public static string ForeignKeys {
             get {
                 return ResourceManager.GetString("ForeignKeys", resourceCulture);
             }
@@ -181,7 +181,7 @@ namespace CrudGenerator.Core.Wpf {
         /// <summary>
         ///   Looks up a localized string similar to Indexed Columns.
         /// </summary>
-        internal static string IndexedColumns {
+        public static string IndexedColumns {
             get {
                 return ResourceManager.GetString("IndexedColumns", resourceCulture);
             }
@@ -190,7 +190,7 @@ namespace CrudGenerator.Core.Wpf {
         /// <summary>
         ///   Looks up a localized string similar to Indexes.
         /// </summary>
-        internal static string Indexes {
+        public static string Indexes {
             get {
                 return ResourceManager.GetString("Indexes", resourceCulture);
             }
@@ -199,7 +199,7 @@ namespace CrudGenerator.Core.Wpf {
         /// <summary>
         ///   Looks up a localized string similar to Index Name.
         /// </summary>
-        internal static string IndexName {
+        public static string IndexName {
             get {
                 return ResourceManager.GetString("IndexName", resourceCulture);
             }
@@ -208,7 +208,7 @@ namespace CrudGenerator.Core.Wpf {
         /// <summary>
         ///   Looks up a localized string similar to Is Unique.
         /// </summary>
-        internal static string IsIndexUnique {
+        public static string IsIndexUnique {
             get {
                 return ResourceManager.GetString("IsIndexUnique", resourceCulture);
             }
@@ -217,7 +217,7 @@ namespace CrudGenerator.Core.Wpf {
         /// <summary>
         ///   Looks up a localized string similar to Is Primary Key.
         /// </summary>
-        internal static string IsPrimaryKeyColumn {
+        public static string IsPrimaryKeyColumn {
             get {
                 return ResourceManager.GetString("IsPrimaryKeyColumn", resourceCulture);
             }
@@ -226,7 +226,7 @@ namespace CrudGenerator.Core.Wpf {
         /// <summary>
         ///   Looks up a localized string similar to MySql Database Connection Configuration.
         /// </summary>
-        internal static string MySqlDatabaseConnectionConfiguration {
+        public static string MySqlDatabaseConnectionConfiguration {
             get {
                 return ResourceManager.GetString("MySqlDatabaseConnectionConfiguration", resourceCulture);
             }
@@ -235,7 +235,7 @@ namespace CrudGenerator.Core.Wpf {
         /// <summary>
         ///   Looks up a localized string similar to Password: .
         /// </summary>
-        internal static string PasswordTitle {
+        public static string PasswordTitle {
             get {
                 return ResourceManager.GetString("PasswordTitle", resourceCulture);
             }
@@ -244,7 +244,7 @@ namespace CrudGenerator.Core.Wpf {
         /// <summary>
         ///   Looks up a localized string similar to PostgreSql Database Connection Configuration.
         /// </summary>
-        internal static string PostgreSqlDatabaseConnectionConfiguration {
+        public static string PostgreSqlDatabaseConnectionConfiguration {
             get {
                 return ResourceManager.GetString("PostgreSqlDatabaseConnectionConfiguration", resourceCulture);
             }
@@ -253,7 +253,7 @@ namespace CrudGenerator.Core.Wpf {
         /// <summary>
         ///   Looks up a localized string similar to Read Database Informations.
         /// </summary>
-        internal static string ReadDatabaseInformations {
+        public static string ReadDatabaseInformations {
             get {
                 return ResourceManager.GetString("ReadDatabaseInformations", resourceCulture);
             }
@@ -262,7 +262,7 @@ namespace CrudGenerator.Core.Wpf {
         /// <summary>
         ///   Looks up a localized string similar to Referenced Column.
         /// </summary>
-        internal static string ReferencedColumn {
+        public static string ReferencedColumn {
             get {
                 return ResourceManager.GetString("ReferencedColumn", resourceCulture);
             }
@@ -271,7 +271,7 @@ namespace CrudGenerator.Core.Wpf {
         /// <summary>
         ///   Looks up a localized string similar to Referenced Table.
         /// </summary>
-        internal static string ReferencedTable {
+        public static string ReferencedTable {
             get {
                 return ResourceManager.GetString("ReferencedTable", resourceCulture);
             }
@@ -280,7 +280,7 @@ namespace CrudGenerator.Core.Wpf {
         /// <summary>
         ///   Looks up a localized string similar to Please enter the Database Name....
         /// </summary>
-        internal static string SelectedDatabaseName {
+        public static string SelectedDatabaseName {
             get {
                 return ResourceManager.GetString("SelectedDatabaseName", resourceCulture);
             }
@@ -289,7 +289,7 @@ namespace CrudGenerator.Core.Wpf {
         /// <summary>
         ///   Looks up a localized string similar to Please enter the password....
         /// </summary>
-        internal static string SelectedPassword {
+        public static string SelectedPassword {
             get {
                 return ResourceManager.GetString("SelectedPassword", resourceCulture);
             }
@@ -298,7 +298,7 @@ namespace CrudGenerator.Core.Wpf {
         /// <summary>
         ///   Looks up a localized string similar to Please enter the Server Name or Server IP Addres....
         /// </summary>
-        internal static string SelectedServerOrIpAddress {
+        public static string SelectedServerOrIpAddress {
             get {
                 return ResourceManager.GetString("SelectedServerOrIpAddress", resourceCulture);
             }
@@ -307,7 +307,7 @@ namespace CrudGenerator.Core.Wpf {
         /// <summary>
         ///   Looks up a localized string similar to Selected the Sqlite Database File....
         /// </summary>
-        internal static string SelectedSqliteDatabaseFile {
+        public static string SelectedSqliteDatabaseFile {
             get {
                 return ResourceManager.GetString("SelectedSqliteDatabaseFile", resourceCulture);
             }
@@ -316,7 +316,7 @@ namespace CrudGenerator.Core.Wpf {
         /// <summary>
         ///   Looks up a localized string similar to Selected the Database Type.
         /// </summary>
-        internal static string SelectedTheDatabaseTypeTitle {
+        public static string SelectedTheDatabaseTypeTitle {
             get {
                 return ResourceManager.GetString("SelectedTheDatabaseTypeTitle", resourceCulture);
             }
@@ -325,7 +325,7 @@ namespace CrudGenerator.Core.Wpf {
         /// <summary>
         ///   Looks up a localized string similar to Please enter the User ID....
         /// </summary>
-        internal static string SelectedUserId {
+        public static string SelectedUserId {
             get {
                 return ResourceManager.GetString("SelectedUserId", resourceCulture);
             }
@@ -334,7 +334,7 @@ namespace CrudGenerator.Core.Wpf {
         /// <summary>
         ///   Looks up a localized string similar to Select the database type to proceed....
         /// </summary>
-        internal static string SelectTheDatabase {
+        public static string SelectTheDatabase {
             get {
                 return ResourceManager.GetString("SelectTheDatabase", resourceCulture);
             }
@@ -343,7 +343,7 @@ namespace CrudGenerator.Core.Wpf {
         /// <summary>
         ///   Looks up a localized string similar to Server: .
         /// </summary>
-        internal static string ServerTitle {
+        public static string ServerTitle {
             get {
                 return ResourceManager.GetString("ServerTitle", resourceCulture);
             }
@@ -352,7 +352,7 @@ namespace CrudGenerator.Core.Wpf {
         /// <summary>
         ///   Looks up a localized string similar to Sqlite Database Connection Configuration.
         /// </summary>
-        internal static string SqliteDatabaseConnectionConfiguration {
+        public static string SqliteDatabaseConnectionConfiguration {
             get {
                 return ResourceManager.GetString("SqliteDatabaseConnectionConfiguration", resourceCulture);
             }
@@ -361,7 +361,7 @@ namespace CrudGenerator.Core.Wpf {
         /// <summary>
         ///   Looks up a localized string similar to SqlServer Database Connection Configuration.
         /// </summary>
-        internal static string SqlServerDatabaseConnectionConfiguration {
+        public static string SqlServerDatabaseConnectionConfiguration {
             get {
                 return ResourceManager.GetString("SqlServerDatabaseConnectionConfiguration", resourceCulture);
             }
@@ -370,7 +370,7 @@ namespace CrudGenerator.Core.Wpf {
         /// <summary>
         ///   Looks up a localized string similar to Table Definitions.
         /// </summary>
-        internal static string TableDefinitions {
+        public static string TableDefinitions {
             get {
                 return ResourceManager.GetString("TableDefinitions", resourceCulture);
             }
@@ -379,7 +379,7 @@ namespace CrudGenerator.Core.Wpf {
         /// <summary>
         ///   Looks up a localized string similar to Test Connection.
         /// </summary>
-        internal static string TestConnection {
+        public static string TestConnection {
             get {
                 return ResourceManager.GetString("TestConnection", resourceCulture);
             }
@@ -388,7 +388,7 @@ namespace CrudGenerator.Core.Wpf {
         /// <summary>
         ///   Looks up a localized string similar to User ID: .
         /// </summary>
-        internal static string UserIdTitle {
+        public static string UserIdTitle {
             get {
                 return ResourceManager.GetString("UserIdTitle", resourceCulture);
             }

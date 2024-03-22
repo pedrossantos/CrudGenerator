@@ -22,7 +22,7 @@ namespace CrudGenerator.Core {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Messages {
+    public class Messages {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace CrudGenerator.Core {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("CrudGenerator.Core.Messages", typeof(Messages).Assembly);
@@ -51,7 +51,7 @@ namespace CrudGenerator.Core {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +63,7 @@ namespace CrudGenerator.Core {
         /// <summary>
         ///   Looks up a localized string similar to Database Connection Configuration.
         /// </summary>
-        internal static string DatabaseConnectionConfiguration {
+        public static string DatabaseConnectionConfiguration {
             get {
                 return ResourceManager.GetString("DatabaseConnectionConfiguration", resourceCulture);
             }
@@ -72,7 +72,7 @@ namespace CrudGenerator.Core {
         /// <summary>
         ///   Looks up a localized string similar to Please enter the Database Name!.
         /// </summary>
-        internal static string EnterDatabaseName {
+        public static string EnterDatabaseName {
             get {
                 return ResourceManager.GetString("EnterDatabaseName", resourceCulture);
             }
@@ -81,7 +81,7 @@ namespace CrudGenerator.Core {
         /// <summary>
         ///   Looks up a localized string similar to Please enter the Server Name or Server IP Address!.
         /// </summary>
-        internal static string EnterServerNameOrIpAddres {
+        public static string EnterServerNameOrIpAddres {
             get {
                 return ResourceManager.GetString("EnterServerNameOrIpAddres", resourceCulture);
             }
@@ -90,7 +90,7 @@ namespace CrudGenerator.Core {
         /// <summary>
         ///   Looks up a localized string similar to Please enter the User ID!.
         /// </summary>
-        internal static string EnterUserId {
+        public static string EnterUserId {
             get {
                 return ResourceManager.GetString("EnterUserId", resourceCulture);
             }
@@ -100,7 +100,7 @@ namespace CrudGenerator.Core {
         ///   Looks up a localized string similar to Error to open database:
         ///{0}.
         /// </summary>
-        internal static string ErrorOnOpenSqliteDatabase {
+        public static string ErrorOnOpenSqliteDatabase {
             get {
                 return ResourceManager.GetString("ErrorOnOpenSqliteDatabase", resourceCulture);
             }
@@ -109,7 +109,7 @@ namespace CrudGenerator.Core {
         /// <summary>
         ///   Looks up a localized string similar to Error.
         /// </summary>
-        internal static string ErrorTitle {
+        public static string ErrorTitle {
             get {
                 return ResourceManager.GetString("ErrorTitle", resourceCulture);
             }
@@ -118,7 +118,7 @@ namespace CrudGenerator.Core {
         /// <summary>
         ///   Looks up a localized string similar to MySql Database Connection Configuration.
         /// </summary>
-        internal static string MySqlDatabaseConnectionConfiguration {
+        public static string MySqlDatabaseConnectionConfiguration {
             get {
                 return ResourceManager.GetString("MySqlDatabaseConnectionConfiguration", resourceCulture);
             }
@@ -127,7 +127,7 @@ namespace CrudGenerator.Core {
         /// <summary>
         ///   Looks up a localized string similar to PostgreSql Database Connection Configuration.
         /// </summary>
-        internal static string PostgreSqlDatabaseConnectionConfiguration {
+        public static string PostgreSqlDatabaseConnectionConfiguration {
             get {
                 return ResourceManager.GetString("PostgreSqlDatabaseConnectionConfiguration", resourceCulture);
             }
@@ -136,7 +136,7 @@ namespace CrudGenerator.Core {
         /// <summary>
         ///   Looks up a localized string similar to Please select the File Path!.
         /// </summary>
-        internal static string SelectFilePath {
+        public static string SelectFilePath {
             get {
                 return ResourceManager.GetString("SelectFilePath", resourceCulture);
             }
@@ -145,7 +145,7 @@ namespace CrudGenerator.Core {
         /// <summary>
         ///   Looks up a localized string similar to Please select the Project Folder!.
         /// </summary>
-        internal static string SelectProjectFolder {
+        public static string SelectProjectFolder {
             get {
                 return ResourceManager.GetString("SelectProjectFolder", resourceCulture);
             }
@@ -154,7 +154,7 @@ namespace CrudGenerator.Core {
         /// <summary>
         ///   Looks up a localized string similar to Please type the Project Name!.
         /// </summary>
-        internal static string SelectProjectName {
+        public static string SelectProjectName {
             get {
                 return ResourceManager.GetString("SelectProjectName", resourceCulture);
             }
@@ -163,7 +163,7 @@ namespace CrudGenerator.Core {
         /// <summary>
         ///   Looks up a localized string similar to Sqlite Database Connection Configuration.
         /// </summary>
-        internal static string SqliteDatabaseConnectionConfiguration {
+        public static string SqliteDatabaseConnectionConfiguration {
             get {
                 return ResourceManager.GetString("SqliteDatabaseConnectionConfiguration", resourceCulture);
             }
@@ -172,7 +172,7 @@ namespace CrudGenerator.Core {
         /// <summary>
         ///   Looks up a localized string similar to SqlServer Database Connection Configuration.
         /// </summary>
-        internal static string SqlServerDatabaseConnectionConfiguration {
+        public static string SqlServerDatabaseConnectionConfiguration {
             get {
                 return ResourceManager.GetString("SqlServerDatabaseConnectionConfiguration", resourceCulture);
             }

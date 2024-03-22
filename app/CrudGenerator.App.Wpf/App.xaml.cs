@@ -15,6 +15,8 @@ namespace CrudGenerator.App.Wpf
 
         private async void Application_Startup(object sender, StartupEventArgs e)
         {
+            AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
+
             _serviceProvider = new CrudGeneratorContainerBuilder().Build();
 
             IMessageDialog messageDialog = _serviceProvider.Resolve<IMessageDialog>();
@@ -42,6 +44,23 @@ namespace CrudGenerator.App.Wpf
                     await wpfNavigationController.RootAsync(mainWindow);
                     wpfNavigationController.Show();
                 }
+            }
+        }
+
+        private System.Reflection.Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+        {
+            AppDomain.CurrentDomain.AssemblyResolve -= CurrentDomain_AssemblyResolve;
+            try
+            {
+                return AppDomain.CurrentDomain.Load(args.Name.Split(',')[0]);
+            }
+            catch
+            {
+                return args.RequestingAssembly;
+            }
+            finally
+            {
+                AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
             }
         }
 
