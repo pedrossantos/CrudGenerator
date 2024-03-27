@@ -26,7 +26,7 @@ namespace CrudGenerator.App.Wpf
                 if (messageDialog != null)
                     await messageDialog.ShowAsync(string.Format(Messages.ErrorToResolveObject, nameof(IMessageDialog)), Messages.ErrorTitle);
                 else
-                    MessageBox.Show($"Erro ao carregar {nameof(MainWindow)}", Messages.ErrorTitle, MessageBoxButton.OK);
+                    MessageBox.Show(string.Format(Messages.ErrorToResolveObject, nameof(MainWindow)), Messages.ErrorTitle, MessageBoxButton.OK);
 
                 Shutdown();
             }

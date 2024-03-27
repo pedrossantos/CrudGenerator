@@ -22,7 +22,7 @@
                     GeneralDatabaseConfigurationViewModel="{Binding Path=GeneralDatabaseConfigurationViewModel, ElementName=mainWindow}" />
             </TabItem>
 
-            <TabItem Header="Entities Readed" IsEnabled="{Binding Path=GeneralDatabaseConfigurationViewModel.SchemaInformation.CanReadDatabaseSchema, Mode=OneWay, ElementName=mainWindow, UpdateSourceTrigger=PropertyChanged}">
+            <TabItem Header="Entities Readed" IsEnabled="{Binding Path=GeneralDatabaseConfigurationViewModel.CanReadDatabaseSchema, Mode=OneWay, ElementName=mainWindow, UpdateSourceTrigger=PropertyChanged}">
                 <crudGeneratorComponents:SchemaInformationGenetator
                     Padding="0"
                     GenerateSchemaInformationFinalized="SchemaInformationGenetatorGenerateSchemaInformationFinalized"
@@ -31,7 +31,7 @@
                     SelectedDatabaseType="{Binding Path=GeneralDatabaseConfigurationViewModel.SelectedDatabaseType, ElementName=mainWindow, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             </TabItem>
 
-            <TabItem Header="Generated C# Classes" IsEnabled="{Binding Path=GeneralDatabaseConfigurationViewModel.SchemaInformation.SchemaTableMappingsObservableCollection.Count, Mode=OneWay, ElementName=mainWindow}">
+            <TabItem Header="Generated C# Classes" IsEnabled="{Binding Path=SchemaInformationGenetatorViewModel.SchemaInformation.SchemaTableMappingsObservableCollection.Count, Mode=OneWay, ElementName=mainWindow}">
                 <crudGeneratorComponents:ProjectGeneratorControl
                     Padding="0"
                     GenerateClassesFinalized="ProjectGeneratorControl_GenerateClassesFinalized"
