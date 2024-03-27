@@ -25,24 +25,25 @@
                 <components:MySqlConnectionConfiguration
                     Margin="0"
                     Padding="0"
+                    ConnectionManager="{Binding Path=GeneralDatabaseConfigurationViewModel.MySqlConnectionConfigurationViewModel.ConnectionManager, Mode=OneWay, ElementName=generalDatabaseConfiguration, UpdateSourceTrigger=PropertyChanged}"
                     MessageDialog="{Binding Path=GeneralDatabaseConfigurationViewModel.MessageDialog, Mode=OneWay, ElementName=generalDatabaseConfiguration, UpdateSourceTrigger=PropertyChanged}"
-                    MySqlConnectionConfigurationViewModel="{Binding Path=GeneralDatabaseConfigurationViewModel.MySqlConnectionConfigurationViewModel, Mode=OneWay, ElementName=generalDatabaseConfiguration, UpdateSourceTrigger=PropertyChanged}"
-                    SchemaInformation="{Binding Path=GeneralDatabaseConfigurationViewModel.MySqlConnectionConfigurationViewModel.SchemaInformation, Mode=OneWay, ElementName=generalDatabaseConfiguration, UpdateSourceTrigger=PropertyChanged}" />
+                    MySqlConnectionConfigurationViewModel="{Binding Path=GeneralDatabaseConfigurationViewModel.MySqlConnectionConfigurationViewModel, Mode=OneWay, ElementName=generalDatabaseConfiguration, UpdateSourceTrigger=PropertyChanged}" />
             </DataTemplate>
 
             <DataTemplate x:Key="PostgreSqlOptions">
                 <components:PostgreSqlConnectionConfiguration
                     Margin="0"
                     Padding="0"
+                    ConnectionManager="{Binding Path=GeneralDatabaseConfigurationViewModel.PostgreSqlConnectionConfigurationViewModel.ConnectionManager, Mode=OneWay, ElementName=generalDatabaseConfiguration, UpdateSourceTrigger=PropertyChanged}"
                     MessageDialog="{Binding Path=GeneralDatabaseConfigurationViewModel.MessageDialog, Mode=OneWay, ElementName=generalDatabaseConfiguration, UpdateSourceTrigger=PropertyChanged}"
-                    PostgreSqlConnectionConfigurationViewModel="{Binding Path=GeneralDatabaseConfigurationViewModel.PostgreSqlConnectionConfigurationViewModel, Mode=OneWay, ElementName=generalDatabaseConfiguration, UpdateSourceTrigger=PropertyChanged}"
-                    SchemaInformation="{Binding Path=GeneralDatabaseConfigurationViewModel.PostgreSqlConnectionConfigurationViewModel.SchemaInformation, Mode=OneWay, ElementName=generalDatabaseConfiguration, UpdateSourceTrigger=PropertyChanged}" />
+                    PostgreSqlConnectionConfigurationViewModel="{Binding Path=GeneralDatabaseConfigurationViewModel.PostgreSqlConnectionConfigurationViewModel, Mode=OneWay, ElementName=generalDatabaseConfiguration, UpdateSourceTrigger=PropertyChanged}" />
             </DataTemplate>
 
             <DataTemplate x:Key="SqliteOptions">
                 <components:SqliteConnectionConfiguration
                     Margin="0"
                     Padding="0"
+                    ConnectionManager="{Binding Path=GeneralDatabaseConfigurationViewModel.SqliteConnectionConfigurationViewModel.ConnectionManager, Mode=OneWay, ElementName=generalDatabaseConfiguration, UpdateSourceTrigger=PropertyChanged}"
                     SqliteConnectionConfigurationViewModel="{Binding Path=GeneralDatabaseConfigurationViewModel.SqliteConnectionConfigurationViewModel, Mode=OneWay, ElementName=generalDatabaseConfiguration, UpdateSourceTrigger=PropertyChanged}" />
             </DataTemplate>
 
@@ -50,6 +51,7 @@
                 <components:SqlServerConnectionConfiguration
                     Margin="0"
                     Padding="0"
+                    ConnectionManager="{Binding Path=GeneralDatabaseConfigurationViewModel.SqlServerConnectionConfigurationViewModel.ConnectionManager, Mode=OneWay, ElementName=generalDatabaseConfiguration, UpdateSourceTrigger=PropertyChanged}"
                     SqlServerConnectionConfigurationViewModel="{Binding Path=GeneralDatabaseConfigurationViewModel.SqlServerConnectionConfigurationViewModel, Mode=OneWay, ElementName=generalDatabaseConfiguration, UpdateSourceTrigger=PropertyChanged}" />
             </DataTemplate>
 

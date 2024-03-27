@@ -19,9 +19,9 @@ namespace CrudGenerator.Core.ViewModels
 
         [Injectable]
         public MySqlConnectionConfigurationViewModel(
-            MySqlSchemaInformation mysSqlSchemaInformation,
+            MySqlConnectionManager mysSqlConnectionManager,
             IMessageDialog messageDialog)
-            : base(mysSqlSchemaInformation, messageDialog)
+            : base(mysSqlConnectionManager, messageDialog)
         {
             PresenterTitle = Messages.MySqlDatabaseConnectionConfiguration;
         }
@@ -52,7 +52,7 @@ namespace CrudGenerator.Core.ViewModels
 
         public override void UpdateConnection()
         {
-            SchemaInformation.UpdateConnection(
+            ConnectionManager.UpdateConnectionStringBuilder(
                 new MySql.Data.MySqlClient.MySqlConnectionStringBuilder($"Server={MySqlServerNameOrIpAddress};Database={MySqlDatabaseName}")
                 {
                     UserID = MySqlUserId,

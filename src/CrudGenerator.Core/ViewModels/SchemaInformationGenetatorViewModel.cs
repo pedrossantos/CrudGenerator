@@ -13,6 +13,7 @@ namespace CrudGenerator.Core.ViewModels
     public class SchemaInformationGenetatorViewModel : ViewModelBase
     {
         private DatabaseTypes _selectedDatabaseType;
+        private NullSchemaInformation _nullSchemaInformation;
         private MySqlSchemaInformation _mySqlSchemaInformation;
         private PostgreSqlSchemaInformation _postgreSqlSchemaInformation;
         private SqliteSchemaInformation _sqliteSchemaInformation;
@@ -23,6 +24,9 @@ namespace CrudGenerator.Core.ViewModels
 
         public SchemaInformationGenetatorViewModel()
         {
+            PropertyChanged += SchemaInformationGenetatorViewModel_PropertyChanged;
+
+            _nullSchemaInformation = new NullSchemaInformation();
         }
 
         [Injectable]
@@ -32,6 +36,10 @@ namespace CrudGenerator.Core.ViewModels
             SqliteSchemaInformation sqliteSchemaInformation,
             SqlServerSchemaInformation sqlServerSchemaInformation)
         {
+            PropertyChanged += SchemaInformationGenetatorViewModel_PropertyChanged;
+
+            _nullSchemaInformation = new NullSchemaInformation();
+
             _mySqlSchemaInformation = mySqlSchemaInformation;
             _postgreSqlSchemaInformation = postgreSqlSchemaInformation;
             _sqliteSchemaInformation = sqliteSchemaInformation;
@@ -51,7 +59,7 @@ namespace CrudGenerator.Core.ViewModels
                 else if (SelectedDatabaseType == DatabaseTypes.SqlServer)
                     return _sqlServerSchemaInformation;
 
-                return null;
+                return _nullSchemaInformation;
             }
         }
 
@@ -167,6 +175,17 @@ namespace CrudGenerator.Core.ViewModels
             finally
             {
                 GeneratingSchemaInformations = false;
+            }
+        }
+
+        private void SchemaInformationGenetatorViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(SelectedDatabaseType))
+            {
+                _mySqlSchemaInformation.Clear();
+                _postgreSqlSchemaInformation.Clear();
+                _sqliteSchemaInformation.Clear();
+                _sqlServerSchemaInformation.Clear();
             }
         }
     }

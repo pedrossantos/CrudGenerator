@@ -53,12 +53,12 @@ namespace CrudGenerator.Core.Wpf.Components
         }
 
         public MySqlConnectionConfiguration(
-            MySqlSchemaInformation mySqlSchemaInformation,
+            MySqlConnectionManager mySqlConnectionManager,
             IMessageDialog messageDialog)
-            : base(mySqlSchemaInformation, messageDialog)
+            : base(mySqlConnectionManager, messageDialog)
         {
             DbConnectionConfigurationViewModel = MySqlConnectionConfigurationViewModel = new MySqlConnectionConfigurationViewModel(
-                mySqlSchemaInformation,
+                mySqlConnectionManager,
                 MessageDialog);
 
             PropertyChanged += MySqlConnectionConfigurationPropertyChanged;

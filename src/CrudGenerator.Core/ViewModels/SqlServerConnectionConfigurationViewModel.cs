@@ -20,9 +20,9 @@ namespace CrudGenerator.Core.ViewModels
 
         [Injectable]
         public SqlServerConnectionConfigurationViewModel(
-            SqlServerSchemaInformation sqlServerSchemaInformation,
+            SqlServerConnectionManager sqlServerConnectionManager,
             IMessageDialog messageDialog)
-            : base(sqlServerSchemaInformation, messageDialog)
+            : base(sqlServerConnectionManager, messageDialog)
         {
             PresenterTitle = Messages.SqlServerDatabaseConnectionConfiguration;
         }
@@ -53,7 +53,7 @@ namespace CrudGenerator.Core.ViewModels
 
         public override void UpdateConnection()
         {
-            SchemaInformation.UpdateConnection(
+            ConnectionManager.UpdateConnectionStringBuilder(
                 new System.Data.SqlClient.SqlConnectionStringBuilder($"Server=tcp:{SqlServerServerNameOrIpAddress},1433;Initial Catalog={SqlServerDatabaseName}")
                 {
                     UserID = SqlServerUserId,

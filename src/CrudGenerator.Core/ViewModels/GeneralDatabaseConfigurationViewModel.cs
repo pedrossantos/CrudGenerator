@@ -1,5 +1,4 @@
-﻿using Database.DataAccess;
-using Database.DataMapping;
+﻿using Database.DataMapping;
 using DependencyInversion;
 using Framework.Validation;
 using System.Collections.Generic;
@@ -21,6 +20,7 @@ namespace CrudGenerator.Core.ViewModels
         private IEnumerable<DatabaseTypes> _avaiableDatabaseTypes;
         private DatabaseTypes _selectedDatabaseType;
         private NullSchemaInformation _nullSchemaInformation;
+        private bool _canReadDatabaseSchema;
 
         public GeneralDatabaseConfigurationViewModel()
         {
@@ -47,9 +47,16 @@ namespace CrudGenerator.Core.ViewModels
             _nullSchemaInformation = new NullSchemaInformation();
 
             _mySqlConnectionConfigurationViewModel = mySqlConnectionConfigurationViewModel;
+            _mySqlConnectionConfigurationViewModel.PropertyChanged += ConnectionConfigurationViewModelPropertyChanged;
+
             _postgreSqlConnectionConfigurationViewModel = postgreSqlConnectionConfigurationViewModel;
+            _postgreSqlConnectionConfigurationViewModel.PropertyChanged += ConnectionConfigurationViewModelPropertyChanged;
+
             _sqliteConnectionConfigurationViewModel = sqliteConnectionConfigurationViewModel;
+            _sqliteConnectionConfigurationViewModel.PropertyChanged += ConnectionConfigurationViewModelPropertyChanged;
+
             _sqlServerConnectionConfigurationViewModel = sqlServerConnectionConfigurationViewModel;
+            _sqlServerConnectionConfigurationViewModel.PropertyChanged += ConnectionConfigurationViewModelPropertyChanged;
 
             _messageDialog = messageDialog;
             _openFileDialog = openFileDialog;
@@ -64,8 +71,6 @@ namespace CrudGenerator.Core.ViewModels
             };
 
             _selectedDatabaseType = DatabaseTypes.None;
-
-            PropertyChanged += GeneralDatabaseConfigurationViewModelPropertyChanged;
         }
 
         public IMessageDialog MessageDialog
@@ -125,8 +130,8 @@ namespace CrudGenerator.Core.ViewModels
                 {
                     PropertyChangedDispatcher.SetProperty(ref _selectedDatabaseType, value);
 
-                    SchemaInformation.Clear();
-                    PropertyChangedDispatcher.Notify(nameof(SchemaInformation));
+                    CanReadDatabaseSchema = false;
+
                     PropertyChangedDispatcher.Notify(nameof(MySqlConnectionConfigurationViewModel));
                     PropertyChangedDispatcher.Notify(nameof(PostgreSqlConnectionConfigurationViewModel));
                     PropertyChangedDispatcher.Notify(nameof(SqliteConnectionConfigurationViewModel));
@@ -135,31 +140,21 @@ namespace CrudGenerator.Core.ViewModels
             }
         }
 
-        public ISchemaInformation SchemaInformation
+        public bool CanReadDatabaseSchema
         {
-            get
-            {
-                if (SelectedDatabaseType == DatabaseTypes.MySql)
-                    return MySqlConnectionConfigurationViewModel.SchemaInformation;
-                else if (SelectedDatabaseType == DatabaseTypes.PostgreSql)
-                    return PostgreSqlConnectionConfigurationViewModel.SchemaInformation;
-                else if (SelectedDatabaseType == DatabaseTypes.Sqlite)
-                    return SqliteConnectionConfigurationViewModel.SchemaInformation;
-                else if (SelectedDatabaseType == DatabaseTypes.SqlServer)
-                    return SqlServerConnectionConfigurationViewModel.SchemaInformation;
-
-                return NullSchemaInformation;
-            }
+            get => _canReadDatabaseSchema;
+            private set => PropertyChangedDispatcher.SetProperty(ref _canReadDatabaseSchema, value);
         }
 
-        private void GeneralDatabaseConfigurationViewModelPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void ConnectionConfigurationViewModelPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(SelectedDatabaseType))
+            if ((e.PropertyName == nameof(DbConnectionConfigurationViewModel.ConnectionState))
+                && (sender is DbConnectionConfigurationViewModel dbConnectionConfigurationViewModel))
             {
-                _mySqlConnectionConfigurationViewModel.SchemaInformation.Clear();
-                _postgreSqlConnectionConfigurationViewModel.SchemaInformation.Clear();
-                _sqliteConnectionConfigurationViewModel.SchemaInformation.Clear();
-                _sqlServerConnectionConfigurationViewModel.SchemaInformation.Clear();
+                if (dbConnectionConfigurationViewModel.ConnectionState == true)
+                    CanReadDatabaseSchema = true;
+                else
+                    CanReadDatabaseSchema = false;
             }
         }
     }

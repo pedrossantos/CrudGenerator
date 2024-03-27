@@ -20,9 +20,9 @@ namespace CrudGenerator.Core.ViewModels
 
         [Injectable]
         public PostgreSqlConnectionConfigurationViewModel(
-            PostgreSqlSchemaInformation sqlServerSchemaInformation,
+            PostgreSqlConnectionManager sqlServerConnectionManager,
             IMessageDialog messageDialog)
-            : base(sqlServerSchemaInformation, messageDialog)
+            : base(sqlServerConnectionManager, messageDialog)
         {
             PresenterTitle = Messages.PostgreSqlDatabaseConnectionConfiguration;
         }
@@ -53,7 +53,7 @@ namespace CrudGenerator.Core.ViewModels
 
         public override void UpdateConnection()
         {
-            SchemaInformation.UpdateConnection(
+            ConnectionManager.UpdateConnectionStringBuilder(
                 new Npgsql.NpgsqlConnectionStringBuilder($"server={PostgreSqlServerNameOrIpAddress};Port=5432;user id={PostgreSqlUserId};password={PostgreSqlPassword};CommandTimeout=3600;Timeout=120;Pooling=True;")
                 {
                     Database = $"{PostgreSqlDatabaseName}"

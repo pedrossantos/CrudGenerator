@@ -14,12 +14,12 @@ namespace CrudGenerator.Core.Wpf.Components
 {
     public abstract class DbConnectionConfiguration : UserControl, IPresenterHandle, INotifyPropertyChanged
     {
-        public static readonly DependencyProperty SchemaInformationProperty =
+        public static readonly DependencyProperty ConnectionManagerProperty =
             DependencyProperty.Register(
-                nameof(SchemaInformation),
-                typeof(ISchemaInformation),
+                nameof(ConnectionManager),
+                typeof(ConnectionManager),
                 typeof(DbConnectionConfiguration),
-                new FrameworkPropertyMetadata(null, new PropertyChangedCallback(OnSchemaInformationChanged)));
+                new FrameworkPropertyMetadata(null, new PropertyChangedCallback(OnConnectionManagerChanged)));
 
         public static readonly DependencyProperty MessageDialogProperty =
             DependencyProperty.Register(
@@ -45,14 +45,14 @@ namespace CrudGenerator.Core.Wpf.Components
         }
 
         protected DbConnectionConfiguration(
-            ISchemaInformation schemaInformation,
+            ConnectionManager connectionManager,
             IMessageDialog messageDialog)
             : this()
         {
-            Requires.NotNull(schemaInformation, nameof(schemaInformation));
+            Requires.NotNull(connectionManager, nameof(connectionManager));
             Requires.NotNull(messageDialog, nameof(messageDialog));
 
-            SchemaInformation = schemaInformation;
+            ConnectionManager = connectionManager;
             MessageDialog = messageDialog;
 
             PropertyChanged += DbConnectionConfigurationPropertyChanged;
@@ -66,7 +66,7 @@ namespace CrudGenerator.Core.Wpf.Components
 
             DbConnectionConfigurationViewModel = dbConnectionConfigurationViewModel;
 
-            SchemaInformation = dbConnectionConfigurationViewModel.SchemaInformation;
+            ConnectionManager = dbConnectionConfigurationViewModel.ConnectionManager;
             MessageDialog = dbConnectionConfigurationViewModel.MessageDialog;
 
             PropertyChanged += DbConnectionConfigurationPropertyChanged;
@@ -78,10 +78,10 @@ namespace CrudGenerator.Core.Wpf.Components
             remove => _propertyChangedDispatcher.RemoveHandler(value);
         }
 
-        public ISchemaInformation SchemaInformation
+        public ConnectionManager ConnectionManager
         {
-            get { return GetValue(SchemaInformationProperty) as ISchemaInformation; }
-            set { SetValue(SchemaInformationProperty, value); }
+            get { return GetValue(ConnectionManagerProperty) as ConnectionManager; }
+            set { SetValue(ConnectionManagerProperty, value); }
         }
 
         public IMessageDialog MessageDialog
@@ -106,14 +106,14 @@ namespace CrudGenerator.Core.Wpf.Components
             set => _propertyChangedDispatcher.SetProperty(ref _connectionStateBrush, value);
         }
 
-        public static void OnSchemaInformationChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
+        public static void OnConnectionManagerChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
         {
             if (obj is DbConnectionConfiguration dbConnectionConfiguration)
             {
                 if (dbConnectionConfiguration.DbConnectionConfigurationViewModel != null)
-                    dbConnectionConfiguration.DbConnectionConfigurationViewModel.SchemaInformation = dbConnectionConfiguration.SchemaInformation;
+                    dbConnectionConfiguration.DbConnectionConfigurationViewModel.ConnectionManager = dbConnectionConfiguration.ConnectionManager;
 
-                dbConnectionConfiguration.PropertyChangedDispatcher.Notify(nameof(SchemaInformation));
+                dbConnectionConfiguration.PropertyChangedDispatcher.Notify(nameof(ConnectionManager));
             }
         }
 
@@ -139,7 +139,7 @@ namespace CrudGenerator.Core.Wpf.Components
 
                 if (args.NewValue is DbConnectionConfigurationViewModel newDbConnectionConfigurationViewModel)
                 {
-                    dbConnectionConfiguration.SchemaInformation = newDbConnectionConfigurationViewModel.SchemaInformation;
+                    dbConnectionConfiguration.ConnectionManager = newDbConnectionConfigurationViewModel.ConnectionManager;
                     dbConnectionConfiguration.MessageDialog = newDbConnectionConfigurationViewModel.MessageDialog;
 
                     dbConnectionConfiguration.PropertyChangedDispatcher.Notify(nameof(DbConnectionConfigurationViewModel));
@@ -161,7 +161,7 @@ namespace CrudGenerator.Core.Wpf.Components
             if (e.PropertyName == nameof(DbConnectionConfigurationViewModel) && DbConnectionConfigurationViewModel is DbConnectionConfigurationViewModel dbConnectionConfigurationViewModel)
             {
                 MessageDialog = dbConnectionConfigurationViewModel.MessageDialog;
-                SchemaInformation = dbConnectionConfigurationViewModel.SchemaInformation;
+                ConnectionManager = dbConnectionConfigurationViewModel.ConnectionManager;
             }
             else if (e.PropertyName == nameof(DbConnectionConfigurationViewModel.ConnectionState))
             {

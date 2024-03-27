@@ -41,17 +41,17 @@ namespace CrudGenerator.Core.Wpf.Components
         }
 
         public SqliteConnectionConfiguration(
-            SqliteSchemaInformation sqliteSchemaInformation,
+            FileSqliteConnectionManager sqliteConnectionManager,
             IMessageDialog messageDialog,
             IOpenFileDialog openFileDialog)
-            : base(sqliteSchemaInformation, messageDialog)
+            : base(sqliteConnectionManager, messageDialog)
         {
             Requires.NotNull(openFileDialog, nameof(openFileDialog));
 
             OpenFileDialog = openFileDialog;
 
             DbConnectionConfigurationViewModel = SqliteConnectionConfigurationViewModel = new SqliteConnectionConfigurationViewModel(
-                sqliteSchemaInformation,
+                sqliteConnectionManager,
                 MessageDialog,
                 OpenFileDialog);
 

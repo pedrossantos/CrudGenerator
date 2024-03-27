@@ -18,10 +18,10 @@ namespace CrudGenerator.Core.ViewModels
 
         [Injectable]
         public SqliteConnectionConfigurationViewModel(
-            SqliteSchemaInformation sqliteSchemaInformation,
+            FileSqliteConnectionManager sqliteConnectionManager,
             IMessageDialog messageDialog,
             IOpenFileDialog openFileDialog)
-            : base(sqliteSchemaInformation, messageDialog)
+            : base(sqliteConnectionManager, messageDialog)
         {
             PresenterTitle = Messages.SqliteDatabaseConnectionConfiguration;
 
@@ -49,15 +49,14 @@ namespace CrudGenerator.Core.ViewModels
 
                     ConnectionState = null;
 
-                    SchemaInformation.Clear();
-                    PropertyChangedDispatcher.Notify(nameof(SchemaInformation));
+                    PropertyChangedDispatcher.Notify(nameof(ConnectionManager));
                 }
             }
         }
 
         public override void UpdateConnection()
         {
-            SchemaInformation.UpdateConnection(new System.Data.SQLite.SQLiteConnectionStringBuilder($"Data Source={SqliteDatabasePath};Version=3;DateTimeFormat=Ticks;foreign keys=false;"));
+            ConnectionManager.UpdateConnectionStringBuilder(new System.Data.SQLite.SQLiteConnectionStringBuilder($"Data Source={SqliteDatabasePath};Version=3;DateTimeFormat=Ticks;foreign keys=false;"));
         }
 
         public override async Task<bool> ValidateConnectionInformations()

@@ -53,12 +53,12 @@ namespace CrudGenerator.Core.Wpf.Components
         }
 
         public PostgreSqlConnectionConfiguration(
-            PostgreSqlSchemaInformation mySqlSchemaInformation,
+            PostgreSqlConnectionManager postgreSqlConnectionManager,
             IMessageDialog messageDialog)
-            : base(mySqlSchemaInformation, messageDialog)
+            : base(postgreSqlConnectionManager, messageDialog)
         {
             DbConnectionConfigurationViewModel = PostgreSqlConnectionConfigurationViewModel = new PostgreSqlConnectionConfigurationViewModel(
-                mySqlSchemaInformation,
+                postgreSqlConnectionManager,
                 MessageDialog);
 
             PropertyChanged += PostgreSqlConnectionConfigurationPropertyChanged;

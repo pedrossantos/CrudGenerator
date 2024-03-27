@@ -47,7 +47,7 @@ namespace CrudGenerator.Core.DependencyInversion
 
             yield return CreateSingleton(container =>
                 {
-                    return new System.Data.SqlClient.SqlConnectionStringBuilder("Server=tcp:DESKTOP-CO383P2,1433;Initial Catalog=TesteDatabaseLocal")
+                    return new System.Data.SqlClient.SqlConnectionStringBuilder("Server=tcp:localhost,1433;Initial Catalog=TesteDatabaseLocal")
                     {
                         UserID = "teste",
                         Password = "teste",
