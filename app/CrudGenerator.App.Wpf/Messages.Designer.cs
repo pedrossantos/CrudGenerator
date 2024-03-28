@@ -70,6 +70,15 @@ namespace CrudGenerator.App.Wpf {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Entities Readed.
+        /// </summary>
+        public static string EntitiesReaded {
+            get {
+                return ResourceManager.GetString("EntitiesReaded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error.
         /// </summary>
         public static string ErrorTitle {
@@ -84,6 +93,15 @@ namespace CrudGenerator.App.Wpf {
         public static string ErrorToResolveObject {
             get {
                 return ResourceManager.GetString("ErrorToResolveObject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Generated C# Classes.
+        /// </summary>
+        public static string GeneratedCSharpClasses {
+            get {
+                return ResourceManager.GetString("GeneratedCSharpClasses", resourceCulture);
             }
         }
     }

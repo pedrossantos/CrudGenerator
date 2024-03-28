@@ -120,10 +120,16 @@
   <data name="DatabaseConnectionConfiguration" xml:space="preserve">
     <value>Configuração de Conexão com Banco de Dados</value>
   </data>
+  <data name="EntitiesReaded" xml:space="preserve">
+    <value>Entidades Lidas</value>
+  </data>
   <data name="ErrorTitle" xml:space="preserve">
     <value>Error</value>
   </data>
   <data name="ErrorToResolveObject" xml:space="preserve">
     <value>Erro ao resolver objeto: {0}.</value>
+  </data>
+  <data name="GeneratedCSharpClasses" xml:space="preserve">
+    <value>Classes C# Geradas</value>
   </data>
 </root>

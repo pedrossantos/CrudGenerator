@@ -18,7 +18,7 @@ namespace CrudGenerator.Core.Wpf.Components
         public static readonly DependencyProperty GeneralDatabaseConfigurationViewModelProperty =
             DependencyProperty.Register(
                 nameof(GeneralDatabaseConfigurationViewModel),
-                typeof(GeneralDatabaseConfigurationViewModel),
+                typeof(IDatabaseConfigurationViewModel),
                 typeof(GeneralDatabaseConfiguration),
                 new FrameworkPropertyMetadata(null, OnGeneralDatabaseConfigurationViewModelChanged));
 
@@ -134,7 +134,7 @@ namespace CrudGenerator.Core.Wpf.Components
         }
 
         [Injectable]
-        public GeneralDatabaseConfiguration(GeneralDatabaseConfigurationViewModel generalDatabaseConfigurationViewModel)
+        public GeneralDatabaseConfiguration(IDatabaseConfigurationViewModel generalDatabaseConfigurationViewModel)
         {
             Requires.NotNull(generalDatabaseConfigurationViewModel, nameof(generalDatabaseConfigurationViewModel));
 
@@ -158,11 +158,11 @@ namespace CrudGenerator.Core.Wpf.Components
             remove => _propertyChangedDispatcher.RemoveHandler(value);
         }
 
-        public string Title => GeneralDatabaseConfigurationViewModel.PresenterTitle;
+        public string Title => nameof(GeneralDatabaseConfiguration);
 
-        public GeneralDatabaseConfigurationViewModel GeneralDatabaseConfigurationViewModel
+        public IDatabaseConfigurationViewModel GeneralDatabaseConfigurationViewModel
         {
-            get { return GetValue(GeneralDatabaseConfigurationViewModelProperty) as GeneralDatabaseConfigurationViewModel; }
+            get { return GetValue(GeneralDatabaseConfigurationViewModelProperty) as IDatabaseConfigurationViewModel; }
             set { SetValue(GeneralDatabaseConfigurationViewModelProperty, value); }
         }
 
@@ -224,7 +224,7 @@ namespace CrudGenerator.Core.Wpf.Components
         {
             if ((d is GeneralDatabaseConfiguration generalDatabaseConfiguration) && (e.OldValue != e.NewValue))
             {
-                if (e.NewValue is GeneralDatabaseConfigurationViewModel newGeneralDatabaseConfigurationViewModel)
+                if (e.NewValue is IDatabaseConfigurationViewModel newGeneralDatabaseConfigurationViewModel)
                 {
                     generalDatabaseConfiguration.NullSchemaInformation = newGeneralDatabaseConfigurationViewModel.NullSchemaInformation;
                     generalDatabaseConfiguration.MySqlConnectionConfigurationViewModel = newGeneralDatabaseConfigurationViewModel.MySqlConnectionConfigurationViewModel;

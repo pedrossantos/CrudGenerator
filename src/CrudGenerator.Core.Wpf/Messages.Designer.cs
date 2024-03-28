@@ -124,6 +124,15 @@ namespace CrudGenerator.Core.Wpf {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Default Namespcace: .
+        /// </summary>
+        public static string DefaultNamespaceTitle {
+            get {
+                return ResourceManager.GetString("DefaultNamespaceTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Default Values.
         /// </summary>
         public static string DefaultValues {
@@ -175,6 +184,33 @@ namespace CrudGenerator.Core.Wpf {
         public static string ForeignKeys {
             get {
                 return ResourceManager.GetString("ForeignKeys", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Generated Classes.
+        /// </summary>
+        public static string GeneratedClasses {
+            get {
+                return ResourceManager.GetString("GeneratedClasses", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Generate Entities.
+        /// </summary>
+        public static string GenerateEntities {
+            get {
+                return ResourceManager.GetString("GenerateEntities", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Generate Project.
+        /// </summary>
+        public static string GenerateProject {
+            get {
+                return ResourceManager.GetString("GenerateProject", resourceCulture);
             }
         }
         
@@ -247,6 +283,24 @@ namespace CrudGenerator.Core.Wpf {
         public static string PostgreSqlDatabaseConnectionConfiguration {
             get {
                 return ResourceManager.GetString("PostgreSqlDatabaseConnectionConfiguration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Project Folder: .
+        /// </summary>
+        public static string ProjectFolderTitle {
+            get {
+                return ResourceManager.GetString("ProjectFolderTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Project Name: .
+        /// </summary>
+        public static string ProjectNameTitle {
+            get {
+                return ResourceManager.GetString("ProjectNameTitle", resourceCulture);
             }
         }
         
@@ -328,6 +382,15 @@ namespace CrudGenerator.Core.Wpf {
         public static string SelectedUserId {
             get {
                 return ResourceManager.GetString("SelectedUserId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select the Project Folder.
+        /// </summary>
+        public static string SelectProjectFolder {
+            get {
+                return ResourceManager.GetString("SelectProjectFolder", resourceCulture);
             }
         }
         

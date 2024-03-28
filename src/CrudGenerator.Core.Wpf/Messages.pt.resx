@@ -138,6 +138,9 @@
   <data name="DatabaseTypeTitle" xml:space="preserve">
     <value>Tipo do Banco de Dados:</value>
   </data>
+  <data name="DefaultNamespaceTitle" xml:space="preserve">
+    <value>Namespcace Padrão: </value>
+  </data>
   <data name="DefaultValues" xml:space="preserve">
     <value>Valores Padrão</value>
   </data>
@@ -156,6 +159,15 @@
   </data>
   <data name="ForeignKeys" xml:space="preserve">
     <value>Chaves Estrangeiras</value>
+  </data>
+  <data name="GeneratedClasses" xml:space="preserve">
+    <value>Classes Geradas</value>
+  </data>
+  <data name="GenerateEntities" xml:space="preserve">
+    <value>Gerar Entidades</value>
+  </data>
+  <data name="GenerateProject" xml:space="preserve">
+    <value>Gerar Projeto</value>
   </data>
   <data name="IndexedColumns" xml:space="preserve">
     <value>Colunas Indexadas</value>
@@ -180,6 +192,12 @@
   </data>
   <data name="PostgreSqlDatabaseConnectionConfiguration" xml:space="preserve">
     <value>Configuração de Conexão com Banco de Dados PostgreSQL</value>
+  </data>
+  <data name="ProjectFolderTitle" xml:space="preserve">
+    <value>Pasta do Projeto: </value>
+  </data>
+  <data name="ProjectNameTitle" xml:space="preserve">
+    <value>Nome do Projeto: </value>
   </data>
   <data name="ReadDatabaseInformations" xml:space="preserve">
     <value>Ler Informações do Banco de Dados</value>
@@ -207,6 +225,9 @@
   </data>
   <data name="SelectedUserId" xml:space="preserve">
     <value>Por favor informa o ID do Usuário...</value>
+  </data>
+  <data name="SelectProjectFolder" xml:space="preserve">
+    <value>Selecione a Pasta do Projeto</value>
   </data>
   <data name="SelectTheDatabase" xml:space="preserve">
     <value>Selecione o tipo do banco de dados para prosseguir...</value>

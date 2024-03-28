@@ -7,7 +7,7 @@ using View.Abstractions.UseCase;
 
 namespace CrudGenerator.Core.ViewModels
 {
-    public class GeneralDatabaseConfigurationViewModel : ViewModelBase
+    public class GeneralDatabaseConfigurationViewModel : ViewModelBase, IDatabaseConfigurationViewModel<Framework.Void, Framework.Void>
     {
         private MySqlConnectionConfigurationViewModel _mySqlConnectionConfigurationViewModel;
         private PostgreSqlConnectionConfigurationViewModel _postgreSqlConnectionConfigurationViewModel;

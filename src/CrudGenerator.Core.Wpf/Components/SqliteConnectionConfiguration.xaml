@@ -30,12 +30,12 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width=".5*" />
                 <ColumnDefinition Width="3*" />
-                <ColumnDefinition Width=".5*" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
             <TextBlock
@@ -51,16 +51,16 @@
             <TextBlock
                 Grid.Row="1"
                 Grid.Column="0"
-                Margin="5,10"
+                Margin="20,5"
                 VerticalAlignment="Center"
                 FontSize="16"
                 FontWeight="Bold"
                 Text="{x:Static messages:Messages.DatabasePathTitle}" />
 
             <textboxes:PlaceholderTextBox
-                Grid.Row="1"
-                Grid.Column="1"
-                Margin="5,10"
+                Grid.Row="2"
+                Grid.Column="0"
+                Margin="20,5"
                 HorizontalAlignment="Stretch"
                 VerticalContentAlignment="Center"
                 FontSize="16"
@@ -70,11 +70,11 @@
 
             <Button
                 x:Name="selectSqliteDatabase"
-                Grid.Row="1"
-                Grid.Column="2"
+                Grid.Row="2"
+                Grid.Column="1"
                 Width="30"
                 Height="30"
-                Margin="5,10"
+                Margin="20,5"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
                 Content="..."

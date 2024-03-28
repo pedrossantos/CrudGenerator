@@ -7,6 +7,8 @@ using Database.Sqlite.Sql;
 using Database.SqlServer.DataAccess;
 using Database.SqlServer.Sql;
 using DependencyInversion;
+using Framework;
+using View.Abstractions.IO;
 using View.Abstractions.Wpf;
 
 namespace CrudGenerator.App.Wpf.DependencyInversion
@@ -20,6 +22,39 @@ namespace CrudGenerator.App.Wpf.DependencyInversion
 
         private static IEnumerable<ContainerRegistration> GetRegistrations()
         {
+            // TODO: Caso necessário utilizar banco de dados fixo, alterar códigos abaixo
+            yield return CreateSingleton(container =>
+            {
+                return new MySql.Data.MySqlClient.MySqlConnectionStringBuilder("Server=localhost;Database=testedatabaselocal")
+                {
+                    UserID = "teste",
+                    Password = "teste",
+                };
+            });
+
+            yield return CreateSingleton(container =>
+            {
+                IApplicationMetadata applicationMetadata = container.Resolve<IApplicationMetadata>();
+                IApplicationPaths applicationPaths = container.Resolve<IApplicationPaths>();
+                EnvironmentBasedSqliteFilePath filePath = new EnvironmentBasedSqliteFilePath("teste.db3", applicationPaths.ApplicationData);
+                return new System.Data.SQLite.SQLiteConnectionStringBuilder($"Data Source={filePath.FullPath};Version=3;DateTimeFormat=Ticks;foreign keys=false;");
+            });
+
+            yield return CreateSingleton(container => new Npgsql.NpgsqlConnectionStringBuilder("server=localhost;user id=teste;password=teste;CommandTimeout=3600;Timeout=120;Pooling=True;") { Database = "testedatabaselocal" });
+
+            yield return CreateSingleton(container =>
+            {
+                return new System.Data.SqlClient.SqlConnectionStringBuilder("Server=tcp:localhost,1433;Initial Catalog=TesteDatabaseLocal")
+                {
+                    UserID = "teste",
+                    Password = "teste",
+                    MultipleActiveResultSets = false,
+                    Encrypt = true,
+                    TrustServerCertificate = true,
+                    ConnectTimeout = 30,
+                };
+            });
+
             #region MySql
             yield return CreateSingleton(new MySqlBuilderTemplate());
             yield return CreateSingleton(c => new MySqlNativeCommandBuilder(c.Resolve<MySqlBuilderTemplate>()));

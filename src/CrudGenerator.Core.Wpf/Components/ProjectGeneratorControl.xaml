@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:classGeneratorCore="clr-namespace:CrudGenerator.Core;assembly=CrudGenerator.Core"
     xmlns:components="clr-namespace:CrudGenerator.Core.Wpf.Components"
+    xmlns:messages="clr-namespace:CrudGenerator.Core.Wpf"
     x:Name="projectGeneratorControl">
 
     <UserControl.Resources>
@@ -49,7 +50,7 @@
                     VerticalAlignment="Center"
                     FontSize="14"
                     FontWeight="Bold"
-                    Text="Project Name: " />
+                    Text="{x:Static messages:Messages.ProjectNameTitle}" />
                 <TextBox
                     Grid.Column="1"
                     Margin="6,3"
@@ -66,7 +67,7 @@
                     Margin="10"
                     Padding="6,3"
                     HorizontalAlignment="Right"
-                    Content="Generate Entities"
+                    Content="{x:Static messages:Messages.GenerateEntities}"
                     FontSize="16"
                     FontWeight="Bold"
                     PreviewMouseLeftButtonUp="GenerateClassesPreviewMouseLeftButtonUp" />
@@ -95,7 +96,7 @@
                     VerticalAlignment="Center"
                     FontSize="14"
                     FontWeight="Bold"
-                    Text="Default Namespace: " />
+                    Text="{x:Static messages:Messages.DefaultNamespaceTitle}" />
                 <TextBox
                     Grid.Column="1"
                     Margin="6,3"
@@ -136,7 +137,7 @@
                     VerticalAlignment="Center"
                     FontSize="14"
                     FontWeight="Bold"
-                    Text="Project Folder: " />
+                    Text="{x:Static messages:Messages.ProjectFolderTitle}" />
                 <TextBox
                     Grid.Column="1"
                     Margin="6,3"
@@ -154,7 +155,7 @@
                     Margin="10"
                     Padding="6,3"
                     HorizontalAlignment="Right"
-                    Content="Select Project Folder"
+                    Content="{x:Static messages:Messages.SelectProjectFolder}"
                     FontSize="16"
                     FontWeight="Bold"
                     PreviewMouseLeftButtonUp="SelectProjectFolderPreviewMouseLeftButtonUp" />
@@ -181,7 +182,7 @@
                     Margin="10,5"
                     FontSize="16"
                     FontWeight="Bold"
-                    Text="Generated Classes" />
+                    Text="{x:Static messages:Messages.GeneratedClasses}" />
                 <Border
                     Grid.Row="1"
                     Margin="10,5"
@@ -229,7 +230,7 @@
             Margin="20,10"
             Padding="6,3"
             HorizontalAlignment="Right"
-            Content="Generate Project"
+            Content="{x:Static messages:Messages.GenerateProject}"
             FontSize="22"
             FontWeight="Bold"
             PreviewMouseLeftButtonUp="GenerateProjectPreviewMouseLeftButtonUp" />
