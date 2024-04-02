@@ -217,7 +217,11 @@
             Margin="10,5"
             BorderBrush="Black"
             BorderThickness="0.5">
-            <ScrollViewer Margin="10,5" Background="#FAFAFA">
+            <ScrollViewer
+                Margin="10,5"
+                Background="#FAFAFA"
+                HorizontalScrollBarVisibility="Auto"
+                VerticalScrollBarVisibility="Auto">
                 <!--<components:BindableRichTextBox Document="{Binding Path=SelectedGeneratedClass.ClassContent, Converter={StaticResource stringToFlowDocumentConverter}, Mode=OneWay, ElementName=projectGeneratorControl, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" />-->
                 <TextBlock FontSize="15" Text="{Binding Path=ProjectGeneratorViewModel.SelectedGeneratedClass.ClassContent, Mode=OneWay, ElementName=projectGeneratorControl, UpdateSourceTrigger=PropertyChanged}" />
             </ScrollViewer>

@@ -14,7 +14,7 @@ namespace CrudGenerator.Core
 {
     public class EntityGenerator : INotifyPropertyChanged, IDisposable
     {
-        public const string ModelNamespaceSufix = "Model";
+        public const string ModelNamespaceSufix = "Models";
         public const string DependencyInversionNamespaceSufix = "DependencyInversion";
 
         /// <summary>
@@ -247,26 +247,48 @@ namespace CrudGenerator.Core
     }}";
 
         /// <summary>
-        /// {adapter class name}, {entity name}, {identity name}, {getIdentity parameters}, {identity mappedDbDataReader calls}, {getIdentity parameters names}, {entity mappedDbDataReader calls}, {identity toDbParameters calls}, {entity toDbParameters calls}
+        /// {adapter class name}
+        /// {entity name}
+        /// {identity name}
+        /// {getIdentity parameters}
+        /// {identity mappedDbDataReader calls}
+        /// {getIdentity parameters names}
+        /// {entity mappedDbDataReader calls}
+        /// {identity toDbParameters calls}
+        /// {entity toDbParameters calls}
+        /// {entity TableMapping name}
+        /// {dependecy databaseAdapters definition}
+        /// {dependecy databaseAdapters construction}
         /// </summary>
         private const string databaseAdapterTemplate = @"
     internal sealed class {0}
         : IDatabaseAdapter<{1}>, IObjectToDatabaseAdapter<{2}>
     {{
-        public {0}()
-        {{
+{10}        public {0}()
+        {{{11}
         }}
 
         public static {2} GetIdentity(
             MappedDbDataReader reader,
-{3})
+{3}
+            string columnAlias = null)
         {{
+            if (string.IsNullOrEmpty(columnAlias))
+                columnAlias = {9}._TableName;
+
             return new {2}(
 {4});
         }}
 
-        public {1} FromDataReader(MappedDbDataReader reader)
+        public {1} FromDataReader(
+            MappedDbDataReader reader,
+            string columnAlias = null)
         {{
+            if (string.IsNullOrEmpty(columnAlias))
+                columnAlias = {9}._TableName;
+            else
+                columnAlias = TableAliasing.GetTableAlias({9}._TableName, columnAlias);
+
             var ret = new {1}(
                 GetIdentity(
                     reader{5}),
@@ -1264,7 +1286,7 @@ namespace {0}
                                     }
 
                                     IEnumerable<string> foreignKeyGetIdentityParameters = foreignKeyValue.ForeignColunmnsToReferencedColumns.Select(fctrc => fctrc.ForeignColumn);
-                                    getIdentityMappedDbDataReaderCalls.Add($"                {_databaseAdapterClassNamesMap[referencedTableName.ToLower()]}.GetIdentity(reader, {string.Join(", ", foreignKeyGetIdentityParameters)})");
+                                    getIdentityMappedDbDataReaderCalls.Add($"                {_databaseAdapterClassNamesMap[referencedTableName.ToLower()]}.GetIdentity(reader, {string.Join(", ", foreignKeyGetIdentityParameters)}, columnAlias)");
 
                                     continue;
                                 }
@@ -1274,7 +1296,7 @@ namespace {0}
 
                     getIdentityParameters.Add($"            string {primaryKeyColumn.Name}");
                     getIdentityParametersNames.Add($"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(primaryKeyColumn.Name)}");
-                    getIdentityMappedDbDataReaderCalls.Add($"                {GenerateReaderGetFunction(primaryKeyColumn.DbType)}({primaryKeyColumn.Name})");
+                    getIdentityMappedDbDataReaderCalls.Add($"                {GenerateReaderGetFunction(primaryKeyColumn.DbType)}(ColumnAliasing.GetColumnAlias(columnAlias, {primaryKeyColumn.Name}))");
 
                     string propertyName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(primaryKeyColumn.Name);
                     identityToDbParametersCalls.Add(
@@ -1338,7 +1360,7 @@ namespace {0}
                                     }
 
                                     IEnumerable<string> foreignKeyGetIdentityParameters = foreignKeyValue.ForeignColunmnsToReferencedColumns.Select(fctrc => fctrc.ForeignColumn);
-                                    entityMappedDbDataReaderCalls.Add($"                {_databaseAdapterClassNamesMap[referencedTableName.ToLower()]}.GetIdentity(reader, {string.Join(", ", foreignKeyGetIdentityParameters.Select(fkgip => $"{_tableMappingClassNamesMap[tableName.ToLower()]}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(fkgip)}"))})");
+                                    entityMappedDbDataReaderCalls.Add($"                {_databaseAdapterClassNamesMap[referencedTableName.ToLower()]}.GetIdentity(reader, {string.Join(", ", foreignKeyGetIdentityParameters.Select(fkgip => $"{_tableMappingClassNamesMap[tableName.ToLower()]}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(fkgip)}"))}, columnAlias)");
 
                                     continue;
                                 }
@@ -1346,7 +1368,7 @@ namespace {0}
                         }
                     }
 
-                    entityMappedDbDataReaderCalls.Add($"                {GenerateReaderGetFunction(otherColumn.DbType)}({_tableMappingClassNamesMap[tableName.ToLower()]}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(otherColumn.Name)})");
+                    entityMappedDbDataReaderCalls.Add($"                {GenerateReaderGetFunction(otherColumn.DbType)}(ColumnAliasing.GetColumnAlias(columnAlias, {_tableMappingClassNamesMap[tableName.ToLower()]}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(otherColumn.Name)}))");
 
                     string propertyName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(otherColumn.Name);
                     entityToDbParametersCalls.Add(
@@ -1361,14 +1383,23 @@ namespace {0}
                         _databaseAdapterClassNamesMap[tableName.ToLower()],
                         _entityClassNamesMap[tableName.ToLower()],
                         _identityClassNamesMap[tableName.ToLower()],
-                        string.Join(",\r\n", getIdentityParameters),
+                        getIdentityParameters.Count == 0
+                            ? string.Empty
+                            : $"{string.Join(",\r\n", getIdentityParameters)},",
                         string.Join(",\r\n", getIdentityMappedDbDataReaderCalls),
                         getIdentityParametersNames.Count == 0
                             ? string.Empty
-                            : $",\r\n{string.Join(",\r\n", getIdentityParametersNames.Select(pn => $"                    {_tableMappingClassNamesMap[tableName.ToLower()]}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(pn)}"))}",
+                            : $",\r\n{string.Join(",\r\n", getIdentityParametersNames.Select(pn => $"                    {_tableMappingClassNamesMap[tableName.ToLower()]}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(pn)}"))},\r\n                    columnsAlias",
                         string.Join(",\r\n", entityMappedDbDataReaderCalls),
                         string.Join("\r\n", identityToDbParametersCalls),
-                        string.Join("\r\n", entityToDbParametersCalls));
+                        string.Join("\r\n", entityToDbParametersCalls),
+                        _tableMappingClassNamesMap[tableName],
+                        !schemaInformationTableMapping.ForeignKeyValues.Any()
+                            ? string.Empty
+                            : $"        {string.Join("        \r\n", schemaInformationTableMapping.ForeignKeyValues.Select(fkv => $"private readonly {_databaseAdapterClassNamesMap[fkv.ReferencedTable.ToLower()]} _{_databaseAdapterClassNamesMap[fkv.ReferencedTable.ToLower()]};"))}\r\n\r\n",
+                        !schemaInformationTableMapping.ForeignKeyValues.Any()
+                            ? string.Empty
+                            : $"\r\n            {string.Join("            \r\n", schemaInformationTableMapping.ForeignKeyValues.Select(fkv => $"_{_databaseAdapterClassNamesMap[fkv.ReferencedTable.ToLower()]} = new {_databaseAdapterClassNamesMap[fkv.ReferencedTable.ToLower()]}();"))}");
 
                 List<string> namespaceDependenciesList = new List<string>(
                     new string[]
