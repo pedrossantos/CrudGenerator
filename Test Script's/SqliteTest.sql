@@ -25,11 +25,11 @@ CREATE TABLE Cargo
 
 CREATE TABLE Funcionario
 (
-	id INTEGER PRIMARY KEY AUTOINCREMENT,
-	nome TEXT NOT NULL UNIQUE,
-	email TEXT NOT NULL DEFAULT ' ',
+	id INTEGER NOT NULL,
 	idCargo INTEGER NOT NULL CHECK(idCargo > 0),
 	idEmpresa INTEGER NOT NULL CHECK(idEmpresa > 0),
+	nome TEXT NOT NULL UNIQUE,
+	email TEXT NOT NULL DEFAULT ' ',
 	dataCriacao DATETIME DEFAULT(datetime('now')),
 
 	columnBlob BLOB DEFAULT(NULL),
@@ -42,7 +42,7 @@ CREATE TABLE Funcionario
 	columnReal REAL DEFAULT(1),
 	columnText TEXT DEFAULT('A'),
 	
-
+	CONSTRAINT PK_FuncionarioId PRIMARY KEY(id, idCargo, idEmpresa),
 	CONSTRAINT FK_CargoId FOREIGN KEY (idCargo,idEmpresa)
 		REFERENCES Cargo(id, idEmpresa)
 		ON UPDATE CASCADE
@@ -54,8 +54,8 @@ INSERT INTO Empresa(nome, email) VALUES('Empresa Teste2', 'email@empresateste1.c
 INSERT INTO Cargo(id, idEmpresa, descricao) VALUES(1, 1, 'Cargo Empresa 1');
 INSERT INTO Cargo(id, idEmpresa, descricao) VALUES(1, 2, 'Cargo Empresa 2');
 
-INSERT INTO Funcionario(nome, email, idCargo, idEmpresa) VALUES('Funcionario 1', 'funcionario1@empresateste1.com.br', 1, 1);
-INSERT INTO Funcionario(nome, idCargo, idEmpresa) VALUES('Funcionario 2', 1, 2);
+INSERT INTO Funcionario(id, idCargo, idEmpresa, nome, email) VALUES(1, 1, 1, 'Funcionario 1', 'funcionario1@empresateste1.com.br');
+INSERT INTO Funcionario(id, idCargo, idEmpresa, nome) VALUES(1, 1, 2, 'Funcionario 2');
 
 SELECT * FROM Empresa;
 SELECT * FROM Cargo	;

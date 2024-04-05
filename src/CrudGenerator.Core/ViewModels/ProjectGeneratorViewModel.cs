@@ -37,7 +37,7 @@ namespace CrudGenerator.Core.ViewModels
         private string _defaultNamespace;
         private string _projectFolder;
         private string _projectName;
-        private EntityGenerator _entityGenerator;
+        private ModelGenerator _modelGenerator;
         private GeneratedClass _selectedGenerated;
 
         public ProjectGeneratorViewModel()
@@ -208,10 +208,10 @@ namespace CrudGenerator.Core.ViewModels
             set => PropertyChangedDispatcher.SetProperty(ref _projectName, value);
         }
 
-        public EntityGenerator EntityGenerator
+        public ModelGenerator ModelGenerator
         {
-            get => _entityGenerator;
-            set => PropertyChangedDispatcher.SetProperty(ref _entityGenerator, value);
+            get => _modelGenerator;
+            set => PropertyChangedDispatcher.SetProperty(ref _modelGenerator, value);
         }
 
         public GeneratedClass SelectedGeneratedClass
@@ -220,9 +220,9 @@ namespace CrudGenerator.Core.ViewModels
             set => PropertyChangedDispatcher.SetProperty(ref _selectedGenerated, value);
         }
 
-        public List<GeneratedClassGroupedByNamespace> GeneratedClasses =>
+        public List<GeneratedClassGroupedByNamespace> GeneratedModelClasses =>
             new List<GeneratedClassGroupedByNamespace>(
-                EntityGenerator?.GeneratedClasses?
+                ModelGenerator?.GeneratedClasses?
                 .GroupBy(gc => gc.ClassNameSpace)
                 .Select(g => new GeneratedClassGroupedByNamespace(g)) ?? new GeneratedClassGroupedByNamespace[0]);
 
@@ -245,11 +245,11 @@ namespace CrudGenerator.Core.ViewModels
                 _threadGenerateClasses = null;
             }
 
-            if (EntityGenerator != null)
-                EntityGenerator.Dispose();
+            if (ModelGenerator != null)
+                ModelGenerator.Dispose();
 
-            EntityGenerator = new EntityGenerator(SchemaInformation);
-            PropertyChangedDispatcher.Notify(nameof(EntityGenerator));
+            ModelGenerator = new ModelGenerator(SchemaInformation);
+            PropertyChangedDispatcher.Notify(nameof(ModelGenerator));
 
             GeneratingClasses = true;
             _threadGenerateProject = new Thread(new ParameterizedThreadStart(DoGenerateClasses));
@@ -258,7 +258,7 @@ namespace CrudGenerator.Core.ViewModels
                 {
                     _projectName,
                     _defaultNamespace,
-                    _entityGenerator,
+                    _modelGenerator,
                 });
         }
 
@@ -290,7 +290,7 @@ namespace CrudGenerator.Core.ViewModels
                     _projectFolder,
                     _projectName,
                     _defaultNamespace,
-                    EntityGenerator.GeneratedClasses,
+                    ModelGenerator.GeneratedClasses,
                 });
         }
 
@@ -301,13 +301,13 @@ namespace CrudGenerator.Core.ViewModels
                 object[] argsArray = args as object[];
                 string projectName = argsArray[0]?.ToString();
                 string nameSpace = argsArray[1]?.ToString();
-                EntityGenerator entityGenerator = argsArray[2] as EntityGenerator;
+                ModelGenerator entityGenerator = argsArray[2] as ModelGenerator;
 
                 entityGenerator.GenerateClasses(projectName, string.IsNullOrEmpty(nameSpace) ? projectName : $"{projectName}.{nameSpace}");
             }
             finally
             {
-                PropertyChangedDispatcher.Notify(nameof(GeneratedClasses));
+                PropertyChangedDispatcher.Notify(nameof(GeneratedModelClasses));
                 GeneratingClasses = false;
             }
         }
@@ -320,19 +320,36 @@ namespace CrudGenerator.Core.ViewModels
                 string projectFolder = argsArray[0]?.ToString();
                 string projectName = argsArray[1]?.ToString();
                 string nameSpace = argsArray[1]?.ToString();
-                ObservableCollection<GeneratedClass> generatedClasses =
+
+                if (!nameSpace.EndsWith(".Model"))
+                    nameSpace += ".Model";
+
+                ObservableCollection<GeneratedClass> generatedModelClasses =
                     argsArray[3] as ObservableCollection<GeneratedClass> ?? new ObservableCollection<GeneratedClass>();
 
-                string projectPath = Path.Combine(projectFolder, projectName);
-                if (Directory.Exists(projectPath))
-                    Directory.Delete(projectPath, true);
+                string solutionPath = Path.Combine(projectFolder, projectName);
+                if (Directory.Exists(solutionPath))
+                    Directory.Delete(solutionPath, true);
 
-                Directory.CreateDirectory(projectPath);
+                Directory.CreateDirectory(solutionPath);
 
+                string srcPath = Path.Combine(solutionPath, "src");
+                if (Directory.Exists(srcPath))
+                    Directory.Delete(srcPath, true);
+
+                Directory.CreateDirectory(srcPath);
+
+                string modelProjectPath = Path.Combine(srcPath, $"{nameSpace}.Model");
+                if (Directory.Exists(modelProjectPath))
+                    Directory.Delete(modelProjectPath, true);
+
+                Directory.CreateDirectory(modelProjectPath);
+
+                #region Models Project
                 TreeList<string> namespaceTreeList = new TreeList<string>(projectName);
-                foreach (GeneratedClass generatedClass in generatedClasses)
+                foreach (GeneratedClass generatedClass in generatedModelClasses)
                 {
-                    string projectFolderPath = Path.Combine(projectFolder, projectName);
+                    string modelsProjectFolderPath = modelProjectPath;
 
                     string classNamespace = string.IsNullOrEmpty(nameSpace)
                         ? generatedClass.ClassNameSpace
@@ -353,20 +370,20 @@ namespace CrudGenerator.Core.ViewModels
                         else
                             currentTreeNode = treeNode;
 
-                        projectFolderPath = Path.Combine(projectFolderPath, partialNamespace);
-                        if (!Directory.Exists(projectFolderPath))
-                            Directory.CreateDirectory(projectFolderPath);
+                        modelsProjectFolderPath = Path.Combine(modelsProjectFolderPath, partialNamespace);
+                        if (!Directory.Exists(modelsProjectFolderPath))
+                            Directory.CreateDirectory(modelsProjectFolderPath);
 
                         partialNamespaceList.RemoveAt(0);
                     }
 
-                    StreamWriter streamWriterClass = new StreamWriter(Path.Combine(projectFolderPath, $"{generatedClass.ClassName}.cs"));
+                    StreamWriter streamWriterClass = new StreamWriter(Path.Combine(modelsProjectFolderPath, $"{generatedClass.ClassName}.cs"));
                     streamWriterClass.Write(generatedClass.ClassContent);
                     streamWriterClass.Close();
                     streamWriterClass.Dispose();
                 }
 
-                StreamWriter streamWriterProject = new StreamWriter(Path.Combine(projectPath, $"{projectName}.csproj"));
+                StreamWriter streamWriterProject = new StreamWriter(Path.Combine(modelProjectPath, $"{projectName}.{ModelGenerator.ModelNamespaceSufix}.csproj"));
                 streamWriterProject.Write(
     @"<Project Sdk=""Microsoft.NET.Sdk"">
 
@@ -379,6 +396,7 @@ namespace CrudGenerator.Core.ViewModels
 </Project>");
                 streamWriterProject.Close();
                 streamWriterProject.Dispose();
+                #endregion
             }
             finally
             {
@@ -390,8 +408,8 @@ namespace CrudGenerator.Core.ViewModels
         {
             if (e.Action == NotifyCollectionChangedAction.Reset)
             {
-                if ((_entityGenerator != null) && (_entityGenerator.GeneratedClasses != null))
-                    _entityGenerator.GeneratedClasses.Clear();
+                if ((_modelGenerator != null) && (_modelGenerator.GeneratedClasses != null))
+                    _modelGenerator.GeneratedClasses.Clear();
             }
         }
 
@@ -404,7 +422,7 @@ namespace CrudGenerator.Core.ViewModels
                 ProjectName = string.Empty;
 
                 PropertyChangedDispatcher.Notify(nameof(SelectedGeneratedClass));
-                PropertyChangedDispatcher.Notify(nameof(GeneratedClasses));
+                PropertyChangedDispatcher.Notify(nameof(GeneratedModelClasses));
             }
         }
     }

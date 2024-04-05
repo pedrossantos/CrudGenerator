@@ -12,7 +12,7 @@ using System.Linq;
 
 namespace CrudGenerator.Core
 {
-    public class EntityGenerator : INotifyPropertyChanged, IDisposable
+    public class ModelGenerator : INotifyPropertyChanged, IDisposable
     {
         public const string ModelNamespaceSufix = "Models";
         public const string DependencyInversionNamespaceSufix = "DependencyInversion";
@@ -329,7 +329,9 @@ namespace CrudGenerator.Core
             ExistsFactory<{0}, {1}> existsFactory,
             InsertOneFactory<{0}> insertOneFactory,
             FindOneFactory<{0}, {1}> findOneFactory,
+            FindOneJoinedFactory<{0}, {1}> findOneJoinedFactory,
             FindAllFactory<{0}> findAllFactory,
+            FindAllJoinedFactory<{0}> findAllJoinedFactory,
             UpdateOneFactory<{0}> updateOneFactory,
             DeleteOneFactory<{0}, {1}> deleteOneFactory,
             CountAllFactory<{0}> countAllFactory,
@@ -347,6 +349,8 @@ namespace CrudGenerator.Core
                   countAllFactory,
                   connectionManager)
         {{
+            findOneQuery = findOneJoinedFactory.Create();
+            findAllQuery = findAllJoinedFactory.Create();
         }}{4}
     }}";
 
@@ -365,7 +369,9 @@ namespace CrudGenerator.Core
             ExistsFactory<{0}, {1}> existsFactory,
             InsertOneFactory<{0}> insertOneFactory,
             FindOneFactory<{0}, {1}> findOneFactory,
+            FindOneJoinedFactory<{0}, {1}> findOneJoinedFactory,
             FindAllFactory<{0}> findAllFactory,
+            FindAllJoinedFactory<{0}> findAllJoinedFactory,
             UpdateOneFactory<{0}> updateOneFactory,
             DeleteOneFactory<{0}, {1}> deleteOneFactory,
             CountAllFactory<{0}> countAllFactory,
@@ -382,6 +388,8 @@ namespace CrudGenerator.Core
                   countAllFactory,
                   connectionManager)
         {{
+            findOneQuery = findOneJoinedFactory.Create();
+            findAllQuery = findAllJoinedFactory.Create();
         }}
     }}";
 
@@ -414,49 +422,60 @@ namespace CrudGenerator.Core
         }}";
 
         /// <summary>
-        /// {container builder class name}
+        /// {container builder class name}, {container registrations class name}
         /// </summary>
         private const string createContainerBuilderTemplate = @"
     public class {0} : ImmutableContainerBuilder
     {{
-        public {0}(DatabaseTypes databaseType)
-            : base(GetBuilders(databaseType))
+        public {0}(DbConnectionStringBuilder dbConnectionStringBuilder = null)
+            : base(GetBuilders(dbConnectionStringBuilder))
         {{
         }}
 
-        private static IEnumerable<IContainerBuilder> GetBuilders(DatabaseTypes databaseType)
+        private static IEnumerable<IContainerBuilder> GetBuilders(DbConnectionStringBuilder dbConnectionStringBuilder = null)
         {{
+            yield return new {1}(dbConnectionStringBuilder);
             yield return new DatabaseContainerBuilder();
+            yield return new DomainContainerBuilder();
             yield return new DomainDatabaseContainerBuilder();
             
-            if (databaseType == DatabaseTypes.MySql)
-                yield return new Database.MySql.DependencyInversion.MySqlContainerBuilder();
-            else if (databaseType == DatabaseTypes.PostgreSql)
-                yield return new Database.PostgreSql.DependencyInversion.PostgreSqlContainerBuilder();
-            else if (databaseType == DatabaseTypes.Sqlite)
-                yield return new Database.Sqlite.DependencyInversion.FileSqliteContainerBuilder();
-            else if (databaseType == DatabaseTypes.SqlServer)
-                yield return new Database.SqlServer.DependencyInversion.SqlServerContainerBuilder();
+            if (dbConnectionStringBuilder != null)
+            {{
+                if (dbConnectionStringBuilder is MySqlConnectionStringBuilder)
+                    yield return new MySqlContainerBuilder();
+                else if (dbConnectionStringBuilder is SQLiteConnectionStringBuilder)
+                    yield return new FileSqliteContainerBuilder();
+                else if (dbConnectionStringBuilder is SqlConnectionStringBuilder)
+                    yield return new SqlServerContainerBuilder();
+                else if (dbConnectionStringBuilder is Npgsql.NpgsqlConnectionStringBuilder)
+                    yield return new PostgreSqlContainerBuilder();
+            }}
         }}
     }}";
 
         /// <summary>
-        /// {container registrations class name}, {table mappins reg's}, {model tablemapping providers reg's}, {database adapters reg's}, {repositories reg's}
+        /// {container registrations class name}
+        /// {table mappins reg's}
+        /// {composed model tablemapping providers reg's}
+        /// {model tablemapping providers reg's}
+        /// {database adapters reg's}
+        /// {repositories reg's}
         /// </summary>
         private const string createContainerRegistrationsTemplate = @"
     public class {0} : ImmutableContainerBuilder
     {{
-        public {0}()
-            : base(GetRegistrations())
+        public {0}(DbConnectionStringBuilder dbConnectionStringBuilder = null)
+            : base(GetRegistrations(dbConnectionStringBuilder))
         {{
         }}
 
-        private static IEnumerable<ContainerRegistration> GetRegistrations()
+        private static IEnumerable<ContainerRegistration> GetRegistrations(DbConnectionStringBuilder dbConnectionStringBuilder = null)
         {{
             return RegisterTableMappings()
                 .Concat(RegisterModelTableMappingProviders())
                 .Concat(RegisterDatabaseAdapters())
-                .Concat(RegisterRepositories());
+                .Concat(RegisterRepositories())
+                .Concat(RegisterDatabaseDataAccessObjects(dbConnectionStringBuilder));
         }}
 
         private static IEnumerable<ContainerRegistration> RegisterTableMappings()
@@ -467,16 +486,70 @@ namespace CrudGenerator.Core
         private static IEnumerable<ContainerRegistration> RegisterModelTableMappingProviders()
         {{
 {2}
+{3}
         }}
 
         private static IEnumerable<ContainerRegistration> RegisterDatabaseAdapters()
         {{
-{3}
+{4}
         }}
 
         private static IEnumerable<ContainerRegistration> RegisterRepositories()
         {{
-{4}
+{5}
+        }}
+
+        private static IEnumerable<ContainerRegistration> RegisterDatabaseDataAccessObjects(DbConnectionStringBuilder dbConnectionStringBuilder = null)
+        {{
+            if (dbConnectionStringBuilder == null)
+            {{
+                #region MySql
+                yield return CreateSingleton(new MySqlBuilderTemplate());
+                yield return CreateSingleton(c => new MySqlNativeCommandBuilder(c.Resolve<MySqlBuilderTemplate>()));
+                yield return CreateTransient<MySqlConnectionManagerBuilder>();
+                yield return CreateSingleton<MySqlConnectionManager>();
+                #endregion MySql
+
+                #region PostgreSql
+                yield return CreateSingleton(new PostgreSqlBuilderTemplate());
+                yield return CreateSingleton(c => new PostgreSqlNativeCommandBuilder(c.Resolve<PostgreSqlBuilderTemplate>()));
+                yield return CreateTransient<PostgreSqlConnectionManagerBuilder>();
+                yield return CreateSingleton<PostgreSqlConnectionManager>();
+                #endregion PostgreSql
+
+                #region Sqlite
+                yield return CreateSingleton(new SqliteBuilderTemplate());
+                yield return CreateSingleton(c => new SqliteNativeCommandBuilder(c.Resolve<SqliteBuilderTemplate>()));
+                yield return CreateTransient<SqliteConnectionManagerBuilder>();
+                yield return CreateSingleton<FileSqliteConnectionManager>();
+                #endregion Sqlite
+
+                #region SqlServer
+                yield return CreateSingleton(new SqlServerBuilderTemplate());
+                yield return CreateSingleton(c => new SqlServerNativeCommandBuilder(c.Resolve<SqlServerBuilderTemplate>()));
+                yield return CreateTransient<SqlServerConnectionManagerBuilder>();
+                yield return CreateSingleton<SqlServerConnectionManager>();
+                #endregion SqlServer
+            }}
+            else
+            {{
+                if (dbConnectionStringBuilder is MySqlConnectionStringBuilder mySqlConnectionStringBuilder)
+                {{
+                    yield return CreateSingleton(container => {{ return mySqlConnectionStringBuilder; }});
+                }}
+                else if (dbConnectionStringBuilder is SQLiteConnectionStringBuilder sqliteConnectionStringBuilder)
+                {{
+                    yield return CreateSingleton(container => {{ return sqliteConnectionStringBuilder; }});
+                }}
+                else if (dbConnectionStringBuilder is SqlConnectionStringBuilder sqlServerConnectionStringBuilder)
+                {{
+                    yield return CreateSingleton(container => {{ return sqlServerConnectionStringBuilder; }});
+                }}
+                else if (dbConnectionStringBuilder is NpgsqlConnectionStringBuilder postgreSqlConnectionStringBuilder)
+                {{
+                    yield return CreateSingleton(container => {{ return postgreSqlConnectionStringBuilder; }});
+                }}
+            }}
         }}
     }}";
 
@@ -522,7 +595,7 @@ namespace {0}
         private List<GeneratedClass> _generatedClassesList;
         private ObservableCollection<GeneratedClass> _generatedClasses;
 
-        public EntityGenerator(ISchemaInformation schemaInformation)
+        public ModelGenerator(ISchemaInformation schemaInformation)
         {
             Requires.NotNull(schemaInformation, nameof(schemaInformation));
 
@@ -618,8 +691,8 @@ namespace {0}
 
                 string classNameSpace =
                     !string.IsNullOrEmpty(nameSpace)
-                    ? $"{nameSpace}.{ModelNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}"
-                    : $"{ModelNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}";
+                    ? $"{nameSpace}.Model.{ModelNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}"
+                    : $"Model.{ModelNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}";
 
                 if (!_namespacesMap.ContainsKey(tableName.ToLower()))
                     _namespacesMap.Add(tableName.ToLower(), classNameSpace);
@@ -791,15 +864,27 @@ namespace {0}
 
                 string classNameSpace =
                     !string.IsNullOrEmpty(nameSpace)
-                    ? $"{nameSpace}.{ModelNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}"
-                    : $"{ModelNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}";
+                    ? $"{nameSpace}.Model.{ModelNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}"
+                    : $"Model.{ModelNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}";
 
                 if (!_namespacesMap.ContainsKey(tableName.ToLower()))
                     _namespacesMap.Add(tableName.ToLower(), classNameSpace);
 
                 bool containsPrimaryKeyColumns = schemaInformationTableMapping.Value.Columns.Where(col => col.IsPrimaryKey).Any();
-                List<ColumnInfo> entityColumns = new List<ColumnInfo>(schemaInformationTableMapping.Value.Columns.Where(col => !col.IsPrimaryKey));
-                int entityColumnsCount = entityColumns.Count + (containsPrimaryKeyColumns ? 1 : 0);
+                List<ColumnInfo> entityColumns = new List<ColumnInfo>(
+                    schemaInformationTableMapping.Value.Columns
+                        .Where(col =>
+                            !col.IsPrimaryKey ||
+                            schemaInformationTableMapping.Value.ForeignKeyValues
+                                .Any(fkvc => fkvc.ForeignKeyValueList
+                                    .Any(fkv => fkv.ForeignColunmnsToReferencedColumns
+                                        .Any(fkctrc => fkctrc.ForeignColumn.ToLower() == col.Name.ToLower())))));
+
+                List<string> dependencyEntityFields = new List<string>();
+                List<string> dependencyConstructorParameters = new List<string>();
+                List<string> dependencyEntityProperties = new List<string>();
+                List<string> dependencyFieldValidations = new List<string>();
+                List<string> dependencyFieldAssignments = new List<string>();
 
                 List<string> entityFields = new List<string>();
                 List<string> constructorParameters = new List<string>();
@@ -857,54 +942,50 @@ namespace {0}
 
                                 bool foreignColumnIsPrimaryKey = foreignKeyValue.ForeignColunmnsToReferencedColumns.FirstOrDefault(fctrc => fctrc.IsPrimaryKey && fctrc.ForeignColumn.ToLower() == entityColumn.Name.ToLower()) != null;
                                 string referencedColumn = foreignKeyValue.ForeignColunmnsToReferencedColumns.FirstOrDefault(fctrc => fctrc.ForeignColumn.ToLower() == entityColumn.Name.ToLower()).ReferencedColumn.ToLower();
-                                bool referencedColumnIsPrimaryKey = referencedSchemaInformationTableMapping.Columns.FirstOrDefault(col => col.Name.ToLower() == referencedColumn).IsPrimaryKey;
-                                if (referencedColumnIsPrimaryKey)
+                                foreach (ForeignColunmnToReferencedColumn foreignColunmnToReferencedColumn in foreignKeyValue.ForeignColunmnsToReferencedColumns)
                                 {
-                                    foreach (ForeignColunmnToReferencedColumn foreignColunmnToReferencedColumn in foreignKeyValue.ForeignColunmnsToReferencedColumns)
-                                    {
-                                        int columnIndexToRemove = entityColumns.FindIndex(col => col.Name.ToLower() == foreignColunmnToReferencedColumn.ForeignColumn.ToLower());
-                                        if (columnIndexToRemove > -1)
-                                            entityColumns.RemoveAt(columnIndexToRemove);
-                                    }
-
-                                    string fieldName = foreignColumnIsPrimaryKey ? _identityClassNamesMap[referencedTableName] : entityColumn.Name;
-                                    string propertyName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(foreignColumnIsPrimaryKey ? _identityClassNamesMap[referencedTableName] : entityColumn.Name);
-
-                                    columnType = _identityClassNamesMap[referencedTableName];
-                                    fieldValidations.Add(string.Format(constructorParameterValidationTemplate, fieldName));
-
-                                    entityFields.Add(
-                                        string.Format(
-                                            fieldTemplate,
-                                            columnType,
-                                            fieldName));
-
-                                    constructorParameters.Add(
-                                        string.Format(
-                                            constructorParameterTemplate,
-                                            columnType,
-                                            fieldName));
-
-                                    entityProperties.Add(
-                                        string.Format(
-                                            propertyTemplate,
-                                            columnType,
-                                            propertyName,
-                                            fieldName));
-
-                                    fieldAssignments.Add(
-                                        string.Format(
-                                            fieldAssignmentTemplate,
-                                            fieldName));
-
-                                    if (!_namespaceDependenciesMap.ContainsKey(tableName.ToLower()))
-                                        _namespaceDependenciesMap.Add(tableName.ToLower(), new List<string>());
-
-                                    if (!_namespaceDependenciesMap[tableName.ToLower()].Contains(referencedTableName.ToLower()))
-                                        _namespaceDependenciesMap[tableName.ToLower()].Add(referencedTableName.ToLower());
-
-                                    continue;
+                                    int columnIndexToRemove = entityColumns.FindIndex(col => col.Name.ToLower() == foreignColunmnToReferencedColumn.ForeignColumn.ToLower());
+                                    if (columnIndexToRemove > -1)
+                                        entityColumns.RemoveAt(columnIndexToRemove);
                                 }
+
+                                string fieldName = referencedTableName;
+                                string propertyName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(referencedTableName);
+
+                                columnType = _entityClassNamesMap[referencedTableName];
+                                dependencyFieldValidations.Add(string.Format(constructorParameterValidationTemplate, fieldName));
+
+                                dependencyEntityFields.Add(
+                                    string.Format(
+                                        fieldTemplate,
+                                        columnType,
+                                        fieldName));
+
+                                dependencyConstructorParameters.Add(
+                                    string.Format(
+                                        constructorParameterTemplate,
+                                        columnType,
+                                        fieldName));
+
+                                dependencyEntityProperties.Add(
+                                    string.Format(
+                                        propertyTemplate,
+                                        columnType,
+                                        propertyName,
+                                        fieldName));
+
+                                dependencyFieldAssignments.Add(
+                                    string.Format(
+                                        fieldAssignmentTemplate,
+                                        fieldName));
+
+                                if (!_namespaceDependenciesMap.ContainsKey(tableName.ToLower()))
+                                    _namespaceDependenciesMap.Add(tableName.ToLower(), new List<string>());
+
+                                if (!_namespaceDependenciesMap[tableName.ToLower()].Contains(referencedTableName.ToLower()))
+                                    _namespaceDependenciesMap[tableName.ToLower()].Add(referencedTableName.ToLower());
+
+                                continue;
                             }
                         }
                     }
@@ -938,20 +1019,20 @@ namespace {0}
 
                 string fieldsValidation = string.Empty;
                 if (fieldValidations.Any(fv => fv != null))
-                    fieldsValidation = string.Join("\r\n", fieldValidations.Where(fv => fv != null)) + "\r\n";
+                    fieldsValidation = string.Join("\r\n", fieldValidations.Concat(dependencyFieldValidations).Where(fv => fv != null)) + "\r\n";
 
                 string generatedEntityClass =
                     string.Format(
                         entityClassTemplate.TrimStart('\r', '\n'),
                         _entityClassNamesMap[tableName.ToLower()],
                         _identityClassNamesMap[tableName.ToLower()],
-                        string.Join("\r\n", entityFields),
+                        string.Join("\r\n", entityFields.Concat(dependencyEntityFields)),
                         constructorParameters[0].Trim(),
                         constructorParameters[0].TrimStart(' ').Split(' ')[1].Trim(' '),
-                        string.Join(",\r\n", constructorParameters),
+                        string.Join(",\r\n", constructorParameters.Concat(dependencyConstructorParameters)),
                         fieldsValidation,
-                        string.Join("\r\n", fieldAssignments),
-                        string.Join("\r\n", entityProperties),
+                        string.Join("\r\n", fieldAssignments.Concat(dependencyFieldAssignments)),
+                        string.Join("\r\n", entityProperties.Concat(dependencyEntityProperties)),
                         string.Empty);
 
                 List<string> namespaceDependenciesList = new List<string>(
@@ -1006,8 +1087,8 @@ namespace {0}
 
                 string classNameSpace =
                     !string.IsNullOrEmpty(nameSpace)
-                    ? $"{nameSpace}.{ModelNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}"
-                    : $"{ModelNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}";
+                    ? $"{nameSpace}.Model.{ModelNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}"
+                    : $"Model.{ModelNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}";
 
                 if (!_namespacesMap.ContainsKey(tableName.ToLower()))
                     _namespacesMap.Add(tableName.ToLower(), classNameSpace);
@@ -1221,8 +1302,8 @@ namespace {0}
 
                 string classNameSpace =
                     !string.IsNullOrEmpty(nameSpace)
-                    ? $"{nameSpace}.{ModelNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}"
-                    : $"{ModelNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}";
+                    ? $"{nameSpace}.Model.{ModelNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}"
+                    : $"Model.{ModelNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}";
 
                 if (!_namespacesMap.ContainsKey(tableName.ToLower()))
                     _namespacesMap.Add(tableName.ToLower(), classNameSpace);
@@ -1305,10 +1386,19 @@ namespace {0}
                         + $"value.{propertyName});");
                 }
 
+                List<string> dependencyEntityMappedDbDataReaderCalls = new List<string>();
                 List<string> entityMappedDbDataReaderCalls = new List<string>();
                 List<string> entityToDbParametersCalls = new List<string>();
 
-                List<ColumnInfo> otherColumns = new List<ColumnInfo>(schemaInformationTableMapping.Columns.Where(col => !col.IsPrimaryKey));
+                List<ColumnInfo> otherColumns = new List<ColumnInfo>(
+                    schemaInformationTableMapping.Columns
+                        .Where(col =>
+                            !col.IsPrimaryKey ||
+                            schemaInformationTableMapping.ForeignKeyValues
+                                .Any(fkvc => fkvc.ForeignKeyValueList
+                                    .Any(fkv => fkv.ForeignColunmnsToReferencedColumns
+                                        .Any(fkctrc => fkctrc.ForeignColumn.ToLower() == col.Name.ToLower())))));
+
                 int otherColumnsCount = otherColumns.Count;
 
                 while (otherColumns.Count > 0)
@@ -1333,8 +1423,8 @@ namespace {0}
                                 SchemaInformationTableMapping referencedSchemaInformationTableMapping = _schemaInformation.SchemaTableMappings[referencedTableName.ToLower()];
 
                                 string referencedColumn = foreignKeyValue.ForeignColunmnsToReferencedColumns.FirstOrDefault(fctrc => fctrc.ForeignColumn.ToLower() == otherColumn.Name.ToLower()).ReferencedColumn.ToLower();
-                                bool referencedColumnIsPrimaryKey = referencedSchemaInformationTableMapping.Columns.FirstOrDefault(col => col.Name.ToLower() == referencedColumn).IsPrimaryKey;
-                                if (referencedColumnIsPrimaryKey)
+                                //bool referencedColumnIsPrimaryKey = referencedSchemaInformationTableMapping.Columns.FirstOrDefault(col => col.Name.ToLower() == referencedColumn).IsPrimaryKey;
+                                //if (referencedColumnIsPrimaryKey)
                                 {
                                     columnType = _identityClassNamesMap[referencedTableName];
                                     if (!_namespaceDependenciesMap.ContainsKey(tableName.ToLower()))
@@ -1349,18 +1439,19 @@ namespace {0}
                                         if (columnIndexToRemove > -1)
                                             otherColumns.RemoveAt(columnIndexToRemove);
 
-                                        string parameterPath = $"value.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(otherColumn.Name)}";
-                                        string foreignPropertyName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(foreignColunmnToReferencedColumn.ForeignColumn);
-                                        GetDependencyPropertyPath(ref parameterPath, columnType, foreignColunmnToReferencedColumn.ReferencedColumn);
+                                        //string parameterPath = $"value.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(otherColumn.Name)}";
+                                        //string foreignPropertyName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(foreignColunmnToReferencedColumn.ForeignColumn);
+                                        //GetDependencyPropertyPath(ref parameterPath, columnType, foreignColunmnToReferencedColumn.ReferencedColumn);
 
-                                        entityToDbParametersCalls.Add(
-                                            $"            yield return new DbParameterDefinition("
-                                            + $"{_tableMappingClassNamesMap[tableName.ToLower()]}.{foreignPropertyName}, "
-                                            + $"{parameterPath});");
+                                        //entityToDbParametersCalls.Add(
+                                        //    $"            yield return new DbParameterDefinition("
+                                        //    + $"{_tableMappingClassNamesMap[tableName.ToLower()]}.{foreignPropertyName}, "
+                                        //    + $"{parameterPath});");
                                     }
 
                                     IEnumerable<string> foreignKeyGetIdentityParameters = foreignKeyValue.ForeignColunmnsToReferencedColumns.Select(fctrc => fctrc.ForeignColumn);
-                                    entityMappedDbDataReaderCalls.Add($"                {_databaseAdapterClassNamesMap[referencedTableName.ToLower()]}.GetIdentity(reader, {string.Join(", ", foreignKeyGetIdentityParameters.Select(fkgip => $"{_tableMappingClassNamesMap[tableName.ToLower()]}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(fkgip)}"))}, columnAlias)");
+
+                                    dependencyEntityMappedDbDataReaderCalls.Add($"                _{_databaseAdapterClassNamesMap[foreignKeyValue.ForeignColunmnsToReferencedColumns.First().ReferencedTableName.ToLower()]}.FromDataReader(reader, {_tableMappingClassNamesMap[tableName]}._TableName)");
 
                                     continue;
                                 }
@@ -1389,8 +1480,8 @@ namespace {0}
                         string.Join(",\r\n", getIdentityMappedDbDataReaderCalls),
                         getIdentityParametersNames.Count == 0
                             ? string.Empty
-                            : $",\r\n{string.Join(",\r\n", getIdentityParametersNames.Select(pn => $"                    {_tableMappingClassNamesMap[tableName.ToLower()]}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(pn)}"))},\r\n                    columnsAlias",
-                        string.Join(",\r\n", entityMappedDbDataReaderCalls),
+                            : $",\r\n{string.Join(",\r\n", getIdentityParametersNames.Select(pn => $"                    {_tableMappingClassNamesMap[tableName.ToLower()]}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(pn)}"))},\r\n                    columnAlias",
+                        string.Join(",\r\n", entityMappedDbDataReaderCalls.Concat(dependencyEntityMappedDbDataReaderCalls)),
                         string.Join("\r\n", identityToDbParametersCalls),
                         string.Join("\r\n", entityToDbParametersCalls),
                         _tableMappingClassNamesMap[tableName],
@@ -1405,6 +1496,7 @@ namespace {0}
                     new string[]
                     {
                         "Database.DataTransfer",
+                        "Database.Sql",
                         "System.Collections.Generic",
                     });
 
@@ -1446,8 +1538,8 @@ namespace {0}
 
                 string classNameSpace =
                     !string.IsNullOrEmpty(nameSpace)
-                    ? $"{nameSpace}.{ModelNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}"
-                    : $"{ModelNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}";
+                    ? $"{nameSpace}.Model.{ModelNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}"
+                    : $"Model.{ModelNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}";
 
                 if (!_namespacesMap.ContainsKey(tableName.ToLower()))
                     _namespacesMap.Add(tableName.ToLower(), classNameSpace);
@@ -1563,6 +1655,7 @@ namespace {0}
                     new string[]
                     {
                         "Database.DataAccess",
+                        "Database.IdentityGeneration",
                         "Database.RepositoryServicing.Factories",
                         "Domain.Database",
                     });
@@ -1572,11 +1665,16 @@ namespace {0}
                     namespaceDependenciesList.AddRange(
                         new string[]
                         {
-                            "Database.IdentityGeneration",
                             "Domain.Model",
                             "Framework.Extensions",
                             "Framework.IdentityGeneration",
                             "System.Threading.Tasks",
+
+                            //"Database.IdentityGeneration",
+                            //"Domain.Model",
+                            //"Framework.Extensions",
+                            //"Framework.IdentityGeneration",
+                            //"System.Threading.Tasks",
                         });
                 }
 
@@ -1613,22 +1711,29 @@ namespace {0}
         {
             string classNameSpace =
                 !string.IsNullOrEmpty(nameSpace)
-                ? $"{nameSpace}.{DependencyInversionNamespaceSufix}"
-                : $"{DependencyInversionNamespaceSufix}";
+                ? $"{nameSpace}.Model.{DependencyInversionNamespaceSufix}"
+                : $"Model.{DependencyInversionNamespaceSufix}";
 
-            string containerBuilderClassName = $"{projectName}ContainerBuilder";
-            string containerRegistrationsClassName = $"{projectName}ContainerRegistrations";
             string formattedProjectName = projectName[0].ToString().ToUpper() + string.Join("", projectName.Skip(1));
+            string containerBuilderClassName = $"{formattedProjectName}{ModelNamespaceSufix}ContainerBuilder";
+            string containerRegistrationsClassName = $"{formattedProjectName}{ModelNamespaceSufix}ContainerRegistrations";
 
             List<string> namespaceDependenciesList = new List<string>(
                 new string[]
                 {
-                    "Database.DataMapping",
                     "Database.DependencyInversion",
+                    "Database.MySql.DependencyInversion",
+                    "Database.PostgreSql.DependencyInversion",
+                    "Database.Sqlite.DependencyInversion",
+                    "Database.SqlServer.DependencyInversion",
                     "DependencyInversion",
                     "Domain.Database.DependencyInversion",
+                    "Domain.Infrastructure.DependencyInversion",
+                    "MySql.Data.MySqlClient",
                     "System.Collections.Generic",
-                    "System.Linq",
+                    "System.Data.Common",
+                    "System.Data.SqlClient",
+                    "System.Data.SQLite",
                 });
 
             string generatedContainerBuilderClass =
@@ -1637,7 +1742,8 @@ namespace {0}
                     classNameSpace,
                     string.Format(
                         createContainerBuilderTemplate,
-                        $"{formattedProjectName}ContainerBuilder"),
+                        containerBuilderClassName,
+                        containerRegistrationsClassName),
                     string.Join("\r\n", namespaceDependenciesList.OrderBy(ns => ns).Select(dependencyNamespace => $"using {dependencyNamespace};")));
 
             _generatedClassesList.Add(new GeneratedClass(
@@ -1651,8 +1757,21 @@ namespace {0}
                 new string[]
                 {
                     "Database.DataTransfer",
+                    "Database.MySql.DataAccess",
+                    "Database.MySql.Sql",
+                    "Database.PostgreSql.DataAccess",
+                    "Database.PostgreSql.Sql",
+                    "Database.Sqlite.DataAccess",
+                    "Database.Sqlite.Sql",
+                    "Database.SqlServer.DataAccess",
+                    "Database.SqlServer.Sql",
                     "DependencyInversion",
+                    "MySql.Data.MySqlClient",
+                    "Npgsql",
                     "System.Collections.Generic",
+                    "System.Data.Common",
+                    "System.Data.SqlClient",
+                    "System.Data.SQLite",
                     "System.Linq",
                 });
 
@@ -1664,11 +1783,12 @@ namespace {0}
                     classNameSpace,
                     string.Format(
                         createContainerRegistrationsTemplate,
-                        $"{formattedProjectName}ContainerRegistrations",
-                        string.Join("\r\n", _tableMappingClassNamesMap.Values.Select(tableMapping => $"            yield return CreateSingleton<{tableMapping}>();")),
-                        string.Join("\r\n", _tableMappingClassNamesMap.Select(tableMappingPair => $"            yield return CreateSingleton<ModelTableMappingProvider<{_entityClassNamesMap[tableMappingPair.Key.ToLower()]}, {tableMappingPair.Value}>>();")),
-                        string.Join("\r\n", _databaseAdapterClassNamesMap.Values.Select(databaseAdapter => $"            yield return CreateSingleton<{databaseAdapter}>();")),
-                        string.Join("\r\n", _databaseRepositoryClassNamesMap.Values.Select(repository => $"            yield return CreateSingleton<{repository}>();"))),
+                        containerRegistrationsClassName,
+                        string.Join("\r\n", _tableMappingClassNamesMap.Values.Select(tableMapping => $"            yield return CreateSingleton<{tableMapping}>().WithAbstractions();")),
+                        string.Join("\r\n", _tableMappingClassNamesMap.Select(tableMappingPair => $"            yield return CreateSingleton(c => new ComposedModelTableMappingProvider<{_entityClassNamesMap[tableMappingPair.Key.ToLower()]}, {tableMappingPair.Value}>(c.Resolve<TableMappingProvider>())).WithAbstractions();")),
+                        string.Join("\r\n", _tableMappingClassNamesMap.Select(tableMappingPair => $"            yield return CreateSingleton<ModelTableMappingProvider<{_entityClassNamesMap[tableMappingPair.Key.ToLower()]}, {tableMappingPair.Value}>>().WithAbstractions();")),
+                        string.Join("\r\n", _databaseAdapterClassNamesMap.Values.Select(databaseAdapter => $"            yield return CreateSingleton<{databaseAdapter}>().WithAbstractions();")),
+                        string.Join("\r\n", _databaseRepositoryClassNamesMap.Values.Select(repository => $"            yield return CreateSingleton<{repository}>().WithAbstractions();"))),
                     string.Join("\r\n", namespaceDependenciesList.OrderBy(ns => ns).Select(dependencyNamespace => $"using {dependencyNamespace};")));
 
             if (!_generatedDependencyInversionClassesDictionary.ContainsKey(containerRegistrationsClassName))

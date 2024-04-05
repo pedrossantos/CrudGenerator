@@ -191,7 +191,7 @@
                     <TreeView
                         HorizontalAlignment="Stretch"
                         VerticalAlignment="Stretch"
-                        ItemsSource="{Binding Path=ProjectGeneratorViewModel.GeneratedClasses, ElementName=projectGeneratorControl, UpdateSourceTrigger=PropertyChanged}"
+                        ItemsSource="{Binding Path=ProjectGeneratorViewModel.GeneratedModelClasses, ElementName=projectGeneratorControl, UpdateSourceTrigger=PropertyChanged}"
                         SelectedItemChanged="TreeViewSelectedItemChanged">
                         <TreeView.Resources>
                             <HierarchicalDataTemplate DataType="{x:Type classGeneratorCore:GeneratedClassGroupedByNamespace}" ItemsSource="{Binding Path=GeneratedClasses}">
