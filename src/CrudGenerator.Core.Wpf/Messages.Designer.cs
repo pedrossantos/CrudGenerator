@@ -197,20 +197,20 @@ namespace CrudGenerator.Core.Wpf {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Generate Entities.
-        /// </summary>
-        public static string GenerateEntities {
-            get {
-                return ResourceManager.GetString("GenerateEntities", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Generate Project.
         /// </summary>
         public static string GenerateProject {
             get {
                 return ResourceManager.GetString("GenerateProject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Generate Project Classes.
+        /// </summary>
+        public static string GenerateProjectClasses {
+            get {
+                return ResourceManager.GetString("GenerateProjectClasses", resourceCulture);
             }
         }
         

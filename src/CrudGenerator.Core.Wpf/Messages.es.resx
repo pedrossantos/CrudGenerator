@@ -161,10 +161,10 @@
     <value>Llaves Extranjeras</value>
   </data>
   <data name="GeneratedClasses" xml:space="preserve">
-    <value>Generar Proyecto</value>
+    <value>Clases Generadas</value>
   </data>
-  <data name="GenerateEntities" xml:space="preserve">
-    <value>Generar Entidades</value>
+  <data name="GenerateProjectClasses" xml:space="preserve">
+    <value>Generar Clases de Proyecto</value>
   </data>
   <data name="IndexedColumns" xml:space="preserve">
     <value>Columnas Indexadas</value>

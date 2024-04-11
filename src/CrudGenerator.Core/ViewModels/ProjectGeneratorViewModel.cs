@@ -319,10 +319,7 @@ namespace CrudGenerator.Core.ViewModels
                 object[] argsArray = args as object[];
                 string projectFolder = argsArray[0]?.ToString();
                 string projectName = argsArray[1]?.ToString();
-                string nameSpace = argsArray[1]?.ToString();
-
-                if (!nameSpace.EndsWith(".Model"))
-                    nameSpace += ".Model";
+                string nameSpace = argsArray[2]?.ToString();
 
                 ObservableCollection<GeneratedClass> generatedModelClasses =
                     argsArray[3] as ObservableCollection<GeneratedClass> ?? new ObservableCollection<GeneratedClass>();
@@ -339,25 +336,21 @@ namespace CrudGenerator.Core.ViewModels
 
                 Directory.CreateDirectory(srcPath);
 
-                string modelProjectPath = Path.Combine(srcPath, $"{nameSpace}.Model");
+                #region Models Project
+                string modelProjectPath = Path.Combine(srcPath, $"{projectName}.{nameSpace}.Model");
                 if (Directory.Exists(modelProjectPath))
                     Directory.Delete(modelProjectPath, true);
 
                 Directory.CreateDirectory(modelProjectPath);
 
-                #region Models Project
-                TreeList<string> namespaceTreeList = new TreeList<string>(projectName);
+                TreeList<string> namespaceModelTreeList = new TreeList<string>(projectName);
+                string classNamespace = $"{projectName}.{nameSpace}.Model";
                 foreach (GeneratedClass generatedClass in generatedModelClasses)
                 {
                     string modelsProjectFolderPath = modelProjectPath;
 
-                    string classNamespace = string.IsNullOrEmpty(nameSpace)
-                        ? generatedClass.ClassNameSpace
-                        : generatedClass.ClassNameSpace.Replace($"{nameSpace}.", "");
-
-                    List<string> partialNamespaceList = new List<string>(classNamespace.Split('.'));
-
-                    TreeNode<string> currentTreeNode = namespaceTreeList.Root;
+                    List<string> partialNamespaceList = new List<string>(generatedClass.ClassNameSpace.Replace($"{classNamespace}.","").Split('.'));
+                    TreeNode<string> currentTreeNode = namespaceModelTreeList.Root;
                     while (partialNamespaceList.Count > 0)
                     {
                         string partialNamespace = partialNamespaceList[0];

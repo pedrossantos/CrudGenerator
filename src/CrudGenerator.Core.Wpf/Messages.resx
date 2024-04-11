@@ -163,11 +163,11 @@
   <data name="GeneratedClasses" xml:space="preserve">
     <value>Generated Classes</value>
   </data>
-  <data name="GenerateEntities" xml:space="preserve">
-    <value>Generate Entities</value>
-  </data>
   <data name="GenerateProject" xml:space="preserve">
     <value>Generate Project</value>
+  </data>
+  <data name="GenerateProjectClasses" xml:space="preserve">
+    <value>Generate Project Classes</value>
   </data>
   <data name="IndexedColumns" xml:space="preserve">
     <value>Indexed Columns</value>
