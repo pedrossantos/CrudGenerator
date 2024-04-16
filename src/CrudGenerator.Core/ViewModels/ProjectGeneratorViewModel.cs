@@ -337,19 +337,26 @@ namespace CrudGenerator.Core.ViewModels
                 Directory.CreateDirectory(srcPath);
 
                 #region Models Project
-                string modelProjectPath = Path.Combine(srcPath, $"{projectName}.{nameSpace}.Model");
+                string modelProjectPath = string.IsNullOrEmpty(nameSpace)
+                    ? Path.Combine(srcPath, $"{projectName}.Model")
+                    : Path.Combine(srcPath, $"{nameSpace}.Model");
+
                 if (Directory.Exists(modelProjectPath))
                     Directory.Delete(modelProjectPath, true);
 
                 Directory.CreateDirectory(modelProjectPath);
 
                 TreeList<string> namespaceModelTreeList = new TreeList<string>(projectName);
-                string classNamespace = $"{projectName}.{nameSpace}.Model";
+
+                string modelClassesNamespace = string.IsNullOrEmpty(nameSpace)
+                    ? $"{projectName}.Model"
+                    : $"{nameSpace}.Model";
+
                 foreach (GeneratedClass generatedClass in generatedModelClasses)
                 {
                     string modelsProjectFolderPath = modelProjectPath;
 
-                    List<string> partialNamespaceList = new List<string>(generatedClass.ClassNameSpace.Replace($"{classNamespace}.","").Split('.'));
+                    List<string> partialNamespaceList = new List<string>(generatedClass.ClassNameSpace.Replace($"{modelClassesNamespace}.","").Split('.'));
                     TreeNode<string> currentTreeNode = namespaceModelTreeList.Root;
                     while (partialNamespaceList.Count > 0)
                     {

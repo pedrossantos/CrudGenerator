@@ -262,7 +262,7 @@ namespace CrudGenerator.Core
         /// </summary>
         private const string databaseAdapterTemplate = @"
     internal sealed class {0}
-        : IDatabaseAdapter<{1}>, IObjectToDatabaseAdapter<{2}>
+        : IDatabaseAdapter<{1}>, IObjectToDatabaseAdapter<{2}>, IObjectToDatabaseAdapter<{1}>
     {{
 {10}        public {0}()
         {{{11}
@@ -330,11 +330,13 @@ namespace CrudGenerator.Core
             InsertOneFactory<{0}> insertOneFactory,
             FindOneFactory<{0}, {1}> findOneFactory,
             FindOneJoinedFactory<{0}, {1}> findOneJoinedFactory,
-            FindAllFactory<{0}> findAllFactory,
-            FindAllJoinedFactory<{0}> findAllJoinedFactory,
+            FindAllWithDynamicCriteriaFactory<{0}> findAllWithDynamicCriteriaFactory,
+            FindAllJoinedWithDynamicCriteriaFactory<{0}> findAllJoinedWithDynamicCriteriaFactory,
             UpdateOneFactory<{0}> updateOneFactory,
             DeleteOneFactory<{0}, {1}> deleteOneFactory,
             CountAllFactory<{0}> countAllFactory,
+            CountAllByDynamicCriteriaFactory<{0}> countAllByDynamicCriteriaFactory,
+            DataModelToDatabaseAdapter<{0}> dataModelToDatabaseAdapter,
             ConnectionManager connectionManager)
             : base(
                   identityGenerator,
@@ -343,14 +345,16 @@ namespace CrudGenerator.Core
                   existsFactory,
                   insertOneFactory,
                   findOneFactory,
-                  findAllFactory,
+                  findAllWithDynamicCriteriaFactory,
                   updateOneFactory,
                   deleteOneFactory,
                   countAllFactory,
+                  countAllByDynamicCriteriaFactory,
+                  dataModelToDatabaseAdapter,
                   connectionManager)
         {{
             findOneQuery = findOneJoinedFactory.Create();
-            findAllQuery = findAllJoinedFactory.Create();
+            findAllWithDynamicCriteriaQuery = findAllJoinedWithDynamicCriteriaFactory.Create();
         }}{4}
     }}";
 
@@ -370,11 +374,13 @@ namespace CrudGenerator.Core
             InsertOneFactory<{0}> insertOneFactory,
             FindOneFactory<{0}, {1}> findOneFactory,
             FindOneJoinedFactory<{0}, {1}> findOneJoinedFactory,
-            FindAllFactory<{0}> findAllFactory,
-            FindAllJoinedFactory<{0}> findAllJoinedFactory,
+            FindAllWithDynamicCriteriaFactory<{0}> findAllWithDynamicCriteriaFactory,
+            FindAllJoinedWithDynamicCriteriaFactory<{0}> findAllJoinedWithDynamicCriteriaFactory,
             UpdateOneFactory<{0}> updateOneFactory,
             DeleteOneFactory<{0}, {1}> deleteOneFactory,
             CountAllFactory<{0}> countAllFactory,
+            CountAllByDynamicCriteriaFactory<{0}> countAllByDynamicCriteriaFactory,
+            DataModelToDatabaseAdapter<{0}> dataModelToDatabaseAdapter,
             ConnectionManager connectionManager)
             : base(
                   createTableFactory,
@@ -382,14 +388,16 @@ namespace CrudGenerator.Core
                   existsFactory,
                   insertOneFactory,
                   findOneFactory,
-                  findAllFactory,
+                  findAllWithDynamicCriteriaFactory,
                   updateOneFactory,
                   deleteOneFactory,
                   countAllFactory,
+                  countAllByDynamicCriteriaFactory,
+                  dataModelToDatabaseAdapter,
                   connectionManager)
         {{
             findOneQuery = findOneJoinedFactory.Create();
-            findAllQuery = findAllJoinedFactory.Create();
+            findAllWithDynamicCriteriaQuery = findAllJoinedWithDynamicCriteriaFactory.Create();
         }}
     }}";
 
@@ -1655,6 +1663,7 @@ namespace {0}
                     new string[]
                     {
                         "Database.DataAccess",
+                        "Database.DataTransfer",
                         "Database.IdentityGeneration",
                         "Database.RepositoryServicing.Factories",
                         "Domain.Database",
@@ -1669,12 +1678,6 @@ namespace {0}
                             "Framework.Extensions",
                             "Framework.IdentityGeneration",
                             "System.Threading.Tasks",
-
-                            //"Database.IdentityGeneration",
-                            //"Domain.Model",
-                            //"Framework.Extensions",
-                            //"Framework.IdentityGeneration",
-                            //"System.Threading.Tasks",
                         });
                 }
 
