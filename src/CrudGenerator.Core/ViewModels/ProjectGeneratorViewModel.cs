@@ -385,8 +385,8 @@ namespace CrudGenerator.Core.ViewModels
 
                 StreamWriter streamWriterProject = 
                     string.IsNullOrEmpty(nameSpace)
-                    ? new StreamWriter(Path.Combine(modelProjectPath, $"{projectName}.{ModelGenerator.ModelNamespaceSufix}.csproj"))
-                    : new StreamWriter(Path.Combine(modelProjectPath, $"{projectName}.{nameSpace}.{ModelGenerator.ModelNamespaceSufix}.csproj"));
+                    ? new StreamWriter(Path.Combine(modelProjectPath, $"{projectName}.Model.csproj"))
+                    : new StreamWriter(Path.Combine(modelProjectPath, $"{projectName}.{nameSpace}.Model.csproj"));
                 streamWriterProject.Write(
     @"<Project Sdk=""Microsoft.NET.Sdk"">
 
