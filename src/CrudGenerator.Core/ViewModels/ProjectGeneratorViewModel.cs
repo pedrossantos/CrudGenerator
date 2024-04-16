@@ -339,7 +339,7 @@ namespace CrudGenerator.Core.ViewModels
                 #region Models Project
                 string modelProjectPath = string.IsNullOrEmpty(nameSpace)
                     ? Path.Combine(srcPath, $"{projectName}.Model")
-                    : Path.Combine(srcPath, $"{nameSpace}.Model");
+                    : Path.Combine(srcPath, $"{projectName}.{nameSpace}.Model");
 
                 if (Directory.Exists(modelProjectPath))
                     Directory.Delete(modelProjectPath, true);
@@ -350,7 +350,7 @@ namespace CrudGenerator.Core.ViewModels
 
                 string modelClassesNamespace = string.IsNullOrEmpty(nameSpace)
                     ? $"{projectName}.Model"
-                    : $"{nameSpace}.Model";
+                    : $"{projectName}.{nameSpace}.Model";
 
                 foreach (GeneratedClass generatedClass in generatedModelClasses)
                 {
@@ -383,7 +383,10 @@ namespace CrudGenerator.Core.ViewModels
                     streamWriterClass.Dispose();
                 }
 
-                StreamWriter streamWriterProject = new StreamWriter(Path.Combine(modelProjectPath, $"{projectName}.{ModelGenerator.ModelNamespaceSufix}.csproj"));
+                StreamWriter streamWriterProject = 
+                    string.IsNullOrEmpty(nameSpace)
+                    ? new StreamWriter(Path.Combine(modelProjectPath, $"{projectName}.{ModelGenerator.ModelNamespaceSufix}.csproj"))
+                    : new StreamWriter(Path.Combine(modelProjectPath, $"{projectName}.{nameSpace}.{ModelGenerator.ModelNamespaceSufix}.csproj"));
                 streamWriterProject.Write(
     @"<Project Sdk=""Microsoft.NET.Sdk"">
 
