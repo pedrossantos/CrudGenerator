@@ -338,8 +338,8 @@ namespace CrudGenerator.Core.ViewModels
 
                 #region Models Project
                 string modelProjectPath = string.IsNullOrEmpty(nameSpace)
-                    ? Path.Combine(srcPath, $"{projectName}.Model")
-                    : Path.Combine(srcPath, $"{projectName}.{nameSpace}.Model");
+                    ? Path.Combine(srcPath, $"{projectName}.{ModelGenerator.ModelProjectSufix}")
+                    : Path.Combine(srcPath, $"{projectName}.{nameSpace}.{ModelGenerator.ModelProjectSufix}");
 
                 if (Directory.Exists(modelProjectPath))
                     Directory.Delete(modelProjectPath, true);
@@ -349,8 +349,8 @@ namespace CrudGenerator.Core.ViewModels
                 TreeList<string> namespaceModelTreeList = new TreeList<string>(projectName);
 
                 string modelClassesNamespace = string.IsNullOrEmpty(nameSpace)
-                    ? $"{projectName}.Model"
-                    : $"{projectName}.{nameSpace}.Model";
+                    ? $"{projectName}.{ModelGenerator.ModelProjectSufix}"
+                    : $"{projectName}.{nameSpace}.{ModelGenerator.ModelProjectSufix}";
 
                 foreach (GeneratedClass generatedClass in generatedModelClasses)
                 {
@@ -385,8 +385,8 @@ namespace CrudGenerator.Core.ViewModels
 
                 StreamWriter streamWriterProject = 
                     string.IsNullOrEmpty(nameSpace)
-                    ? new StreamWriter(Path.Combine(modelProjectPath, $"{projectName}.Model.csproj"))
-                    : new StreamWriter(Path.Combine(modelProjectPath, $"{projectName}.{nameSpace}.Model.csproj"));
+                    ? new StreamWriter(Path.Combine(modelProjectPath, $"{projectName}.{ModelGenerator.ModelProjectSufix}.csproj"))
+                    : new StreamWriter(Path.Combine(modelProjectPath, $"{projectName}.{nameSpace}.{ModelGenerator.ModelProjectSufix}.csproj"));
                 streamWriterProject.Write(
     @"<Project Sdk=""Microsoft.NET.Sdk"">
 

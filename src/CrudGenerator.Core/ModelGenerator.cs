@@ -14,6 +14,7 @@ namespace CrudGenerator.Core
 {
     public class ModelGenerator : INotifyPropertyChanged, IDisposable
     {
+        public const string ModelProjectSufix = "Model";
         public const string ModelNamespaceSufix = "Models";
         public const string DependencyInversionNamespaceSufix = "DependencyInversion";
 
@@ -699,8 +700,8 @@ namespace {0}
 
                 string classNameSpace =
                     !string.IsNullOrEmpty(nameSpace)
-                    ? $"{nameSpace}.Model.{ModelNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}"
-                    : $"Model.{ModelNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}";
+                    ? $"{nameSpace}.{ModelProjectSufix}.{ModelNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}"
+                    : $"{ModelProjectSufix}.{ModelNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}";
 
                 if (!_namespacesMap.ContainsKey(tableName.ToLower()))
                     _namespacesMap.Add(tableName.ToLower(), classNameSpace);
@@ -872,8 +873,8 @@ namespace {0}
 
                 string classNameSpace =
                     !string.IsNullOrEmpty(nameSpace)
-                    ? $"{nameSpace}.Model.{ModelNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}"
-                    : $"Model.{ModelNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}";
+                    ? $"{nameSpace}.{ModelProjectSufix}.{ModelNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}"
+                    : $"{ModelProjectSufix}.{ModelNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}";
 
                 if (!_namespacesMap.ContainsKey(tableName.ToLower()))
                     _namespacesMap.Add(tableName.ToLower(), classNameSpace);
@@ -1095,8 +1096,8 @@ namespace {0}
 
                 string classNameSpace =
                     !string.IsNullOrEmpty(nameSpace)
-                    ? $"{nameSpace}.Model.{ModelNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}"
-                    : $"Model.{ModelNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}";
+                    ? $"{nameSpace}.{ModelProjectSufix}.{ModelNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}"
+                    : $"{ModelProjectSufix}.{ModelNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}";
 
                 if (!_namespacesMap.ContainsKey(tableName.ToLower()))
                     _namespacesMap.Add(tableName.ToLower(), classNameSpace);
@@ -1310,8 +1311,8 @@ namespace {0}
 
                 string classNameSpace =
                     !string.IsNullOrEmpty(nameSpace)
-                    ? $"{nameSpace}.Model.{ModelNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}"
-                    : $"Model.{ModelNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}";
+                    ? $"{nameSpace}.{ModelProjectSufix}.{ModelNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}"
+                    : $"{ModelProjectSufix}.{ModelNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}";
 
                 if (!_namespacesMap.ContainsKey(tableName.ToLower()))
                     _namespacesMap.Add(tableName.ToLower(), classNameSpace);
@@ -1546,8 +1547,8 @@ namespace {0}
 
                 string classNameSpace =
                     !string.IsNullOrEmpty(nameSpace)
-                    ? $"{nameSpace}.Model.{ModelNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}"
-                    : $"Model.{ModelNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}";
+                    ? $"{nameSpace}.{ModelProjectSufix}.{ModelNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}"
+                    : $"{ModelProjectSufix}.{ModelNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}";
 
                 if (!_namespacesMap.ContainsKey(tableName.ToLower()))
                     _namespacesMap.Add(tableName.ToLower(), classNameSpace);
@@ -1714,8 +1715,8 @@ namespace {0}
         {
             string classNameSpace =
                 !string.IsNullOrEmpty(nameSpace)
-                ? $"{nameSpace}.Model.{DependencyInversionNamespaceSufix}"
-                : $"Model.{DependencyInversionNamespaceSufix}";
+                ? $"{nameSpace}.{ModelProjectSufix}.{DependencyInversionNamespaceSufix}"
+                : $"{ModelProjectSufix}.{DependencyInversionNamespaceSufix}";
 
             string formattedProjectName = projectName[0].ToString().ToUpper() + string.Join("", projectName.Skip(1));
             string containerBuilderClassName = $"{formattedProjectName}{ModelNamespaceSufix}ContainerBuilder";
