@@ -20,12 +20,14 @@ namespace CrudGenerator.Core.ViewModels
         [Injectable]
         public DbConnectionConfigurationViewModel(
             ConnectionManager connectionManager,
+            SchemaInformationBase schemaInformationBase,
             IMessageDialog messageDialog)
             : base()
         {
             PresenterTitle = Messages.DatabaseConnectionConfiguration;
 
             _connectionManager = connectionManager;
+            SchemaInformationBase = schemaInformationBase;
             _messageDialog = messageDialog;
         }
 
@@ -47,7 +49,11 @@ namespace CrudGenerator.Core.ViewModels
             set => PropertyChangedDispatcher.SetProperty(ref _connectionState, value);
         }
 
+        public SchemaInformationBase SchemaInformationBase { get; }
+
         public abstract void UpdateConnection();
+
+        public abstract void UpdateSchemaInformationSchemaName();
 
         public abstract Task<bool> ValidateConnectionInformations();
 
@@ -59,6 +65,7 @@ namespace CrudGenerator.Core.ViewModels
             {
                 UpdateConnection();
                 ConnectionState = _connectionManager.TestConnection();
+                UpdateSchemaInformationSchemaName();
             }
         }
     }

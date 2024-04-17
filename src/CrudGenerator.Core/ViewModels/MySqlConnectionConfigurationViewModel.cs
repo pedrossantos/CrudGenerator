@@ -20,8 +20,9 @@ namespace CrudGenerator.Core.ViewModels
         [Injectable]
         public MySqlConnectionConfigurationViewModel(
             MySqlConnectionManager mysSqlConnectionManager,
+            MySqlSchemaInformation mySqlSchemaInformation,
             IMessageDialog messageDialog)
-            : base(mysSqlConnectionManager, messageDialog)
+            : base(mysSqlConnectionManager, mySqlSchemaInformation, messageDialog)
         {
             PresenterTitle = Messages.MySqlDatabaseConnectionConfiguration;
         }
@@ -58,6 +59,14 @@ namespace CrudGenerator.Core.ViewModels
                     UserID = MySqlUserId,
                     Password = MySqlPassword,
                 });
+        }
+
+        public override void UpdateSchemaInformationSchemaName()
+        {
+            if (ConnectionState == true)
+                SchemaInformationBase.SchemaName = MySqlDatabaseName;
+            else
+                SchemaInformationBase.SchemaName = string.Empty;
         }
 
         public override async Task<bool> ValidateConnectionInformations()

@@ -21,8 +21,9 @@ namespace CrudGenerator.Core.ViewModels
         [Injectable]
         public PostgreSqlConnectionConfigurationViewModel(
             PostgreSqlConnectionManager sqlServerConnectionManager,
+            PostgreSqlSchemaInformation postgreSqlSchemaInformation,
             IMessageDialog messageDialog)
-            : base(sqlServerConnectionManager, messageDialog)
+            : base(sqlServerConnectionManager, postgreSqlSchemaInformation, messageDialog)
         {
             PresenterTitle = Messages.PostgreSqlDatabaseConnectionConfiguration;
         }
@@ -58,6 +59,14 @@ namespace CrudGenerator.Core.ViewModels
                 {
                     Database = $"{PostgreSqlDatabaseName}"
                 });
+        }
+
+        public override void UpdateSchemaInformationSchemaName()
+        {
+            if (ConnectionState == true)
+                SchemaInformationBase.SchemaName = PostgreSqlDatabaseName;
+            else
+                SchemaInformationBase.SchemaName = string.Empty;
         }
 
         public override async Task<bool> ValidateConnectionInformations()

@@ -21,8 +21,9 @@ namespace CrudGenerator.Core.ViewModels
         [Injectable]
         public SqlServerConnectionConfigurationViewModel(
             SqlServerConnectionManager sqlServerConnectionManager,
+            SqlServerSchemaInformation sqlServerSchemaInformation,
             IMessageDialog messageDialog)
-            : base(sqlServerConnectionManager, messageDialog)
+            : base(sqlServerConnectionManager, sqlServerSchemaInformation, messageDialog)
         {
             PresenterTitle = Messages.SqlServerDatabaseConnectionConfiguration;
         }
@@ -63,6 +64,14 @@ namespace CrudGenerator.Core.ViewModels
                     TrustServerCertificate = true,
                     ConnectTimeout = 30,
                 });
+        }
+
+        public override void UpdateSchemaInformationSchemaName()
+        {
+            if (ConnectionState == true)
+                SchemaInformationBase.SchemaName = SqlServerDatabaseName;
+            else
+                SchemaInformationBase.SchemaName = string.Empty;
         }
 
         public override async Task<bool> ValidateConnectionInformations()

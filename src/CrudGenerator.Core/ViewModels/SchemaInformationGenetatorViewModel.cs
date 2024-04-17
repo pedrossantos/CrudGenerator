@@ -13,6 +13,8 @@ namespace CrudGenerator.Core.ViewModels
     public class SchemaInformationGenetatorViewModel : ViewModelBase
     {
         private DatabaseTypes _selectedDatabaseType;
+        private string _schemaName;
+
         private NullSchemaInformation _nullSchemaInformation;
         private MySqlSchemaInformation _mySqlSchemaInformation;
         private PostgreSqlSchemaInformation _postgreSqlSchemaInformation;
@@ -67,6 +69,12 @@ namespace CrudGenerator.Core.ViewModels
         {
             get => _selectedDatabaseType;
             set => PropertyChangedDispatcher.SetProperty(ref _selectedDatabaseType, value);
+        }
+
+        public string SchemaName
+        {
+            get => _schemaName;
+            set => PropertyChangedDispatcher.SetProperty(ref _schemaName, value);
         }
 
         public MySqlSchemaInformation MySqlSchemaInformation
@@ -186,6 +194,13 @@ namespace CrudGenerator.Core.ViewModels
                 _postgreSqlSchemaInformation.Clear();
                 _sqliteSchemaInformation.Clear();
                 _sqlServerSchemaInformation.Clear();
+            }
+            else if (e.PropertyName == nameof(SchemaName))
+            {
+                _mySqlSchemaInformation.SchemaName = SchemaName;
+                _postgreSqlSchemaInformation.SchemaName = SchemaName;
+                _sqliteSchemaInformation.SchemaName = SchemaName;
+                _sqlServerSchemaInformation.SchemaName = SchemaName;
             }
         }
     }

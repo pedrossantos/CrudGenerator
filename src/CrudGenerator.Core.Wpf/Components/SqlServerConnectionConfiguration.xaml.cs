@@ -54,11 +54,13 @@ namespace CrudGenerator.Core.Wpf.Components
 
         public SqlServerConnectionConfiguration(
             SqlServerConnectionManager sqlServerConnectionManager,
+            SqlServerSchemaInformation sqlServerSchemaInformation,
             IMessageDialog messageDialog)
             : base(sqlServerConnectionManager, messageDialog)
         {
             DbConnectionConfigurationViewModel = SqlServerConnectionConfigurationViewModel = new SqlServerConnectionConfigurationViewModel(
                 sqlServerConnectionManager,
+                sqlServerSchemaInformation,
                 MessageDialog);
 
             PropertyChanged += SqlSeverConnectionConfigurationPropertyChanged;
