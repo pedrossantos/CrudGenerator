@@ -9,6 +9,7 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using View.Abstractions;
 
 namespace CrudGenerator.Core.Wpf.Components
@@ -435,6 +436,22 @@ namespace CrudGenerator.Core.Wpf.Components
                         RaiseEvent(new RoutedEventArgs(GenerateClassesFinalizedEvent));
                 });
             }
+        }
+
+        private void GridSplitterMouseEnter(object sender, MouseEventArgs e)
+        {
+            if (sender is GridSplitter mouseSplitter)
+                mouseSplitter.Background = Brushes.Black;
+
+            Mouse.OverrideCursor = Cursors.SizeWE;
+        }
+
+        private void GridSplitterMouseLeave(object sender, MouseEventArgs e)
+        {
+            if (sender is GridSplitter mouseSplitter)
+                mouseSplitter.Background = Brushes.Gray;
+
+            Mouse.OverrideCursor = Cursors.Arrow;
         }
     }
 }

@@ -24,12 +24,13 @@
 
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="0.01*" />
             <ColumnDefinition Width="3*" />
         </Grid.ColumnDefinitions>
 
         <Border
             Grid.Row="0"
-            Grid.ColumnSpan="2"
+            Grid.ColumnSpan="3"
             Margin="10,5"
             BorderBrush="Black"
             BorderThickness="0.5">
@@ -78,7 +79,7 @@
 
         <Border
             Grid.Row="1"
-            Grid.ColumnSpan="2"
+            Grid.ColumnSpan="3"
             Margin="10,5"
             BorderBrush="Black"
             BorderThickness="0.5">
@@ -121,7 +122,7 @@
 
         <Border
             Grid.Row="2"
-            Grid.ColumnSpan="2"
+            Grid.ColumnSpan="3"
             Margin="10,5"
             BorderBrush="Black"
             BorderThickness="0.5">
@@ -211,6 +212,15 @@
             </Grid>
         </Border>
 
+        <GridSplitter
+            Grid.Row="3"
+            Grid.Column="1"
+            HorizontalAlignment="Stretch"
+            Background="Gray"
+            Focusable="False"
+            MouseEnter="GridSplitterMouseEnter"
+            MouseLeave="GridSplitterMouseLeave" />
+
         <Border
             Grid.Row="3"
             Grid.Column="2"
@@ -230,7 +240,7 @@
         <Button
             x:Name="btnGenerateProject"
             Grid.Row="4"
-            Grid.ColumnSpan="2"
+            Grid.ColumnSpan="3"
             Margin="20,10"
             Padding="6,3"
             HorizontalAlignment="Right"
