@@ -209,7 +209,7 @@ namespace CrudGenerator.Core
         /// </summary>
         private const string tableMappingTemplate = @"
     public sealed class {0}
-        : IndexedTableMapping
+        : TableMapping
     {{
         public const string _TableName = ""{1}"";
 {2}
@@ -517,6 +517,7 @@ namespace CrudGenerator.Core
                 yield return CreateSingleton(c => new MySqlNativeCommandBuilder(c.Resolve<MySqlBuilderTemplate>()));
                 yield return CreateTransient<MySqlConnectionManagerBuilder>();
                 yield return CreateSingleton<MySqlConnectionManager>();
+                yield return CreateSingleton<MySqlSchemaInformation>();
                 #endregion MySql
 
                 #region PostgreSql
@@ -524,6 +525,7 @@ namespace CrudGenerator.Core
                 yield return CreateSingleton(c => new PostgreSqlNativeCommandBuilder(c.Resolve<PostgreSqlBuilderTemplate>()));
                 yield return CreateTransient<PostgreSqlConnectionManagerBuilder>();
                 yield return CreateSingleton<PostgreSqlConnectionManager>();
+                yield return CreateSingleton<PostgreSqlSchemaInformation>();
                 #endregion PostgreSql
 
                 #region Sqlite
@@ -531,6 +533,7 @@ namespace CrudGenerator.Core
                 yield return CreateSingleton(c => new SqliteNativeCommandBuilder(c.Resolve<SqliteBuilderTemplate>()));
                 yield return CreateTransient<SqliteConnectionManagerBuilder>();
                 yield return CreateSingleton<FileSqliteConnectionManager>();
+                yield return CreateSingleton<SqliteSchemaInformation>();
                 #endregion Sqlite
 
                 #region SqlServer
@@ -538,6 +541,7 @@ namespace CrudGenerator.Core
                 yield return CreateSingleton(c => new SqlServerNativeCommandBuilder(c.Resolve<SqlServerBuilderTemplate>()));
                 yield return CreateTransient<SqlServerConnectionManagerBuilder>();
                 yield return CreateSingleton<SqlServerConnectionManager>();
+                yield return CreateSingleton<SqlServerSchemaInformation>();
                 #endregion SqlServer
             }}
             else
@@ -545,18 +549,22 @@ namespace CrudGenerator.Core
                 if (dbConnectionStringBuilder is MySqlConnectionStringBuilder mySqlConnectionStringBuilder)
                 {{
                     yield return CreateSingleton(container => {{ return mySqlConnectionStringBuilder; }});
-                }}
-                else if (dbConnectionStringBuilder is SQLiteConnectionStringBuilder sqliteConnectionStringBuilder)
-                {{
-                    yield return CreateSingleton(container => {{ return sqliteConnectionStringBuilder; }});
-                }}
-                else if (dbConnectionStringBuilder is SqlConnectionStringBuilder sqlServerConnectionStringBuilder)
-                {{
-                    yield return CreateSingleton(container => {{ return sqlServerConnectionStringBuilder; }});
+                    yield return CreateSingleton<MySqlSchemaInformation>();
                 }}
                 else if (dbConnectionStringBuilder is NpgsqlConnectionStringBuilder postgreSqlConnectionStringBuilder)
                 {{
                     yield return CreateSingleton(container => {{ return postgreSqlConnectionStringBuilder; }});
+                    yield return CreateSingleton<PostgreSqlSchemaInformation>();
+                }}
+                else if (dbConnectionStringBuilder is SQLiteConnectionStringBuilder sqliteConnectionStringBuilder)
+                {{
+                    yield return CreateSingleton(container => {{ return sqliteConnectionStringBuilder; }});
+                    yield return CreateSingleton<SqliteSchemaInformation>();
+                }}
+                else if (dbConnectionStringBuilder is SqlConnectionStringBuilder sqlServerConnectionStringBuilder)
+                {{
+                    yield return CreateSingleton(container => {{ return sqlServerConnectionStringBuilder; }});
+                    yield return CreateSingleton<SqlServerSchemaInformation>();
                 }}
             }}
         }}
