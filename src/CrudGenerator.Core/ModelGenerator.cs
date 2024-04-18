@@ -1379,6 +1379,7 @@ namespace {0}
 
                                         identityToDbParametersCalls.Add(
                                             $"            yield return new DbParameterDefinition("
+                                            + $"{_tableMappingClassNamesMap[tableName.ToLower()]}._TableName, "
                                             + $"{_tableMappingClassNamesMap[tableName.ToLower()]}.{foreignPropertyName}, "
                                             + $"{parameterPath});");
                                     }
@@ -1399,6 +1400,7 @@ namespace {0}
                     string propertyName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(primaryKeyColumn.Name);
                     identityToDbParametersCalls.Add(
                         $"            yield return new DbParameterDefinition("
+                        + $"{_tableMappingClassNamesMap[tableName.ToLower()]}._TableName, "
                         + $"{_tableMappingClassNamesMap[tableName.ToLower()]}.{propertyName}, "
                         + $"value.{propertyName});");
                 }
@@ -1462,6 +1464,7 @@ namespace {0}
 
                                         //entityToDbParametersCalls.Add(
                                         //    $"            yield return new DbParameterDefinition("
+                                        //    + $"{_tableMappingClassNamesMap[tableName.ToLower()]}._TableName, "
                                         //    + $"{_tableMappingClassNamesMap[tableName.ToLower()]}.{foreignPropertyName}, "
                                         //    + $"{parameterPath});");
                                     }
@@ -1481,6 +1484,7 @@ namespace {0}
                     string propertyName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(otherColumn.Name);
                     entityToDbParametersCalls.Add(
                         $"            yield return new DbParameterDefinition("
+                        + $"{_tableMappingClassNamesMap[tableName.ToLower()]}._TableName, "
                         + $"{_tableMappingClassNamesMap[tableName.ToLower()]}.{propertyName}, "
                         + $"value.{propertyName});");
                 }
