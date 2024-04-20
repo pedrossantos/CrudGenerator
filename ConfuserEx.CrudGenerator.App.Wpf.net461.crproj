@@ -1,0 +1,34 @@
+<project outputDir="C:\MeuGitHub\CrudGenerator\app\CrudGenerator.App.Wpf\bin\Release\net461\Confused" baseDir="C:\MeuGitHub\CrudGenerator\app\CrudGenerator.App.Wpf\bin\Release\net461" xmlns="http://confuser.codeplex.com">
+  <rule pattern="true" preset="maximum">
+    <protection id="anti debug" />
+    <protection id="anti dump" />
+    <protection id="anti ildasm" />
+    <protection id="anti tamper" />
+    <protection id="constants" />
+    <protection id="ctrl flow" />
+    <protection id="harden" />
+    <protection id="invalid metadata" />
+    <protection id="ref proxy" />
+    <protection id="resources" />
+    <protection id="typescramble" action="remove" />
+    <protection id="rename" />
+    <protection id="watermark" />
+  </rule>
+  <module path="CrudGenerator.Core.dll" />
+  <module path="CrudGenerator.Core.Wpf.dll" />
+  <module path="CrudGenerator.App.Wpf.exe" />
+  <module path="Database.dll" />
+  <module path="Database.MySql.dll" />
+  <module path="Database.PostgreSql.dll" />
+  <module path="Database.Sqlite.dll" />
+  <module path="Database.SqlServer.dll" />
+  <module path="DependencyInversion.dll" />
+  <module path="Framework.dll" />
+  <module path="Serialization.dll" />
+  <module path="View.Abstractions.dll" />
+  <module path="View.Abstractions.Wpf.dll" />
+  <module path="View.Components.dll" />
+  <module path="View.Components.Wpf.dll" />
+  <module path="Xceed.Wpf.AvalonDock.dll" />
+  <module path="Xceed.Wpf.Toolkit.dll" />
+</project>
