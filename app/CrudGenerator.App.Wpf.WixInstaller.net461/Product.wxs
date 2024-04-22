@@ -17,9 +17,10 @@
   <!--<?define UpgradeCode="54875ADD-43FD-4C08-AC47-0AD92DEFA7B9" ?>-->  <!--v1.1.2.1-->
   <!--<?define UpgradeCode="2B5EF377-37B5-427A-8C13-7125EE8F50FA" ?>-->  <!--v1.1.2.2-->
   <!--<?define UpgradeCode="DC258B70-7FC6-4A6A-AE94-02A34F9555D3" ?>-->  <!--v1.1.2.3-->
-  <?define UpgradeCode="C75AC644-9229-4E46-80E0-33E799BE8DD1" ?>  <!--v1.1.2.4-->
+  <!--<?define UpgradeCode="C75AC644-9229-4E46-80E0-33E799BE8DD1" ?>-->  <!--v1.1.2.4-->
+  <?define UpgradeCode="C42BC941-47B0-445E-9606-CB27262E96DB" ?>  <!--v1.1.2.5-->
 
-	<Product Id="35CE40BF-2F47-409E-BA49-4757F6A3F1DA" Name="!(loc.ApplicationName)" Language="!(loc.Language)" Version="1.1.2.4" Manufacturer="!(loc.ManufacturerFullName)" UpgradeCode="$(var.UpgradeCode)">
+  <Product Id="35CE40BF-2F47-409E-BA49-4757F6A3F1DA" Name="!(loc.ApplicationName)" Language="!(loc.Language)" Version="1.1.2.5" Manufacturer="!(loc.ManufacturerFullName)" UpgradeCode="$(var.UpgradeCode)">
 	<Package Id="30EE239D-F5EA-4630-90CB-22AE1F31DCC4" InstallerVersion="200" Compressed="yes" InstallScope="perMachine" Description="!(loc.ProductDescription)"/>
 
     <!--<WixVariable Id="WixUILicenseRtf" Value="!(loc.LicenseRtf)" />-->
@@ -124,7 +125,7 @@
           </Directory>
 
           <Component Id="ProductComponents" Guid="F10443EE-5385-4240-890F-847E0992C592" KeyPath="yes">
-            <File Id="BouncyCastle.Cryptography" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\BouncyCastle.Cryptography.dll"/>
+            <File Id="BouncyCastle.Crypto" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\BouncyCastle.Crypto.dll"/>
             <File Id="EntityFramework" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\EntityFramework.dll"/>
             <File Id="EntityFramework.SqlServer" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\EntityFramework.SqlServer.dll"/>
             <File Id="Google.Protobuf" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\Google.Protobuf.dll"/>
@@ -151,7 +152,6 @@
             <File Id="System.ComponentModel.EventBasedAsync" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\System.ComponentModel.EventBasedAsync.dll"/>
             <File Id="System.ComponentModel.Primitives" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\System.ComponentModel.Primitives.dll"/>
             <File Id="System.ComponentModel.TypeConverter" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\System.ComponentModel.TypeConverter.dll"/>
-            <File Id="System.Configuration.ConfigurationManager" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\System.Configuration.ConfigurationManager.dll"/>
             <File Id="System.Console" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\System.Console.dll"/>
             <File Id="System.Data.Common" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\System.Data.Common.dll"/>
             <File Id="System.Data.SqlClient" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\System.Data.SqlClient.dll"/>
@@ -183,7 +183,6 @@
             <File Id="System.IO.FileSystem.Watcher" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\System.IO.FileSystem.Watcher.dll"/>
             <File Id="System.IO.IsolatedStorage" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\System.IO.IsolatedStorage.dll"/>
             <File Id="System.IO.MemoryMappedFiles" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\System.IO.MemoryMappedFiles.dll"/>
-            <File Id="System.IO.Pipelines" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\System.IO.Pipelines.dll"/>
             <File Id="System.IO.Pipes" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\System.IO.Pipes.dll"/>
             <File Id="System.IO.UnmanagedMemoryStream" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\System.IO.UnmanagedMemoryStream.dll"/>
             <File Id="System.Linq" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\System.Linq.dll"/>
@@ -217,24 +216,19 @@
             <File Id="System.Runtime.Handles" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\System.Runtime.Handles.dll"/>
             <File Id="System.Runtime.InteropServices" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\System.Runtime.InteropServices.dll"/>
             <File Id="System.Runtime.InteropServices.RuntimeInformation" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\System.Runtime.InteropServices.RuntimeInformation.dll"/>
-            <File Id="System.Runtime.Loader" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\System.Runtime.Loader.dll"/>
             <File Id="System.Runtime.Numerics" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\System.Runtime.Numerics.dll"/>
             <File Id="System.Runtime.Serialization.Formatters" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\System.Runtime.Serialization.Formatters.dll"/>
             <File Id="System.Runtime.Serialization.Json" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\System.Runtime.Serialization.Json.dll"/>
             <File Id="System.Runtime.Serialization.Primitives" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\System.Runtime.Serialization.Primitives.dll"/>
             <File Id="System.Runtime.Serialization.Xml" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\System.Runtime.Serialization.Xml.dll"/>
-            <File Id="System.Security.AccessControl" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\System.Security.AccessControl.dll"/>
             <File Id="System.Security.Claims" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\System.Security.Claims.dll"/>
             <File Id="System.Security.Cryptography.Algorithms" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\System.Security.Cryptography.Algorithms.dll"/>
             <File Id="System.Security.Cryptography.Csp" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\System.Security.Cryptography.Csp.dll"/>
             <File Id="System.Security.Cryptography.Encoding" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\System.Security.Cryptography.Encoding.dll"/>
             <File Id="System.Security.Cryptography.Primitives" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\System.Security.Cryptography.Primitives.dll"/>
             <File Id="System.Security.Cryptography.X509Certificates" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\System.Security.Cryptography.X509Certificates.dll"/>
-            <File Id="System.Security.Permissions" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\System.Security.Permissions.dll"/>
             <File Id="System.Security.Principal" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\System.Security.Principal.dll"/>
-            <File Id="System.Security.Principal.Windows" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\System.Security.Principal.Windows.dll"/>
             <File Id="System.Security.SecureString" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\System.Security.SecureString.dll"/>
-            <File Id="System.Text.Encoding.CodePages" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\System.Text.Encoding.CodePages.dll"/>
             <File Id="System.Text.Encoding" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\System.Text.Encoding.dll"/>
             <File Id="System.Text.Encoding.Extensions" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\System.Text.Encoding.Extensions.dll"/>
             <File Id="System.Text.Encodings.Web" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\System.Text.Encodings.Web.dll"/>
@@ -256,7 +250,6 @@
             <File Id="System.Xml.XmlSerializer" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\System.Xml.XmlSerializer.dll"/>
             <File Id="System.Xml.XPath" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\System.Xml.XPath.dll"/>
             <File Id="System.Xml.XPath.XDocument" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\System.Xml.XPath.XDocument.dll"/>
-            <File Id="ZstdSharp" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\ZstdSharp.dll"/>
 
             <File Id="CrudGenerator.App.Wpf.config" Source="..\CrudGenerator.App.Wpf\bin\Release\net461\CrudGenerator.App.Wpf.exe.config"/>
 
