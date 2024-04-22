@@ -10,7 +10,7 @@ Hoje, temos suporte para bancos de dados Sqlite, SqlServer, PostgreSql e Mysql. 
 Em paralelo, também está em andamento o desenvolvimento da geração da camada de aplicação e camada de apresentação para modelos e reposítórios criados à partir do CrudGenerator.
 Para verificar uma desmonstração de utilização, com banco de dados MySql, veja "CrudGenerator_Demonstração.gif".
 
-Também foi desenvolvido instaladores (pt-BR e en-US) para disponibilizar a aplicação para quem se interessar em conhecê-la. Para instaladores, acesse a pasta "installer/net462".
+Também foi desenvolvido instaladores (pt-BR e en-US) para disponibilizar a aplicação para quem se interessar em conhecê-la. Para instaladores, acesse as pastas "installer/net461" (compatível com Windows 7) ou "installer/net462".
 Caso queira saber mais sobre o Framework e esta solução, ou queira colaborar indicando ocorrência de bugs, entre em contato através do e-mail "ss.pedrohenrique@gmail.com".
 
 Obrigado!
