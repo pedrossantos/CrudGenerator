@@ -700,7 +700,7 @@ namespace {0}
 
         private void GenerateIdentityClasses(string nameSpace)
         {
-            foreach (KeyValuePair<string, SchemaInformationTableMapping> schemaInformationTableMapping in _schemaInformation.SchemaTableMappings)
+            foreach (KeyValuePair<string, SchemaInformationTableMapping> schemaInformationTableMapping in _schemaInformation.SchemaTableMappings.OrderBy(kp => kp.Value.Order))
             {
                 string tableName = schemaInformationTableMapping.Key.ToLower();
                 string identityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}Identity";
@@ -872,7 +872,7 @@ namespace {0}
 
         private void GenerateEntityClasses(string nameSpace)
         {
-            foreach (KeyValuePair<string, SchemaInformationTableMapping> schemaInformationTableMapping in _schemaInformation.SchemaTableMappings)
+            foreach (KeyValuePair<string, SchemaInformationTableMapping> schemaInformationTableMapping in _schemaInformation.SchemaTableMappings.OrderBy(kp => kp.Value.Order))
             {
                 string tableName = schemaInformationTableMapping.Key.ToLower();
                 string identityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}Identity";
@@ -1095,7 +1095,7 @@ namespace {0}
 
         private void GenerateTableMappingClasses(string nameSpace)
         {
-            foreach (KeyValuePair<string, SchemaInformationTableMapping> schemaInformationTableMappingPair in _schemaInformation.SchemaTableMappings)
+            foreach (KeyValuePair<string, SchemaInformationTableMapping> schemaInformationTableMappingPair in _schemaInformation.SchemaTableMappings.OrderBy(kp => kp.Value.Order))
             {
                 SchemaInformationTableMapping schemaInformationTableMapping = schemaInformationTableMappingPair.Value;
                 string tableName = schemaInformationTableMappingPair.Key.ToLower();
@@ -1310,7 +1310,7 @@ namespace {0}
 
         private void GenerateDatabaseAdapterClasses(string nameSpace)
         {
-            foreach (KeyValuePair<string, SchemaInformationTableMapping> schemaInformationTableMappingPair in _schemaInformation.SchemaTableMappings)
+            foreach (KeyValuePair<string, SchemaInformationTableMapping> schemaInformationTableMappingPair in _schemaInformation.SchemaTableMappings.OrderBy(kp => kp.Value.Order))
             {
                 SchemaInformationTableMapping schemaInformationTableMapping = schemaInformationTableMappingPair.Value;
                 string tableName = schemaInformationTableMappingPair.Key.ToLower();
@@ -1550,7 +1550,7 @@ namespace {0}
 
         private void GenerateDatabaseRepositoryClasses(string nameSpace)
         {
-            foreach (KeyValuePair<string, SchemaInformationTableMapping> schemaInformationTableMappingPair in _schemaInformation.SchemaTableMappings)
+            foreach (KeyValuePair<string, SchemaInformationTableMapping> schemaInformationTableMappingPair in _schemaInformation.SchemaTableMappings.OrderBy(kp => kp.Value.Order))
             {
                 SchemaInformationTableMapping schemaInformationTableMapping = schemaInformationTableMappingPair.Value;
                 string tableName = schemaInformationTableMappingPair.Key.ToLower();
