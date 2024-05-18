@@ -182,8 +182,15 @@
                     Grid.Row="0"
                     Margin="10,5"
                     FontSize="16"
-                    FontWeight="Bold"
-                    Text="{x:Static messages:Messages.GeneratedClasses}" />
+                    FontWeight="Bold">
+                    <TextBlock.Inlines>
+                        <Run Text="{x:Static messages:Messages.GeneratedClasses}" />
+                        <LineBreak />
+                        <Run Text=" - Model Classes (" />
+                        <Run Text="{Binding Path=ProjectGeneratorViewModel.GeneratedModelClasses.Count, ElementName=projectGeneratorControl, Mode=OneWay}" />
+                        <Run Text=")" />
+                    </TextBlock.Inlines>
+                </TextBlock>
                 <Border
                     Grid.Row="1"
                     Margin="10,5"
