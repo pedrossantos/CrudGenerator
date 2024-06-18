@@ -187,7 +187,7 @@
                         <Run Text="{x:Static messages:Messages.GeneratedClasses}" />
                         <LineBreak />
                         <Run Text=" - Model Classes (" />
-                        <Run Text="{Binding Path=ProjectGeneratorViewModel.GeneratedModelClasses.Count, ElementName=projectGeneratorControl, Mode=OneWay}" />
+                        <Run Text="{Binding Path=ProjectGeneratorViewModel.GeneratedClasses.Count, ElementName=projectGeneratorControl, Mode=OneWay}" />
                         <Run Text=")" />
                     </TextBlock.Inlines>
                 </TextBlock>
@@ -199,7 +199,7 @@
                     <TreeView
                         HorizontalAlignment="Stretch"
                         VerticalAlignment="Stretch"
-                        ItemsSource="{Binding Path=ProjectGeneratorViewModel.GeneratedModelClasses, ElementName=projectGeneratorControl, UpdateSourceTrigger=PropertyChanged}"
+                        ItemsSource="{Binding Path=ProjectGeneratorViewModel.GeneratedClasses, ElementName=projectGeneratorControl, UpdateSourceTrigger=PropertyChanged}"
                         SelectedItemChanged="TreeViewSelectedItemChanged">
                         <TreeView.Resources>
                             <HierarchicalDataTemplate DataType="{x:Type classGeneratorCore:GeneratedClassGroupedByNamespace}" ItemsSource="{Binding Path=GeneratedClasses}">
