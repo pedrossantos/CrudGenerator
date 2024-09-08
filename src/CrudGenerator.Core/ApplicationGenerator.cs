@@ -707,6 +707,242 @@ namespace {0}
             }
         }
 
+        private void GenerateEntityClasses(string nameSpace)
+        {
+            foreach (KeyValuePair<string, SchemaInformationTableMapping> schemaInformationTableMapping in _schemaInformation.SchemaTableMappings.OrderBy(kp => kp.Value.Order))
+            {
+                string tableName = schemaInformationTableMapping.Key.ToLower();
+                string identityDtoClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}IdentityDto";
+                string dtoClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}Entity";
+                _dataTransferObjectClassNamesMap.Add(tableName, dtoClassName);
+
+                string classNameSpace =
+                    !string.IsNullOrEmpty(nameSpace)
+                    ? $"{nameSpace}.{ApplicationProjectSufix}.DataTransferObjects.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}"
+                    : $"{ApplicationProjectSufix}.DataTransferObjects.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}";
+
+                if (!_namespacesMap.ContainsKey(tableName.ToLower()))
+                    _namespacesMap.Add(tableName.ToLower(), classNameSpace);
+
+                bool containsPrimaryKeyColumns = schemaInformationTableMapping.Value.Columns.Where(col => col.IsPrimaryKey).Any();
+                List<ColumnInfo> entityColumns = new List<ColumnInfo>(
+                    schemaInformationTableMapping.Value.Columns
+                        .Where(col =>
+                            !col.IsPrimaryKey ||
+                            schemaInformationTableMapping.Value.ForeignKeyValues
+                                .Any(fkvc => fkvc.ForeignKeyValueList
+                                    .Any(fkv => fkv.ForeignColunmnsToReferencedColumns
+                                        .Any(fkctrc => fkctrc.ForeignColumn.ToLower() == col.Name.ToLower())))));
+
+                List<string> dependencyEntityFields = new List<string>();
+                List<string> dependencyConstructorParameters = new List<string>();
+                List<string> dependencyEntityProperties = new List<string>();
+                List<string> dependencyFieldValidations = new List<string>();
+                List<string> dependencyFieldAssignments = new List<string>();
+
+                List<string> entityFields = new List<string>();
+                List<string> constructorParameters = new List<string>();
+                List<string> entityProperties = new List<string>();
+                List<string> fieldValidations = new List<string>();
+                List<string> fieldAssignments = new List<string>();
+
+                if (containsPrimaryKeyColumns)
+                {
+                    string columnType = _dataTransferIdentityObjectClassNamesMap[tableName.ToLower()];
+
+                    entityFields.Add(
+                        string.Format(
+                            fieldTemplate,
+                            columnType,
+                            $"{tableName}Identity"));
+
+                    constructorParameters.Add(
+                        string.Format(
+                            constructorParameterTemplate,
+                            columnType,
+                            $"{tableName}Identity"));
+
+                    entityProperties.Add(
+                        string.Format(
+                            propertyTemplate,
+                            columnType,
+                            CultureInfo.CurrentCulture.TextInfo.ToTitleCase($"{tableName}Identity"),
+                            $"{tableName}Identity"));
+
+                    fieldAssignments.Add(
+                        string.Format(
+                            fieldAssignmentTemplate,
+                            $"{tableName}Identity"));
+                }
+
+                while (entityColumns.Count > 0)
+                {
+                    ColumnInfo entityColumn = entityColumns[0];
+
+                    string columnType = entityColumn.ResolveSystemTypeName();
+                    ForeignKeyValueColletion foreignKeyValueColletion = schemaInformationTableMapping.Value.ForeignKeyValues.FirstOrDefault(fkv => fkv.ForeignKeyValueList.Where(fkv => fkv.ForeignColunmnsToReferencedColumns.Any(fctrc => fctrc.ForeignColumn == entityColumn.Name.ToLower())).Any());
+
+                    if (foreignKeyValueColletion != null)
+                    {
+                        ForeignKeyValue foreignKeyValue =
+                            foreignKeyValueColletion.ForeignKeyValueList.FirstOrDefault(fkv => fkv.ForeignColunmnsToReferencedColumns.Any(fctrc => fctrc.ForeignColumn == entityColumn.Name.ToLower()));
+
+                        if (foreignKeyValue != null)
+                        {
+                            string referencedTableName = foreignKeyValue.ForeignColunmnsToReferencedColumns.Select(fctrc => fctrc.ReferencedTableName).FirstOrDefault()?.ToLower();
+                            if (referencedTableName != null && _schemaInformation.SchemaTableMappings.ContainsKey(referencedTableName.ToLower()))
+                            {
+                                SchemaInformationTableMapping referencedSchemaInformationTableMapping = _schemaInformation.SchemaTableMappings[referencedTableName.ToLower()];
+
+                                bool foreignColumnIsPrimaryKey = foreignKeyValue.ForeignColunmnsToReferencedColumns.FirstOrDefault(fctrc => fctrc.IsPrimaryKey && fctrc.ForeignColumn.ToLower() == entityColumn.Name.ToLower()) != null;
+                                string referencedColumn = foreignKeyValue.ForeignColunmnsToReferencedColumns.FirstOrDefault(fctrc => fctrc.ForeignColumn.ToLower() == entityColumn.Name.ToLower()).ReferencedColumn.ToLower();
+                                foreach (ForeignColunmnToReferencedColumn foreignColunmnToReferencedColumn in foreignKeyValue.ForeignColunmnsToReferencedColumns)
+                                {
+                                    int columnIndexToRemove = entityColumns.FindIndex(col => col.Name.ToLower() == foreignColunmnToReferencedColumn.ForeignColumn.ToLower());
+                                    if (columnIndexToRemove > -1)
+                                        entityColumns.RemoveAt(columnIndexToRemove);
+                                }
+
+                                string fieldName = referencedTableName;
+                                string propertyName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(referencedTableName);
+
+                                columnType = _dataTransferObjectClassNamesMap[referencedTableName];
+                                dependencyFieldValidations.Add(string.Format(constructorParameterValidationTemplate, fieldName));
+
+                                dependencyEntityFields.Add(
+                                    string.Format(
+                                        fieldTemplate,
+                                        columnType,
+                                        fieldName));
+
+                                dependencyConstructorParameters.Add(
+                                    string.Format(
+                                        constructorParameterTemplate,
+                                        columnType,
+                                        fieldName));
+
+                                dependencyEntityProperties.Add(
+                                    string.Format(
+                                        propertyTemplate,
+                                        columnType,
+                                        propertyName,
+                                        fieldName));
+
+                                dependencyFieldAssignments.Add(
+                                    string.Format(
+                                        fieldAssignmentTemplate,
+                                        fieldName));
+
+                                if (!_namespaceDependenciesMap.ContainsKey(tableName.ToLower()))
+                                    _namespaceDependenciesMap.Add(tableName.ToLower(), new List<string>());
+
+                                if (!_namespaceDependenciesMap[tableName.ToLower()].Contains(referencedTableName.ToLower()))
+                                    _namespaceDependenciesMap[tableName.ToLower()].Add(referencedTableName.ToLower());
+
+                                continue;
+                            }
+                        }
+                    }
+
+                    entityFields.Add(
+                        string.Format(
+                            fieldTemplate,
+                            columnType,
+                            entityColumn.Name));
+
+                    constructorParameters.Add(
+                        string.Format(
+                            constructorParameterTemplate,
+                            columnType,
+                            entityColumn.Name));
+
+                    entityProperties.Add(
+                        string.Format(
+                            propertyTemplate,
+                            columnType,
+                            CultureInfo.CurrentCulture.TextInfo.ToTitleCase(entityColumn.Name),
+                            entityColumn.Name));
+
+                    fieldAssignments.Add(
+                        string.Format(
+                            fieldAssignmentTemplate,
+                            entityColumn.Name));
+
+                    entityColumns.RemoveAt(0);
+                }
+
+                string fieldsValidation = string.Empty;
+                if (fieldValidations.Any(fv => fv != null))
+                    fieldsValidation = string.Join("\r\n", fieldValidations.Concat(dependencyFieldValidations).Where(fv => fv != null)) + "\r\n";
+
+                /// {class name}
+                /// {data transfer identity object class name}
+                /// {identity field type}
+                /// {class fields}
+                /// {data transfer identity object parameter name}
+                /// {constructor parameters}
+                /// {field assignments}
+                /// {field assignments for non parameterless constructor}
+                /// {serialization read properties assignments}
+                /// {class properties}
+                /// {update field functions}
+                /// {serialization write properties}
+
+                string generatedEntityClass =
+                    string.Format(
+                        dataTransferObjectClassTemplate.TrimStart('\r', '\n'),
+                        _dataTransferObjectClassNamesMap[tableName.ToLower()],
+                        _dataTransferIdentityObjectClassNamesMap[tableName.ToLower()],
+                        string.Join("\r\n", entityFields.Concat(dependencyEntityFields)),
+                        constructorParameters[0].Trim(),
+                        constructorParameters[0].TrimStart(' ').Split(' ')[1].Trim(' '),
+                        string.Join(",\r\n", constructorParameters.Concat(dependencyConstructorParameters)),
+                        fieldsValidation,
+                        string.Join("\r\n", fieldAssignments.Concat(dependencyFieldAssignments)),
+                        string.Join("\r\n", entityProperties.Concat(dependencyEntityProperties)),
+                        string.Empty);
+
+                List<string> namespaceDependenciesList = new List<string>(
+                    new string[]
+                    {
+                        "Domain.Model",
+                    });
+
+                if (schemaInformationTableMapping.Value.Columns.Any(col => new DbType[] { DbType.Date, DbType.DateTime, DbType.DateTime2, DbType.DateTimeOffset, DbType.Time, DbType.Time }.Contains(col.DbType)))
+                    namespaceDependenciesList.Add("System");
+
+                if (_namespaceDependenciesMap.ContainsKey(tableName.ToLower()))
+                {
+                    foreach (string namespaceDependency in _namespaceDependenciesMap[tableName.ToLower()])
+                    {
+                        string dependencyIdentityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}Identity";
+                        string dependencyEntityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}Entity";
+
+                        if (_namespacesMap.ContainsKey(namespaceDependency) &&
+                            (generatedEntityClass.Contains(dependencyIdentityClassName) || generatedEntityClass.Contains(dependencyEntityClassName)))
+                        {
+                            namespaceDependenciesList.Add(_namespacesMap[namespaceDependency]);
+                        }
+                    }
+                }
+
+                _generatedEntityClassesDictionary.Add(
+                    tableName,
+                    string.Format(
+                        nameSpaceTemplate,
+                        classNameSpace,
+                        generatedEntityClass,
+                        string.Join("\r\n", namespaceDependenciesList.OrderBy(ns => ns).Select(dependencyNamespace => $"using {dependencyNamespace};"))));
+
+                _generatedClassesList.Add(new GeneratedClassFromSchemaInformationTableMapping(
+                    schemaInformationTableMapping.Value,
+                    classNameSpace,
+                    entityClassName,
+                    namespaceDependenciesList.OrderBy(ns => ns).ToList(),
+                    _generatedEntityClassesDictionary[tableName.ToLower()]));
+            }
+        }
+
         //private void GenerateDataTrransferObjectClasses(string nameSpace)
         //{
         //    foreach (KeyValuePair<string, SchemaInformationTableMapping> schemaInformationTableMapping in _schemaInformation.SchemaTableMappings.OrderBy(kp => kp.Value.Order))
