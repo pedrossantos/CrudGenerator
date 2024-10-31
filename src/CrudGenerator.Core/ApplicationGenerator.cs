@@ -48,12 +48,80 @@ namespace CrudGenerator.Core
         /// {property type}
         /// {property name}
         /// {field name}
+        /// {required attribute}
+        /// {foreign group attribute}
+        /// {custom display attribute}
         /// </summary>
-        private const string propertyTemplate = @"
+        private const string propertyTemplate = @"{3}{4}{5}
         public {0} {1}
         {{
             get => _{2};
             set => PropertyChangedDispatcher.SetProperty(ref _{2}, value);
+        }}";
+
+        /// <summary>
+        /// {property type}
+        /// {property name}
+        /// {field name}
+        /// {identity data transfer object type}
+        /// {required attribute}
+        /// {foreign group attribute}
+        /// {dependency attribute}
+        /// {custom display attribute}
+        /// </summary>
+        private const string propertyTemplateWithDependency = @"{4}{5}{6}{7}
+        public {0} {1}
+        {{
+            get 
+            {{
+                return _{2};
+            }}
+
+            set
+            {{
+                if (_{2} != value)
+                {{
+                    _{2} = value;
+                    if (_{2} != null)
+                        Id = new {3}(Identity, {2}.Id);
+
+                    PropertyChangedDispatcher.Notify(nameof({1}));
+                    PropertyChangedDispatcher.Notify(nameof(Id));
+                }}
+            }}
+        }}";
+
+        /// <summary>
+        /// {property type}
+        /// {property name}
+        /// {foreign group field name}
+        /// {identity data transfer object type}
+        /// {foreign group attribute}
+        /// {custom display attribute}
+        /// </summary>
+        private const string dependencyPropertyTemplate = @"
+        [Required]
+        {4}
+        {5}
+        public {0} {1}
+        {{
+            get 
+            {{
+                return _{2}.{1};
+            }}
+
+            set
+            {{
+                if (_{2}.{1} != value)
+                {{
+                    _{2}.{1} = value;
+                    if (_{2}.{1} != null)
+                        Id = new {3}(Identity, _{2}.Id);
+
+                    PropertyChangedDispatcher.Notify(nameof({1}));
+                    PropertyChangedDispatcher.Notify(nameof(Id));
+                }}
+            }}
         }}";
 
         /// <summary>
@@ -176,7 +244,6 @@ namespace CrudGenerator.Core
         /// {field assignments for non parameterless constructor}
         /// {serialization read properties assignments}
         /// {class properties}
-        /// {update field functions}
         /// {serialization write properties}
         /// </summary>
         private const string dataTransferObjectClassTemplate = @"
@@ -187,7 +254,6 @@ namespace CrudGenerator.Core
 {3}
 
         public {0}(
-{4},
 {5})
             : base({4})
         {{
@@ -213,15 +279,14 @@ namespace CrudGenerator.Core
             get => Id.Id;
             set => Id.Id = value;
         }}
-{8}
 {9}
 
         protected override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
+        {{
             base.GetObjectData(info, context);
 
 {10}
-        }
+        }}
     }}";
 
         /// <summary>
@@ -496,7 +561,7 @@ namespace {0}
             Clear();
 
             GenerateDataTransferIdentityObjectClasses(nameSpace);
-            //GenerateDataTrransferObjectClasses(nameSpace);
+            GenerateDataTransferObjectClasses(nameSpace);
             //GenerateDataAdapterClasses(nameSpace);
 
             GenerateDependencyInversionClasses(projectName, nameSpace);
@@ -626,7 +691,11 @@ namespace {0}
                             propertyTemplate,
                             columnType,
                             propertyName,
-                            primaryKeyColumn.Name));
+                            primaryKeyColumn.Name,
+                            string.Empty,
+                            string.Empty,
+                            string.Empty,
+                            string.Empty));
 
                     if (!_identityClassPropertiesMap.ContainsKey(identityDtoClassName))
                         _identityClassPropertiesMap.Add(identityDtoClassName, new List<(string PropertyName, string PropertyType)>());
@@ -711,13 +780,13 @@ namespace {0}
             }
         }
 
-        private void GenerateEntityClasses(string nameSpace)
+        private void GenerateDataTransferObjectClasses(string nameSpace)
         {
             foreach (KeyValuePair<string, SchemaInformationTableMapping> schemaInformationTableMapping in _schemaInformation.SchemaTableMappings.OrderBy(kp => kp.Value.Order))
             {
                 string tableName = schemaInformationTableMapping.Key.ToLower();
                 string dataTransferIndeitityObjectClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}IdentityDto";
-                string dataTransferObjectClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}Entity";
+                string dataTransferObjectClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}Dto";
                 _dataTransferObjectClassNamesMap.Add(tableName, dataTransferObjectClassName);
 
                 string classNameSpace =
@@ -749,10 +818,15 @@ namespace {0}
                 List<string> dataTransferObjectProperties = new List<string>();
                 List<string> fieldValidations = new List<string>();
                 List<string> fieldAssignments = new List<string>();
+                List<string> nonParameterlessConstructorParameters = new List<string>();
+
+                List<string> serializationInfoGetValueCalls = new List<string>();
+                List<string> serializationInfoAddValueCalls = new List<string>();
 
                 if (containsPrimaryKeyColumns)
                 {
                     string columnType = _dataTransferIdentityObjectClassNamesMap[tableName.ToLower()];
+                    string propertyName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase($"{tableName}Identity");
 
                     dataTransferObjectFields.Add(
                         string.Format(
@@ -770,20 +844,32 @@ namespace {0}
                         string.Format(
                             propertyTemplate,
                             columnType,
-                            CultureInfo.CurrentCulture.TextInfo.ToTitleCase($"{tableName}Identity"),
-                            $"{tableName}Identity"));
+                            propertyName,
+                            $"{tableName}Identity",
+                            string.Empty,
+                            string.Empty,
+                            string.Empty,
+                            string.Empty));
 
                     fieldAssignments.Add(
                         string.Format(
                             fieldAssignmentTemplate,
                             $"{tableName}Identity"));
+
+                    serializationInfoGetValueCalls.Add($"            info.GetNotNullValue<{columnType}>(nameof({propertyName}));");
+                    serializationInfoAddValueCalls.Add($"            info.AddValue<{columnType}>(nameof({propertyName}), {propertyName});");
                 }
+
+                List<ColumnInfo> primaryKeyColumns = new List<ColumnInfo>(schemaInformationTableMapping.Value.Columns.Where(col => col.IsPrimaryKey));
+                int primaryKeyColumnsCount = primaryKeyColumns.Count;
 
                 while (entityColumns.Count > 0)
                 {
                     ColumnInfo entityColumn = entityColumns[0];
 
                     string columnType = entityColumn.ResolveSystemTypeName();
+                    string propertyName = string.Empty;
+
                     ForeignKeyValueColletion foreignKeyValueColletion = schemaInformationTableMapping.Value.ForeignKeyValues.FirstOrDefault(fkv => fkv.ForeignKeyValueList.Where(fkv => fkv.ForeignColunmnsToReferencedColumns.Any(fctrc => fctrc.ForeignColumn == entityColumn.Name.ToLower())).Any());
 
                     if (foreignKeyValueColletion != null)
@@ -800,15 +886,68 @@ namespace {0}
 
                                 bool foreignColumnIsPrimaryKey = foreignKeyValue.ForeignColunmnsToReferencedColumns.FirstOrDefault(fctrc => fctrc.IsPrimaryKey && fctrc.ForeignColumn.ToLower() == entityColumn.Name.ToLower()) != null;
                                 string referencedColumn = foreignKeyValue.ForeignColunmnsToReferencedColumns.FirstOrDefault(fctrc => fctrc.ForeignColumn.ToLower() == entityColumn.Name.ToLower()).ReferencedColumn.ToLower();
+
+                                string fieldName = referencedTableName;
+
+                                SchemaInformationTableMapping dependencySchemaTableMapping = null;
+                                string dependencyPropertyName = string.Empty;
+                                string foreignFieldName = referencedTableName;
+
+                                // TODO: Criar recursão para realizar busca em profundidade e gerar todas as propriedades dependentes
                                 foreach (ForeignColunmnToReferencedColumn foreignColunmnToReferencedColumn in foreignKeyValue.ForeignColunmnsToReferencedColumns)
                                 {
+                                    if (_schemaInformation.SchemaTableMappings.ContainsKey(referencedTableName))
+                                    {
+                                        dependencySchemaTableMapping = _schemaInformation.SchemaTableMappings[referencedTableName];
+                                        ForeignColunmnToReferencedColumn dependencyForeignColunmnToReferencedColumn = dependencySchemaTableMapping.ForeignKeyValues
+                                            .Select(fkvc => fkvc.ForeignKeyValueList
+                                                .Where(fkv => fkv.ForeignColunmnsToReferencedColumns
+                                                    .Where(fctrc => fctrc.ForeignColumn == foreignColunmnToReferencedColumn.ReferencedColumn) != null)
+                                                    .FirstOrDefault())
+                                            .FirstOrDefault()?
+                                            .ForeignColunmnsToReferencedColumns
+                                            .FirstOrDefault(fctrc => fctrc.ForeignColumn == foreignColunmnToReferencedColumn.ReferencedColumn);
+
+                                        if (dependencyForeignColunmnToReferencedColumn != null)
+                                        {
+                                            string dependencyReferencedTable = dependencyForeignColunmnToReferencedColumn.ReferencedTableName;
+                                            dependencyPropertyName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(dependencyReferencedTable);
+
+                                            string dependencyColumnType = _dataTransferObjectClassNamesMap[dependencyReferencedTable];
+
+                                            string teste = string.Format(
+                                                    dependencyPropertyTemplate,
+                                                    dependencyColumnType,
+                                                    dependencyPropertyName,
+                                                    foreignFieldName,
+                                                    _dataTransferIdentityObjectClassNamesMap[tableName],
+                                                    $"[ForeignGroup(typeof({_dataTransferObjectClassNamesMap[referencedTableName]}))]",
+                                                    $"[CustomDisplay(\"{dependencyPropertyName}\", Order = {dataTransferObjectProperties.Count + dependencyDataTransferObjectProperties.Count}, GroupName = \"{tableName}\")])");
+
+                                            dependencyDataTransferObjectProperties.Add(
+                                                string.Format(
+                                                    dependencyPropertyTemplate,
+                                                    dependencyColumnType,
+                                                    dependencyPropertyName,
+                                                    foreignFieldName,
+                                                    _dataTransferIdentityObjectClassNamesMap[tableName],
+                                                    $"[ForeignGroup(typeof({_dataTransferObjectClassNamesMap[referencedTableName]}))]",
+                                                    $"[CustomDisplay(\"{dependencyPropertyName}\", Order = {dataTransferObjectProperties.Count + dependencyDataTransferObjectProperties.Count}, GroupName = \"{tableName}\")])"));
+
+                                            if (!_namespaceDependenciesMap.ContainsKey(tableName.ToLower()))
+                                                _namespaceDependenciesMap.Add(tableName.ToLower(), new List<string>());
+
+                                            if (!_namespaceDependenciesMap[tableName.ToLower()].Contains(dependencyReferencedTable.ToLower()))
+                                                _namespaceDependenciesMap[tableName.ToLower()].Add(dependencyReferencedTable.ToLower());
+                                        }
+                                    }
+
                                     int columnIndexToRemove = entityColumns.FindIndex(col => col.Name.ToLower() == foreignColunmnToReferencedColumn.ForeignColumn.ToLower());
                                     if (columnIndexToRemove > -1)
                                         entityColumns.RemoveAt(columnIndexToRemove);
                                 }
 
-                                string fieldName = referencedTableName;
-                                string propertyName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(referencedTableName);
+                                propertyName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(referencedTableName);
 
                                 columnType = _dataTransferObjectClassNamesMap[referencedTableName];
                                 dependencyFieldValidations.Add(string.Format(constructorParameterValidationTemplate, fieldName));
@@ -825,12 +964,32 @@ namespace {0}
                                         columnType,
                                         fieldName));
 
-                                dependencyDataTransferObjectProperties.Add(
-                                    string.Format(
-                                        propertyTemplate,
-                                        columnType,
-                                        propertyName,
-                                        fieldName));
+                                if (string.IsNullOrEmpty(dependencyPropertyName))
+                                {
+                                    dependencyDataTransferObjectProperties.Add(
+                                        string.Format(
+                                            propertyTemplate,
+                                            columnType,
+                                            propertyName,
+                                            fieldName,
+                                            foreignColumnIsPrimaryKey ? "\r\n        [Required]" : string.Empty,
+                                            $"\r\n        [ForeignGroup(typeof({_dataTransferObjectClassNamesMap[referencedTableName]}))]",
+                                            $"\r\n        [CustomDisplay(\"{propertyName}\", Order = {dataTransferObjectProperties.Count + dependencyDataTransferObjectProperties.Count}, GroupName = \"{tableName}\")])"));
+                                }
+                                else
+                                {
+                                    dependencyDataTransferObjectProperties.Add(
+                                        string.Format(
+                                            propertyTemplateWithDependency,
+                                            columnType,
+                                            propertyName,
+                                            fieldName,
+                                            _dataTransferIdentityObjectClassNamesMap[tableName],
+                                            foreignColumnIsPrimaryKey ? "\r\n        [Required]" : string.Empty,
+                                            $"\r\n        [ForeignGroup(typeof({_dataTransferObjectClassNamesMap[referencedTableName]}))]",
+                                            !string.IsNullOrEmpty(dependencyPropertyName) ? $"\r\n        [Dependency(typeof({_dataTransferObjectClassNamesMap[dependencyPropertyName.ToLower()]}), nameof({dependencyPropertyName}))]" : string.Empty,
+                                            $"\r\n        [CustomDisplay(\"{propertyName}\", Order = {dataTransferObjectProperties.Count + dependencyDataTransferObjectProperties.Count}, GroupName = \"{tableName}\")])"));
+                                }
 
                                 dependencyFieldAssignments.Add(
                                     string.Format(
@@ -843,10 +1002,15 @@ namespace {0}
                                 if (!_namespaceDependenciesMap[tableName.ToLower()].Contains(referencedTableName.ToLower()))
                                     _namespaceDependenciesMap[tableName.ToLower()].Add(referencedTableName.ToLower());
 
+                                nonParameterlessConstructorParameters.Add($"            {propertyName} = new {columnType}();");
+
                                 continue;
                             }
                         }
                     }
+
+                    if (string.IsNullOrEmpty(propertyName))
+                        propertyName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(entityColumn.Name);
 
                     dataTransferObjectFields.Add(
                         string.Format(
@@ -864,13 +1028,19 @@ namespace {0}
                         string.Format(
                             propertyTemplate,
                             columnType,
-                            CultureInfo.CurrentCulture.TextInfo.ToTitleCase(entityColumn.Name),
-                            entityColumn.Name));
+                            propertyName,
+                            entityColumn.Name,
+                            entityColumn.EnforceNotNull ? "\r\n        [Required]" : string.Empty,
+                            string.Empty,
+                            $"\r\n        [CustomDisplay(\"{propertyName}\", Order = {dataTransferObjectProperties.Count + dependencyDataTransferObjectProperties.Count}, GroupName = \"{tableName}\")])"));
 
                     fieldAssignments.Add(
                         string.Format(
                             fieldAssignmentTemplate,
                             entityColumn.Name));
+
+                    serializationInfoGetValueCalls.Add($"            info.GetNotNullValue<{columnType}>(nameof({propertyName}));");
+                    serializationInfoAddValueCalls.Add($"            info.AddValue<{columnType}>(nameof({propertyName}), {propertyName});");
 
                     entityColumns.RemoveAt(0);
                 }
@@ -879,32 +1049,33 @@ namespace {0}
                 if (fieldValidations.Any(fv => fv != null))
                     fieldsValidation = string.Join("\r\n", fieldValidations.Concat(dependencyFieldValidations).Where(fv => fv != null)) + "\r\n";
 
-                /// {class name}
-                /// {data transfer identity object class name}
-                /// {identity field type}
-                /// {class fields}
-                /// {data transfer identity object parameter name}
-                /// {constructor parameters}
-                /// {field assignments}
-                /// {field assignments for non parameterless constructor}
-                /// {serialization read properties assignments}
-                /// {class properties}
-                /// {update field functions}
-                /// {serialization write properties}
+                /// 0  - {class name}
+                /// 1  - {data transfer identity object class name}
+                /// 2  - {identity field type}
+                /// 3  - {class fields}
+                /// 4  - {data transfer identity object parameter name}
+                /// 5  - {constructor parameters}
+                /// 6  - {field assignments}
+                /// 7  - {field assignments for non parameterless constructor}
+                /// 8  - {serialization read properties assignments}
+                /// 9  - {class properties}
+                /// 10 - {serialization write properties}
 
                 string generatedEntityClass =
                     string.Format(
                         dataTransferObjectClassTemplate.TrimStart('\r', '\n'),
-                        _dataTransferObjectClassNamesMap[tableName.ToLower()],
-                        _dataTransferIdentityObjectClassNamesMap[tableName.ToLower()],
-                        string.Join("\r\n", dataTransferObjectFields.Concat(dependencyDataTransferObjectFields)),
-                        constructorParameters[0].Trim(),
-                        constructorParameters[0].TrimStart(' ').Split(' ')[1].Trim(' '),
-                        string.Join(",\r\n", constructorParameters.Concat(dependencyConstructorParameters)),
-                        fieldsValidation,
-                        string.Join("\r\n", fieldAssignments.Concat(dependencyFieldAssignments)),
-                        string.Join("\r\n", dataTransferObjectProperties.Concat(dependencyDataTransferObjectProperties)),
-                        string.Empty);
+                        _dataTransferObjectClassNamesMap[tableName.ToLower()], // 0
+                        _dataTransferIdentityObjectClassNamesMap[tableName.ToLower()],// 1
+                        _identityClassPropertiesMap[_dataTransferIdentityObjectClassNamesMap[tableName.ToLower()]].First().PropertyType,// 2
+                        string.Join("\r\n", dataTransferObjectFields.Skip(1).Concat(dependencyDataTransferObjectFields)),// 3
+                        constructorParameters[0].Trim().Split(' ')[1].Trim(),// 4
+                        string.Join(",\r\n", constructorParameters.Concat(dependencyConstructorParameters)),// 5
+                        //fieldsValidation,
+                        string.Join("\r\n", fieldAssignments.Skip(1).Concat(dependencyFieldAssignments)),// 6
+                        string.Join("\r\n", nonParameterlessConstructorParameters.Skip(1)),// 7
+                        string.Join("\r\n", serializationInfoGetValueCalls.Skip(1)),// 8
+                        string.Join("\r\n", dependencyDataTransferObjectProperties.Concat(dataTransferObjectProperties.Skip(1))),// 9
+                        string.Join("\r\n", serializationInfoAddValueCalls.Skip(1)));// 10
 
                 List<string> namespaceDependenciesList = new List<string>(
                     new string[]
