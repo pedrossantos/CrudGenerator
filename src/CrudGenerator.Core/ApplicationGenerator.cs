@@ -106,19 +106,23 @@ namespace CrudGenerator.Core
         /// {serialization write properties}
         /// </summary>
         private const string identityClassTemplate = @"
+    [Serializable]
     public class {0}
         : IEquatable<{0}>, IByTypeCloneable<{0}>, ISerializable
     {{
+        private PropertyChangedDispatcher _propertyChangedDispatcher;
 {1}
 
         public {0}(
 {2})
+            : this()
         {{
 {3}{4}
         }}
 
         public {0}()
         {{
+            _propertyChangedDispatcher = new PropertyChangedDispatcher(this);
 {5}
         }}
 
@@ -128,6 +132,8 @@ namespace CrudGenerator.Core
 
 {6}
         }}
+
+        public PropertyChangedDispatcher PropertyChangedDispatcher => _propertyChangedDispatcher;
 {7}
 
         public static bool operator !=({0} left, {0} right) => !Equals(left, right);
@@ -595,7 +601,7 @@ namespace {0}
                                     if (!_namespaceDependenciesMap[tableName.ToLower()].Contains(referencedTableName.ToLower()))
                                         _namespaceDependenciesMap[tableName.ToLower()].Add(referencedTableName.ToLower());
 
-                                    nonParameterlessConstructorParameters.Add($"            {propertyName} = new {columnType}()");
+                                    nonParameterlessConstructorParameters.Add($"            {propertyName} = new {columnType}();");
                                 }
                             }
                         }
@@ -632,8 +638,8 @@ namespace {0}
                             fieldAssignmentTemplate,
                             primaryKeyColumn.Name));
 
-                    serializationInfoGetValueCalls.Add($"            {GenerateSerializationInfoGetFunction(primaryKeyColumn.DbType)}(nameof({propertyName}))");
-                    serializationInfoAddValueCalls.Add($"            info.AddValue<{columnType}>(nameof({propertyName}), {propertyName})");
+                    serializationInfoGetValueCalls.Add($"            {GenerateSerializationInfoGetFunction(primaryKeyColumn.DbType)}(nameof({propertyName}));");
+                    serializationInfoAddValueCalls.Add($"            info.AddValue<{columnType}>(nameof({propertyName}), {propertyName});");
                 }
 
                 string fieldsValidation = string.Empty;
@@ -667,11 +673,9 @@ namespace {0}
                     new string[]
                     {
                         "Framework",
-                        "Framework.Extensions",
-                        "Framework.UserInterface",
+                        "Framework.NotifyChanges",
                         "Framework.Validation",
                         "System",
-                        "System.ComponentModel.DataAnnotations",
                         "System.Runtime.Serialization",
                     });
 
@@ -712,9 +716,9 @@ namespace {0}
             foreach (KeyValuePair<string, SchemaInformationTableMapping> schemaInformationTableMapping in _schemaInformation.SchemaTableMappings.OrderBy(kp => kp.Value.Order))
             {
                 string tableName = schemaInformationTableMapping.Key.ToLower();
-                string identityDtoClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}IdentityDto";
-                string dtoClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}Entity";
-                _dataTransferObjectClassNamesMap.Add(tableName, dtoClassName);
+                string dataTransferIndeitityObjectClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}IdentityDto";
+                string dataTransferObjectClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}Entity";
+                _dataTransferObjectClassNamesMap.Add(tableName, dataTransferObjectClassName);
 
                 string classNameSpace =
                     !string.IsNullOrEmpty(nameSpace)
@@ -734,15 +738,15 @@ namespace {0}
                                     .Any(fkv => fkv.ForeignColunmnsToReferencedColumns
                                         .Any(fkctrc => fkctrc.ForeignColumn.ToLower() == col.Name.ToLower())))));
 
-                List<string> dependencyEntityFields = new List<string>();
+                List<string> dependencyDataTransferObjectFields = new List<string>();
                 List<string> dependencyConstructorParameters = new List<string>();
-                List<string> dependencyEntityProperties = new List<string>();
+                List<string> dependencyDataTransferObjectProperties = new List<string>();
                 List<string> dependencyFieldValidations = new List<string>();
                 List<string> dependencyFieldAssignments = new List<string>();
 
-                List<string> entityFields = new List<string>();
+                List<string> dataTransferObjectFields = new List<string>();
                 List<string> constructorParameters = new List<string>();
-                List<string> entityProperties = new List<string>();
+                List<string> dataTransferObjectProperties = new List<string>();
                 List<string> fieldValidations = new List<string>();
                 List<string> fieldAssignments = new List<string>();
 
@@ -750,7 +754,7 @@ namespace {0}
                 {
                     string columnType = _dataTransferIdentityObjectClassNamesMap[tableName.ToLower()];
 
-                    entityFields.Add(
+                    dataTransferObjectFields.Add(
                         string.Format(
                             fieldTemplate,
                             columnType,
@@ -762,7 +766,7 @@ namespace {0}
                             columnType,
                             $"{tableName}Identity"));
 
-                    entityProperties.Add(
+                    dataTransferObjectProperties.Add(
                         string.Format(
                             propertyTemplate,
                             columnType,
@@ -809,7 +813,7 @@ namespace {0}
                                 columnType = _dataTransferObjectClassNamesMap[referencedTableName];
                                 dependencyFieldValidations.Add(string.Format(constructorParameterValidationTemplate, fieldName));
 
-                                dependencyEntityFields.Add(
+                                dependencyDataTransferObjectFields.Add(
                                     string.Format(
                                         fieldTemplate,
                                         columnType,
@@ -821,7 +825,7 @@ namespace {0}
                                         columnType,
                                         fieldName));
 
-                                dependencyEntityProperties.Add(
+                                dependencyDataTransferObjectProperties.Add(
                                     string.Format(
                                         propertyTemplate,
                                         columnType,
@@ -844,7 +848,7 @@ namespace {0}
                         }
                     }
 
-                    entityFields.Add(
+                    dataTransferObjectFields.Add(
                         string.Format(
                             fieldTemplate,
                             columnType,
@@ -856,7 +860,7 @@ namespace {0}
                             columnType,
                             entityColumn.Name));
 
-                    entityProperties.Add(
+                    dataTransferObjectProperties.Add(
                         string.Format(
                             propertyTemplate,
                             columnType,
@@ -893,13 +897,13 @@ namespace {0}
                         dataTransferObjectClassTemplate.TrimStart('\r', '\n'),
                         _dataTransferObjectClassNamesMap[tableName.ToLower()],
                         _dataTransferIdentityObjectClassNamesMap[tableName.ToLower()],
-                        string.Join("\r\n", entityFields.Concat(dependencyEntityFields)),
+                        string.Join("\r\n", dataTransferObjectFields.Concat(dependencyDataTransferObjectFields)),
                         constructorParameters[0].Trim(),
                         constructorParameters[0].TrimStart(' ').Split(' ')[1].Trim(' '),
                         string.Join(",\r\n", constructorParameters.Concat(dependencyConstructorParameters)),
                         fieldsValidation,
                         string.Join("\r\n", fieldAssignments.Concat(dependencyFieldAssignments)),
-                        string.Join("\r\n", entityProperties.Concat(dependencyEntityProperties)),
+                        string.Join("\r\n", dataTransferObjectProperties.Concat(dependencyDataTransferObjectProperties)),
                         string.Empty);
 
                 List<string> namespaceDependenciesList = new List<string>(
@@ -926,7 +930,7 @@ namespace {0}
                     }
                 }
 
-                _generatedEntityClassesDictionary.Add(
+                _generatedDataTransferObjectClassesDictionary.Add(
                     tableName,
                     string.Format(
                         nameSpaceTemplate,
@@ -937,9 +941,9 @@ namespace {0}
                 _generatedClassesList.Add(new GeneratedClassFromSchemaInformationTableMapping(
                     schemaInformationTableMapping.Value,
                     classNameSpace,
-                    entityClassName,
+                    dataTransferObjectClassName,
                     namespaceDependenciesList.OrderBy(ns => ns).ToList(),
-                    _generatedEntityClassesDictionary[tableName.ToLower()]));
+                    _generatedDataTransferObjectClassesDictionary[tableName.ToLower()]));
             }
         }
 
