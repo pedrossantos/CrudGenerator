@@ -334,7 +334,10 @@ namespace CrudGenerator.Core.ViewModels
             }
             finally
             {
-                PropertyChangedDispatcher.Notify(nameof(GeneratedClasses));
+                PropertyChangedDispatcher.Notify(nameof(SelectedGeneratedClass));
+                PropertyChangedDispatcher.Notify(nameof(GeneratedModelClasses));
+                PropertyChangedDispatcher.Notify(nameof(GeneratedApplicationClasses));
+
                 GeneratingClasses = false;
             }
         }

@@ -380,109 +380,141 @@ namespace CrudGenerator.Core
 
         /// <summary>
         /// {container registrations class name}
-        /// {table mappins reg's}
-        /// {composed model tablemapping providers reg's}
-        /// {model tablemapping providers reg's}
-        /// {database adapters reg's}
-        /// {repositories reg's}
+        /// {crud services reg's}
+        /// {dataModelToDatabaseAdapter reg's}
         /// </summary>
         private const string createContainerRegistrationsTemplate = @"
     public class {0} : ImmutableContainerBuilder
     {{
-        public {0}(DbConnectionStringBuilder dbConnectionStringBuilder = null)
-            : base(GetRegistrations(dbConnectionStringBuilder))
+        public {0}()
+            : base(GetRegistrations())
         {{
         }}
 
-        private static IEnumerable<ContainerRegistration> GetRegistrations(DbConnectionStringBuilder dbConnectionStringBuilder = null)
+        private static IEnumerable<ContainerRegistration> GetRegistrations()
         {{
-            return RegisterTableMappings()
-                .Concat(RegisterModelTableMappingProviders())
-                .Concat(RegisterDatabaseAdapters())
-                .Concat(RegisterRepositories())
-                .Concat(RegisterDatabaseDataAccessObjects(dbConnectionStringBuilder));
+            return RegisterApplicationServices()
+                .Concat(RegisterDataModelToDatabaseAdapters());
         }}
 
-        private static IEnumerable<ContainerRegistration> RegisterTableMappings()
+        private static IEnumerable<ContainerRegistration> RegisterApplicationServices()
         {{
-{1}
+            {1}
+            yield return CreateSingleton<
+                ICrudServiceBase<
+                    EmpresaDto,
+                    EmpresaIdDto,
+                    EmpresaInserted,
+                    EmpresaUpdated,
+                    EmpresaDeleted>,
+                EmpresaCrudService>()
+                .WithAbstractions();
+
+            yield return CreateSingleton<
+                ICrudServiceBaseWithParent<
+                    CargoDto,
+                    CargoIdDto,
+                    EmpresaDto,
+                    CargoInserted,
+                    CargoUpdated,
+                    CargoDeleted>,
+                CargoCrudService>()
+                .WithAbstractions();
+
+            yield return CreateSingleton<
+                ICrudServiceBaseWithParent<
+                    FuncionarioDto,
+                    FuncionarioIdDto,
+                    CargoDto,
+                    FuncionarioInserted,
+                    FuncionarioUpdated,
+                    FuncionarioDeleted>,
+                FuncionarioCrudService>()
+                .WithAbstractions();
+
+            yield return CreateSingleton<ApplicationLogStorage>().WithAbstractions();
+            yield return CreateSingleton<IApplicationMetadata, TesteCrudGeneratorApplicationMetadata>();
         }}
 
-        private static IEnumerable<ContainerRegistration> RegisterModelTableMappingProviders()
+        public static IEnumerable<ContainerRegistration> RegisterDataModelToDatabaseAdapters()
         {{
-{2}
-{3}
+            {2}
+            yield return CreateSingleton<DataModelToDatabaseAdapter<EmpresaEntity>, EmpresaDataModelToDatabaseAdapter>();
+            yield return CreateSingleton<DataModelToDatabaseAdapter<CargoEntity>, CargoDataModelToDatabaseAdapter>();
+            yield return CreateSingleton<DataModelToDatabaseAdapter<FuncionarioEntity>, FuncionarioDataModelToDatabaseAdapter>();
         }}
+    }}";
 
-        private static IEnumerable<ContainerRegistration> RegisterDatabaseAdapters()
+        /// <summary>
+        /// {inserted event class name}
+        /// {data transfer object type}
+        /// {constructor parameter}
+        /// </summary>
+        private const string insertedEventClassTemplate = @"    [Serializable]
+    public sealed class {0} : IDataTranserObjectInserted<{1}>, ISerializable
+    {{
+        public {0}({1} {2})
+            : base({2})
         {{
-{4}
         }}
+    }}";
 
-        private static IEnumerable<ContainerRegistration> RegisterRepositories()
+        /// <summary>
+        /// {updated event class name}
+        /// {data transfer object type}
+        /// {constructor parameter}
+        /// </summary>
+        private const string updatedEventClassTemplate = @"    [Serializable]
+    public sealed class {0} : IDataTranserObjectUpdated<{1}>, ISerializable
+    {{
+        public {0}({1} {2})
+            : base({2})
         {{
-{5}
         }}
+    }}";
 
-        private static IEnumerable<ContainerRegistration> RegisterDatabaseDataAccessObjects(DbConnectionStringBuilder dbConnectionStringBuilder = null)
+        /// <summary>
+        /// {deleted event class name}
+        /// {data transfer object type}
+        /// {constructor parameter}
+        /// </summary>
+        private const string deletedEventClassTemplate = @"    [Serializable]
+    public sealed class {0} : IDataTranserObjectDeleted<{1}>, ISerializable
+    {{
+        public {0}({1} {2})
+            : base({2})
         {{
-            if (dbConnectionStringBuilder == null)
-            {{
-                #region MySql
-                yield return CreateSingleton(new MySqlBuilderTemplate());
-                yield return CreateSingleton(c => new MySqlNativeCommandBuilder(c.Resolve<MySqlBuilderTemplate>()));
-                yield return CreateTransient<MySqlConnectionManagerBuilder>();
-                yield return CreateSingleton<MySqlConnectionManager>();
-                yield return CreateSingleton<MySqlSchemaInformation>();
-                #endregion MySql
+        }}
+    }}";
 
-                #region PostgreSql
-                yield return CreateSingleton(new PostgreSqlBuilderTemplate());
-                yield return CreateSingleton(c => new PostgreSqlNativeCommandBuilder(c.Resolve<PostgreSqlBuilderTemplate>()));
-                yield return CreateTransient<PostgreSqlConnectionManagerBuilder>();
-                yield return CreateSingleton<PostgreSqlConnectionManager>();
-                yield return CreateSingleton<PostgreSqlSchemaInformation>();
-                #endregion PostgreSql
+        /// <summary>
+        /// {application metadata class name}
+        /// </summary>
+        private const string applicationMetadataClassTemplate = @"    internal class {0} : IApplicationMetadata
+    {{
+        public string Name => ""{0}"";
 
-                #region Sqlite
-                yield return CreateSingleton(new SqliteBuilderTemplate());
-                yield return CreateSingleton(c => new SqliteNativeCommandBuilder(c.Resolve<SqliteBuilderTemplate>()));
-                yield return CreateTransient<SqliteConnectionManagerBuilder>();
-                yield return CreateSingleton<FileSqliteConnectionManager>();
-                yield return CreateSingleton<SqliteSchemaInformation>();
-                #endregion Sqlite
+        public string Description => ""{0}"";
 
-                #region SqlServer
-                yield return CreateSingleton(new SqlServerBuilderTemplate());
-                yield return CreateSingleton(c => new SqlServerNativeCommandBuilder(c.Resolve<SqlServerBuilderTemplate>()));
-                yield return CreateTransient<SqlServerConnectionManagerBuilder>();
-                yield return CreateSingleton<SqlServerConnectionManager>();
-                yield return CreateSingleton<SqlServerSchemaInformation>();
-                #endregion SqlServer
-            }}
-            else
-            {{
-                if (dbConnectionStringBuilder is MySqlConnectionStringBuilder mySqlConnectionStringBuilder)
-                {{
-                    yield return CreateSingleton(container => {{ return mySqlConnectionStringBuilder; }});
-                    yield return CreateSingleton<MySqlSchemaInformation>();
-                }}
-                else if (dbConnectionStringBuilder is NpgsqlConnectionStringBuilder postgreSqlConnectionStringBuilder)
-                {{
-                    yield return CreateSingleton(container => {{ return postgreSqlConnectionStringBuilder; }});
-                    yield return CreateSingleton<PostgreSqlSchemaInformation>();
-                }}
-                else if (dbConnectionStringBuilder is SQLiteConnectionStringBuilder sqliteConnectionStringBuilder)
-                {{
-                    yield return CreateSingleton(container => {{ return sqliteConnectionStringBuilder; }});
-                    yield return CreateSingleton<SqliteSchemaInformation>();
-                }}
-                else if (dbConnectionStringBuilder is SqlConnectionStringBuilder sqlServerConnectionStringBuilder)
-                {{
-                    yield return CreateSingleton(container => {{ return sqlServerConnectionStringBuilder; }});
-                    yield return CreateSingleton<SqlServerSchemaInformation>();
-                }}
-            }}
+        public Version Version => new Version(1, 0, 0);
+
+        public string FriendlyVersion => Version.ToString();
+
+        public DevelopmentStage LifeState => DevelopmentStage.PreAlpha;
+    }}";
+
+        /// <summary>
+        /// {log storage class name}
+        /// </summary>
+        private const string logStorageClassTemplate = @"    public delegate void LogEventHandler(EventEntry log);
+
+    public class {0} : ILogStorage
+    {{
+        public event LogEventHandler LogAddedEvent;
+
+        public void AddEntry(EventEntry eventEntry)
+        {{
+            LogAddedEvent?.Invoke(eventEntry);
         }}
     }}";
 
@@ -562,9 +594,12 @@ namespace {0}
 
             GenerateDataTransferIdentityObjectClasses(nameSpace);
             GenerateDataTransferObjectClasses(nameSpace);
+            GenerateDataTransferObjectEventsClasses(nameSpace);
             //GenerateDataAdapterClasses(nameSpace);
 
             GenerateDependencyInversionClasses(projectName, nameSpace);
+
+            GenerateLogStorageAndAppMetadataClasse(projectName, nameSpace);
 
             foreach (GeneratedClass generatedClassFromSchemaInformationTableMapping in _generatedClassesList)
                 _generatedClasses.Add(generatedClassFromSchemaInformationTableMapping);
@@ -1070,7 +1105,7 @@ namespace {0}
                         string.Join("\r\n", dataTransferObjectFields.Skip(1).Concat(dependencyDataTransferObjectFields)),// 3
                         constructorParameters[0].Trim().Split(' ')[1].Trim(),// 4
                         string.Join(",\r\n", constructorParameters.Concat(dependencyConstructorParameters)),// 5
-                        //fieldsValidation,
+                                                                                                            //fieldsValidation,
                         string.Join("\r\n", fieldAssignments.Skip(1).Concat(dependencyFieldAssignments)),// 6
                         string.Join("\r\n", nonParameterlessConstructorParameters.Skip(1)),// 7
                         string.Join("\r\n", serializationInfoGetValueCalls.Skip(1)),// 8
@@ -1115,6 +1150,84 @@ namespace {0}
                     dataTransferObjectClassName,
                     namespaceDependenciesList.OrderBy(ns => ns).ToList(),
                     _generatedDataTransferObjectClassesDictionary[tableName.ToLower()]));
+            }
+        }
+
+        private void GenerateDataTransferObjectEventsClasses(string nameSpace)
+        {
+            foreach (KeyValuePair<string, SchemaInformationTableMapping> schemaInformationTableMapping in _schemaInformation.SchemaTableMappings.OrderBy(kp => kp.Value.Order))
+            {
+                string tableName = schemaInformationTableMapping.Key.ToLower();
+
+                string classNameSpace =
+                    !string.IsNullOrEmpty(nameSpace)
+                    ? $"{nameSpace}.{ApplicationProjectSufix}.DataTransferObjects.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}.Events"
+                    : $"{ApplicationProjectSufix}.DataTransferObjects.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}.Events";
+
+                List<string> namespaceDependenciesList = new List<string>(
+                    new string[]
+                    {
+                        "Crud.Abstractions.Application.DataTransferObjects.Events",
+                        "System",
+                        "System.Runtime.Serialization",
+                    });
+
+                string insertedEventClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}Inserted";
+
+                string generatedInsertedEventClass = string.Format(
+                    insertedEventClassTemplate,
+                    insertedEventClassName,
+                    _dataTransferObjectClassNamesMap[tableName],
+                    tableName);
+
+                _generatedClassesList.Add(new GeneratedClassFromSchemaInformationTableMapping(
+                    schemaInformationTableMapping.Value,
+                    classNameSpace,
+                    insertedEventClassName,
+                    namespaceDependenciesList.OrderBy(ns => ns).ToList(),
+                    string.Format(
+                        nameSpaceTemplate,
+                        classNameSpace,
+                        generatedInsertedEventClass,
+                        string.Join("\r\n", namespaceDependenciesList.OrderBy(ns => ns).Select(dependencyNamespace => $"using {dependencyNamespace};")))));
+
+                string updatedEventClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}Updated";
+
+                string generatedUpdatedEventClass = string.Format(
+                    updatedEventClassTemplate,
+                    updatedEventClassName,
+                    _dataTransferObjectClassNamesMap[tableName],
+                    tableName);
+
+                _generatedClassesList.Add(new GeneratedClassFromSchemaInformationTableMapping(
+                    schemaInformationTableMapping.Value,
+                    classNameSpace,
+                    updatedEventClassName,
+                    namespaceDependenciesList.OrderBy(ns => ns).ToList(),
+                    string.Format(
+                        nameSpaceTemplate,
+                        classNameSpace,
+                        generatedUpdatedEventClass,
+                        string.Join("\r\n", namespaceDependenciesList.OrderBy(ns => ns).Select(dependencyNamespace => $"using {dependencyNamespace};")))));
+
+                string deletedEventClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}Deleted";
+
+                string generatedDeletedEventClass = string.Format(
+                    deletedEventClassTemplate,
+                    deletedEventClassName,
+                    _dataTransferObjectClassNamesMap[tableName],
+                    tableName);
+
+                _generatedClassesList.Add(new GeneratedClassFromSchemaInformationTableMapping(
+                    schemaInformationTableMapping.Value,
+                    classNameSpace,
+                    deletedEventClassName,
+                    namespaceDependenciesList.OrderBy(ns => ns).ToList(),
+                    string.Format(
+                        nameSpaceTemplate,
+                        classNameSpace,
+                        generatedDeletedEventClass,
+                        string.Join("\r\n", namespaceDependenciesList.OrderBy(ns => ns).Select(dependencyNamespace => $"using {dependencyNamespace};")))));
             }
         }
 
@@ -1580,6 +1693,38 @@ namespace {0}
         //            _generatedDataAdapterClassesDictionary[tableName.ToLower()]));
         //    }
         //}
+
+        private void GenerateLogStorageAndAppMetadataClasse(string projectName, string nameSpace)
+        {
+            string classNameSpace =
+                !string.IsNullOrEmpty(nameSpace)
+                ? $"{nameSpace}.{ApplicationProjectSufix}"
+                : $"{ApplicationProjectSufix}";
+
+            string applicationMetadaClassName = $"{projectName}ApplicationMetadata";
+            string generatedApplicationMetadataClass = string.Format(applicationMetadataClassTemplate, applicationMetadaClassName);
+            _generatedClassesList.Add(new GeneratedClass(
+                classNameSpace,
+                applicationMetadaClassName,
+                new[] { "Framework", "System" }.OrderBy(ns => ns).ToList(),
+                string.Format(
+                    nameSpaceTemplate,
+                    classNameSpace,
+                    generatedApplicationMetadataClass,
+                    string.Join("\r\n", new[] { "Framework", "System" }.OrderBy(ns => ns).OrderBy(ns => ns).Select(dependencyNamespace => $"using {dependencyNamespace};")))));
+
+            string logStorageClassName = $"{projectName}LogStorage";
+            string generatedLogStorageClass = string.Format(logStorageClassTemplate, logStorageClassName);
+            _generatedClassesList.Add(new GeneratedClass(
+                classNameSpace,
+                applicationMetadaClassName,
+                new[] { "Framework", "System" }.OrderBy(ns => ns).ToList(),
+                string.Format(
+                    nameSpaceTemplate,
+                    classNameSpace,
+                    generatedLogStorageClass,
+                    string.Join("\r\n", new[] { "Framework.Diagnostics" }.OrderBy(ns => ns).OrderBy(ns => ns).Select(dependencyNamespace => $"using {dependencyNamespace};")))));
+        }
 
         private void GenerateDependencyInversionClasses(string projectName, string nameSpace)
         {
