@@ -1513,7 +1513,7 @@ namespace {0}
                 List<ColumnInfo> primaryKeyColumns = new List<ColumnInfo>(schemaInformationTableMapping.Value.Columns.Where(col => col.IsPrimaryKey));
                 int primaryKeyColumnsCount = primaryKeyColumns.Count;
 
-                while (primaryKeyColumns.Count > 1)
+                while (primaryKeyColumns.Count > 0)
                 {
                     ColumnInfo entityColumn = primaryKeyColumns[0];
                     primaryKeyColumns.RemoveAt(0);
