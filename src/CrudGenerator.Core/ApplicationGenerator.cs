@@ -22,7 +22,7 @@ namespace CrudGenerator.Core
         private const string InsertedEventNameSufix = "Inserted";
         private const string UpdatedEventNameSufix = "Updated";
         private const string DeletedEventNameSufix = "Deleted";
-        private const string CrudServiceNameSufix = "Service";
+        private const string CrudServiceNameSufix = "CrudService";
 
         /// <summary>
         /// {field type}
