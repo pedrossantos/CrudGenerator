@@ -18,6 +18,10 @@ namespace CrudGenerator.Core
         public const string ModelNamespaceSufix = "Models";
         public const string DependencyInversionNamespaceSufix = "DependencyInversion";
 
+        public const string EntityNameSufix = "Entity";
+        public const string IdentityNameSufix = "Identity";
+        public const string DatabaseRepositoryNameSufix = "DatabaseRepository";
+
         /// <summary>
         /// {field type}
         /// {field name}
@@ -59,7 +63,7 @@ namespace CrudGenerator.Core
         /// {identity class name}
         /// {equality confition}
         /// {hashcode properties list}
-        /// { toString properties list}
+        /// {toString properties list}
         /// </summary>
         private const string equatableImplementationTemplate =
 @"        public bool Equals({0} other)
@@ -895,8 +899,8 @@ namespace {0}
                 {
                     foreach (string namespaceDependency in _namespaceDependenciesMap[tableName.ToLower()])
                     {
-                        string dependencyIdentityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}Identity";
-                        string dependencyEntityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}Entity";
+                        string dependencyIdentityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}{IdentityNameSufix}";
+                        string dependencyEntityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}{EntityNameSufix}";
 
                         if (_namespacesMap.ContainsKey(namespaceDependency) &&
                             (generatedIdentityClass.Contains(dependencyIdentityClassName) || generatedIdentityClass.Contains(dependencyEntityClassName)))
@@ -928,8 +932,8 @@ namespace {0}
             foreach (KeyValuePair<string, SchemaInformationTableMapping> schemaInformationTableMapping in _schemaInformation.SchemaTableMappings.OrderBy(kp => kp.Value.Order))
             {
                 string tableName = schemaInformationTableMapping.Key.ToLower();
-                string identityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}Identity";
-                string entityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}Entity";
+                string identityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}{IdentityNameSufix}";
+                string entityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}{EntityNameSufix}";
                 _entityClassNamesMap.Add(tableName, entityClassName);
 
                 string classNameSpace =
@@ -1118,8 +1122,8 @@ namespace {0}
                 {
                     foreach (string namespaceDependency in _namespaceDependenciesMap[tableName.ToLower()])
                     {
-                        string dependencyIdentityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}Identity";
-                        string dependencyEntityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}Entity";
+                        string dependencyIdentityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}{IdentityNameSufix}";
+                        string dependencyEntityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}{EntityNameSufix}";
 
                         if (_namespacesMap.ContainsKey(namespaceDependency) &&
                             (generatedEntityClass.Contains(dependencyIdentityClassName) || generatedEntityClass.Contains(dependencyEntityClassName)))
@@ -1607,7 +1611,7 @@ namespace {0}
             {
                 SchemaInformationTableMapping schemaInformationTableMapping = schemaInformationTableMappingPair.Value;
                 string tableName = schemaInformationTableMappingPair.Key.ToLower();
-                string databaseRepositoryClassName = $"{_entityClassNamesMap[tableName]}DatabaseRepository";
+                string databaseRepositoryClassName = $"{_entityClassNamesMap[tableName]}{DatabaseRepositoryNameSufix}";
                 _databaseRepositoryClassNamesMap.Add(tableName, databaseRepositoryClassName);
 
                 string classNameSpace =
@@ -1627,7 +1631,7 @@ namespace {0}
                 List<ColumnInfo> primaryKeyColumns = new List<ColumnInfo>(schemaInformationTableMapping.Columns.Where(col => col.IsPrimaryKey));
                 int primaryKeyColumnsCount = primaryKeyColumns.Count;
 
-                if (primaryKeyColumns.Count <= 2)
+                if (primaryKeyColumns.Count > 0)
                 {
                     while (primaryKeyColumns.Count > 0)
                     {
@@ -1635,7 +1639,10 @@ namespace {0}
                         primaryKeyColumns.RemoveAt(0);
 
                         string columnType = primaryKeyColumn.ResolveSystemTypeName();
-                        ForeignKeyValueColletion foreignKeyValueColletion = schemaInformationTableMapping.ForeignKeyValues.FirstOrDefault(fkv => fkv.ForeignKeyValueList.Where(fkv => fkv.ForeignColunmnsToReferencedColumns.Any(fctrc => fctrc.ForeignColumn == primaryKeyColumn.Name.ToLower())).Any());
+                        ForeignKeyValueColletion foreignKeyValueColletion = schemaInformationTableMapping.ForeignKeyValues
+                            .FirstOrDefault(fkv => fkv.ForeignKeyValueList
+                                .Where(fkv => fkv.ForeignColunmnsToReferencedColumns
+                                    .Any(fctrc => fctrc.ForeignColumn == primaryKeyColumn.Name.ToLower())).Any());
 
                         if (foreignKeyValueColletion == null)
                         {
@@ -1647,6 +1654,17 @@ namespace {0}
                         }
                         else if (foreignKeyValueColletion != null)
                         {
+                            // Remove da lista primaryKeyColumns, colunas que compôem chave estrangeira referenciada pela chave primária da tabela atual
+                            foreach (ForeignKeyValue foreignKeyValue1 in foreignKeyValueColletion.ForeignKeyValueList)
+                            {
+                                foreach (ForeignColunmnToReferencedColumn foreignColunmnToReferencedColumn in foreignKeyValue1.ForeignColunmnsToReferencedColumns)
+                                {
+                                    ColumnInfo foreignKeyColumnInfo = primaryKeyColumns.FirstOrDefault(pkColumn => pkColumn.Name.ToUpper() == foreignColunmnToReferencedColumn.ForeignColumn.ToUpper());
+                                    if (!string.IsNullOrEmpty(foreignKeyColumnInfo.Name))
+                                        primaryKeyColumns.Remove(foreignKeyColumnInfo);
+                                }
+                            }
+
                             ForeignKeyValue foreignKeyValue =
                                 foreignKeyValueColletion.ForeignKeyValueList.FirstOrDefault(fkv => fkv.ForeignColunmnsToReferencedColumns.Any(fctrc => fctrc.IsPrimaryKey && fctrc.ForeignColumn == primaryKeyColumn.Name.ToLower()));
 
@@ -1751,8 +1769,8 @@ namespace {0}
                 {
                     foreach (string namespaceDependency in _namespaceDependenciesMap[tableName.ToLower()])
                     {
-                        string dependencyIdentityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}Identity";
-                        string dependencyEntityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}Entity";
+                        string dependencyIdentityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}{IdentityNameSufix}";
+                        string dependencyEntityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}{EntityNameSufix}";
                         if (_namespacesMap.ContainsKey(namespaceDependency) &&
                             (generatedDatabaseRepositoryClass.Contains(dependencyIdentityClassName) || generatedDatabaseRepositoryClass.Contains(dependencyEntityClassName)))
                             namespaceDependenciesList.Add(_namespacesMap[namespaceDependency]);

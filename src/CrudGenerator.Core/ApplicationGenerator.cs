@@ -17,11 +17,16 @@ namespace CrudGenerator.Core
         public const string ApplicationProjectSufix = "Application";
         public const string ServicesNamespaceSufix = "Services";
         public const string DataTransferObjectsNamespaceSufix = "DataTransferObjects";
+        public const string EventsNamespaceSufix = "Events";
         public const string DependencyInversionNamespaceSufix = "DependencyInversion";
+
+        private const string DataTransferObjectNameSufix = "Dto";
+        private const string IdentityDataTransferObjectNameSufix = "IdentityDto";
 
         private const string InsertedEventNameSufix = "Inserted";
         private const string UpdatedEventNameSufix = "Updated";
         private const string DeletedEventNameSufix = "Deleted";
+        private const string DataAdapterNameSufix = "DataAdapter";
         private const string CrudServiceNameSufix = "CrudService";
 
         /// <summary>
@@ -352,6 +357,291 @@ namespace CrudGenerator.Core
     }}";
 
         /// <summary>
+        /// {crud service class name}
+        /// {data transfer object type}
+        /// {data transfer object identity type}
+        /// {inserted event type}
+        /// {updated event type}
+        /// {deleted event type}
+        /// {entity type}
+        /// {identity type}
+        /// {identity filed type}
+        /// {identity generator type}
+        /// {repository type}
+        /// {repository field name}
+        /// {data adapter type}
+        /// </summary>
+        private const string crudServiceTemplate = @"
+    internal class {0}
+        : CrudServiceBase<
+            {1},
+            {2},
+            {3},
+            {4},
+            {5},
+            {6},
+            {7},
+            {8},
+            {9}>
+    {{
+        {10} _{11};
+
+        public EmpresaCrudService(
+            IBus bus,
+            IEventPublisher eventPublisher,
+            ILogStorage logStorage,
+            {10} {11})
+            : base(bus, eventPublisher, logStorage, {11})
+        {{
+            _{11} = {11};
+        }}
+
+        public override async Task GenerateIdentity({6} entity)
+        {{
+            entity.Identity = await _{11}.CreateNewIdentity();
+        }}
+
+        public override bool HasDefaultIdentity({6} entity)
+        {{
+            return entity.Identity.Id == 0;
+        }}
+
+        protected override {6}[] ConvertDtosToEntities({1}[] dtos)
+        {{
+            return {12}.ConvertDataTransferObjectListToEntityList(dtos).ToArray();
+        }}
+
+        protected override {6} ConvertDtoToEntity({1} dto)
+        {{
+            return {12}.ConvertDataTransferObjectToEntity(dto);
+        }}
+
+        protected override {1}[] ConvertEntitiesToDtos({6}[] entities)
+        {{
+            return {12}.ConvertEntityListToDataTransferObjectList(entities).ToArray();
+        }}
+
+        protected override {1} ConvertEntityToDto({6} entity)
+        {{
+            return {12}.ConvertEntityToDataTransferObject(entity);
+        }}
+
+        protected override {7} ConvertIdentityDtoToIdentity({2} identityDto)
+        {{
+            return {12}.ConvertIdDtoToIdentity(identityDto);
+        }}
+
+        protected override {2} ConvertIdentityToIdentiyDto({7} identity)
+        {{
+            return {12}.ConvertIdentityToIdDto(identity);
+        }}
+
+        protected override Task DataInserted({1} dto)
+        {{
+            EventPublisher.Publish(new {3}(dto));
+            return Task.CompletedTask;
+        }}
+
+        protected override Task DataUpdated({1} dto)
+        {{
+            EventPublisher.Publish(new {4}(dto));
+            return Task.CompletedTask;
+        }}
+
+        protected override Task DataDeleted({1} dto)
+        {{
+            EventPublisher.Publish(new {5}(dto));
+            return Task.CompletedTask;
+        }}
+
+        protected override Task ErrorOnDeleteData({1} dto)
+        {{
+            // TODO: Adicionar ações quando ocorre erro ao tentar remover um dado
+            return Task.CompletedTask;
+        }}
+
+        protected override Task ErrorOnInsertData({1} dto)
+        {{
+            // TODO: Adicionar ações quando ocorre erro ao tentar inserir um dado
+            return Task.CompletedTask;
+        }}
+
+        protected override Task ErrorOnUpdateData({1} dto)
+        {{
+            // TODO: Adicionar ações quando ocorre erro ao tentar atualizar um dado
+            return Task.CompletedTask;
+        }}
+
+        protected override Task ValidateDataBeforeDelete({1} dto)
+        {{
+            // TODO: Adicionar validações antes de realizar remoção de um dado
+            return Task.CompletedTask;
+        }}
+
+        protected override Task ValidateDataBeforeInsert({1} dto)
+        {{
+            // TODO: Adicionar validações antes de realizar inserção de um dado
+            return Task.CompletedTask;
+        }}
+
+        protected override Task ValidateDataBeforeUpdate({1} dto)
+        {{
+            // TODO: Adicionar validações antes de realizar atualização de um dado
+            return Task.CompletedTask;
+        }}
+    }}";
+
+        /// <summary>
+        /// {crud service class name}
+        /// {data transfer object type}
+        /// {data transfer object identity type}
+        /// {parent data transfer object type}
+        /// {inserted event type}
+        /// {updated event type}
+        /// {deleted event type}
+        /// {entity type}
+        /// {identity type}
+        /// {identity filed type}
+        /// {identity generator type}
+        /// {repository type}
+        /// {repository field name}
+        /// {data adapter type}
+        /// {create new identity with scope parameter}
+        /// {parent filter path}
+        /// </summary>
+        private const string crudServiceWithParentTemplate = @"
+    internal class {0}
+        : CrudServiceBaseWithParent<
+            {1},
+            {2},
+            {3},
+            {4},
+            {5},
+            {6},
+            {7},
+            {8},
+            {9},
+            {10}>
+    {{
+        {11} _{12};
+
+        public EmpresaCrudService(
+            IBus bus,
+            IEventPublisher eventPublisher,
+            ILogStorage logStorage,
+            {11} {12})
+            : base(bus, eventPublisher, logStorage, {12})
+        {{
+            _{12} = {12};
+        }}
+
+        public override async Task GenerateIdentity({7} entity)
+        {{
+            entity.Identity = await _{11}.CreateNewIdentity({14});
+        }}
+
+        public override bool HasDefaultIdentity({7} entity)
+        {{
+            return entity.Identity.Id == 0;
+        }}
+
+        protected override {7}[] ConvertDtosToEntities({1}[] dtos)
+        {{
+            return {13}.ConvertDataTransferObjectListToEntityList(dtos).ToArray();
+        }}
+
+        protected override {7} ConvertDtoToEntity({1} dto)
+        {{
+            return {13}.ConvertDataTransferObjectToEntity(dto);
+        }}
+
+        protected override {1}[] ConvertEntitiesToDtos({7}[] entities)
+        {{
+            return {13}.ConvertEntityListToDataTransferObjectList(entities).ToArray();
+        }}
+
+        protected override {1} ConvertEntityToDto({7} entity)
+        {{
+            return {13}.ConvertEntityToDataTransferObject(entity);
+        }}
+
+        protected override {7} ConvertIdentityDtoToIdentity({2} identityDto)
+        {{
+            return {13}.ConvertIdDtoToIdentity(identityDto);
+        }}
+
+        protected override {2} ConvertIdentityToIdentiyDto({7} identity)
+        {{
+            return {13}.ConvertIdentityToIdDto(identity);
+        }}
+
+
+        protected override MatchCriteriaCollection CreateParentIdentityFilter({3} parentDto)
+        {{
+            // TODO: Corrigir criação de MatchCriteriaOperator abaixo
+            return new MatchCriteriaCollection(
+                new MatchCriteriaOperator(
+                    $""{15}"",
+                    OperatorType.Equals,
+                    parentDto.Id.Id));
+        }}
+
+        protected override Task DataInserted({1} dto)
+        {{
+            EventPublisher.Publish(new {4}(dto));
+            return Task.CompletedTask;
+        }}
+
+        protected override Task DataUpdated({1} dto)
+        {{
+            EventPublisher.Publish(new {5}(dto));
+            return Task.CompletedTask;
+        }}
+
+        protected override Task DataDeleted({1} dto)
+        {{
+            EventPublisher.Publish(new {6}(dto));
+            return Task.CompletedTask;
+        }}
+
+        protected override Task ErrorOnDeleteData({1} dto)
+        {{
+            // TODO: Adicionar ações quando ocorre erro ao tentar remover um dado
+            return Task.CompletedTask;
+        }}
+
+        protected override Task ErrorOnInsertData({1} dto)
+        {{
+            // TODO: Adicionar ações quando ocorre erro ao tentar inserir um dado
+            return Task.CompletedTask;
+        }}
+
+        protected override Task ErrorOnUpdateData({1} dto)
+        {{
+            // TODO: Adicionar ações quando ocorre erro ao tentar atualizar um dado
+            return Task.CompletedTask;
+        }}
+
+        protected override Task ValidateDataBeforeDelete({1} dto)
+        {{
+            // TODO: Adicionar validações antes de realizar remoção de um dado
+            return Task.CompletedTask;
+        }}
+
+        protected override Task ValidateDataBeforeInsert({1} dto)
+        {{
+            // TODO: Adicionar validações antes de realizar inserção de um dado
+            return Task.CompletedTask;
+        }}
+
+        protected override Task ValidateDataBeforeUpdate({1} dto)
+        {{
+            // TODO: Adicionar validações antes de realizar atualização de um dado
+            return Task.CompletedTask;
+        }}
+    }}";
+
+        /// <summary>
         /// {container builder class name}, {container registrations class name}
         /// </summary>
         private const string createContainerBuilderTemplate = @"
@@ -538,13 +828,17 @@ namespace {0}
         /// <summary>
         /// (Key: IdentityClassName; Value: (Key: PropertyName, Value: PropertyType))
         /// </summary>
-        private Dictionary<string, List<(string PropertyName, string PropertyType)>> _identityClassPropertiesMap;
+        private Dictionary<string, List<(string PropertyName, string PropertyType)>> _identityDataTransferObjectClassPropertiesMap;
+        private Dictionary<string, List<string>> _identityDataTransferObjectClassPrimaryKeysPropertyMap;
 
         private Dictionary<string, string> _dataTransferObjectClassNamesMap;
         private Dictionary<string, string> _generatedDataTransferObjectClassesDictionary;
 
         private Dictionary<string, string> _dataAdapterClassNamesMap;
         private Dictionary<string, string> _generatedDataAdapterClassesDictionary;
+
+        private Dictionary<string, string> _crudServiceClassNamesMap;
+        private Dictionary<string, string> _generatedCrudServiceClassesDictionary;
 
         private Dictionary<string, string> _generatedDependencyInversionClassesDictionary;
 
@@ -562,13 +856,17 @@ namespace {0}
 
             _dataTransferIdentityObjectClassNamesMap = new Dictionary<string, string>();
             _generatedDataTransferIdentityObjectClassesClassesDictionary = new Dictionary<string, string>();
-            _identityClassPropertiesMap = new Dictionary<string, List<(string PropertyName, string PropertyType)>>();
+            _identityDataTransferObjectClassPropertiesMap = new Dictionary<string, List<(string PropertyName, string PropertyType)>>();
+            _identityDataTransferObjectClassPrimaryKeysPropertyMap = new Dictionary<string, List<string>>();
 
             _dataTransferObjectClassNamesMap = new Dictionary<string, string>();
             _generatedDataTransferObjectClassesDictionary = new Dictionary<string, string>();
 
             _dataAdapterClassNamesMap = new Dictionary<string, string>();
             _generatedDataAdapterClassesDictionary = new Dictionary<string, string>();
+
+            _crudServiceClassNamesMap = new Dictionary<string, string>();
+            _generatedCrudServiceClassesDictionary = new Dictionary<string, string>();
 
             _generatedDependencyInversionClassesDictionary = new Dictionary<string, string>();
 
@@ -591,9 +889,9 @@ namespace {0}
 
             GenerateDataTransferIdentityObjectClasses(nameSpace);
             GenerateDataTransferObjectClasses(nameSpace);
-            GenerateDataAdapterClasses(projectName, nameSpace);
             GenerateDataTransferObjectEventsClasses(nameSpace);
-            //GenerateDataAdapterClasses(nameSpace);
+            GenerateDataAdapterClasses(projectName, nameSpace);
+            GenerateCrudServiceClasses(projectName, nameSpace);
 
             GenerateDependencyInversionClasses(projectName, nameSpace);
 
@@ -615,7 +913,7 @@ namespace {0}
 
             _dataTransferIdentityObjectClassNamesMap.Clear();
             _generatedDataTransferIdentityObjectClassesClassesDictionary.Clear();
-            _identityClassPropertiesMap.Clear();
+            _identityDataTransferObjectClassPropertiesMap.Clear();
 
             _dataTransferObjectClassNamesMap.Clear();
             _generatedDataTransferObjectClassesDictionary.Clear();
@@ -632,13 +930,13 @@ namespace {0}
             foreach (KeyValuePair<string, SchemaInformationTableMapping> schemaInformationTableMapping in _schemaInformation.SchemaTableMappings.OrderBy(kp => kp.Value.Order))
             {
                 string tableName = schemaInformationTableMapping.Key.ToLower();
-                string identityDtoClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}IdentityDto";
+                string identityDtoClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}{IdentityDataTransferObjectNameSufix}";
                 _dataTransferIdentityObjectClassNamesMap.Add(tableName, identityDtoClassName);
 
                 string classNameSpace =
                     !string.IsNullOrEmpty(nameSpace)
-                    ? $"{nameSpace}.{ApplicationProjectSufix}.DataTransferObjects.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}"
-                    : $"{ApplicationProjectSufix}.DataTransferObjects.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}";
+                    ? $"{nameSpace}.{ApplicationProjectSufix}.{DataTransferObjectsNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}"
+                    : $"{ApplicationProjectSufix}.{DataTransferObjectsNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}";
 
                 if (!_namespacesMap.ContainsKey(tableName.ToLower()))
                     _namespacesMap.Add(tableName.ToLower(), classNameSpace);
@@ -713,11 +1011,16 @@ namespace {0}
 
                     primaryKeysFieldNames.Add($"_{primaryKeyColumn.Name}");
 
+                    if (!_identityDataTransferObjectClassPrimaryKeysPropertyMap.ContainsKey(identityDtoClassName))
+                        _identityDataTransferObjectClassPrimaryKeysPropertyMap.Add(identityDtoClassName, new List<string>() { CultureInfo.CurrentCulture.TextInfo.ToTitleCase(primaryKeyColumn.Name) });
+                    else
+                        _identityDataTransferObjectClassPrimaryKeysPropertyMap[identityDtoClassName].Add(CultureInfo.CurrentCulture.TextInfo.ToTitleCase(primaryKeyColumn.Name));
+
                     constructorParameters.Add(
-                        string.Format(
-                            constructorParameterTemplate,
-                            columnType,
-                            primaryKeyColumn.Name));
+                            string.Format(
+                                constructorParameterTemplate,
+                                columnType,
+                                primaryKeyColumn.Name));
 
                     primaryKeysProperties.Add(
                         string.Format(
@@ -730,10 +1033,10 @@ namespace {0}
                             string.Empty,
                             string.Empty));
 
-                    if (!_identityClassPropertiesMap.ContainsKey(identityDtoClassName))
-                        _identityClassPropertiesMap.Add(identityDtoClassName, new List<(string PropertyName, string PropertyType)>());
+                    if (!_identityDataTransferObjectClassPropertiesMap.ContainsKey(identityDtoClassName))
+                        _identityDataTransferObjectClassPropertiesMap.Add(identityDtoClassName, new List<(string PropertyName, string PropertyType)>());
 
-                    _identityClassPropertiesMap[identityDtoClassName].Add(($"{propertyName}", columnType));
+                    _identityDataTransferObjectClassPropertiesMap[identityDtoClassName].Add(($"{propertyName}", columnType));
 
                     fieldAssignments.Add(
                         string.Format(
@@ -785,8 +1088,8 @@ namespace {0}
                 {
                     foreach (string namespaceDependency in _namespaceDependenciesMap[tableName.ToLower()])
                     {
-                        string dependencyIdentityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}Identity";
-                        string dependencyEntityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}Entity";
+                        string dependencyIdentityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}{ModelGenerator.IdentityNameSufix}";
+                        string dependencyEntityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}{ModelGenerator.EntityNameSufix}";
 
                         if (_namespacesMap.ContainsKey(namespaceDependency) &&
                             (generatedIdentityClass.Contains(dependencyIdentityClassName) || generatedIdentityClass.Contains(dependencyEntityClassName)))
@@ -818,14 +1121,14 @@ namespace {0}
             foreach (KeyValuePair<string, SchemaInformationTableMapping> schemaInformationTableMapping in _schemaInformation.SchemaTableMappings.OrderBy(kp => kp.Value.Order))
             {
                 string tableName = schemaInformationTableMapping.Key.ToLower();
-                string dataTransferIndeitityObjectClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}IdentityDto";
-                string dataTransferObjectClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}Dto";
+                string dataTransferIdentityObjectClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}{IdentityDataTransferObjectNameSufix}";
+                string dataTransferObjectClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}{DataTransferObjectNameSufix}";
                 _dataTransferObjectClassNamesMap.Add(tableName, dataTransferObjectClassName);
 
                 string classNameSpace =
                     !string.IsNullOrEmpty(nameSpace)
-                    ? $"{nameSpace}.{ApplicationProjectSufix}.DataTransferObjects.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}"
-                    : $"{ApplicationProjectSufix}.DataTransferObjects.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}";
+                    ? $"{nameSpace}.{ApplicationProjectSufix}.{DataTransferObjectsNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}"
+                    : $"{ApplicationProjectSufix}.{DataTransferObjectsNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}";
 
                 if (!_namespacesMap.ContainsKey(tableName.ToLower()))
                     _namespacesMap.Add(tableName.ToLower(), classNameSpace);
@@ -1099,7 +1402,7 @@ namespace {0}
                         dataTransferObjectClassTemplate.TrimStart('\r', '\n'),
                         _dataTransferObjectClassNamesMap[tableName.ToLower()], // 0
                         _dataTransferIdentityObjectClassNamesMap[tableName.ToLower()],// 1
-                        _identityClassPropertiesMap[_dataTransferIdentityObjectClassNamesMap[tableName.ToLower()]].First().PropertyType,// 2
+                        _identityDataTransferObjectClassPropertiesMap[_dataTransferIdentityObjectClassNamesMap[tableName.ToLower()]].First().PropertyType,// 2
                         string.Join("\r\n", dataTransferObjectFields.Skip(1).Concat(dependencyDataTransferObjectFields)),// 3
                         constructorParameters[0].Trim().Split(' ')[1].Trim(),// 4
                         string.Join(",\r\n", constructorParameters.Concat(dependencyConstructorParameters)),// 5
@@ -1123,8 +1426,8 @@ namespace {0}
                 {
                     foreach (string namespaceDependency in _namespaceDependenciesMap[tableName.ToLower()])
                     {
-                        string dependencyIdentityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}Identity";
-                        string dependencyEntityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}Entity";
+                        string dependencyIdentityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}{ModelGenerator.IdentityNameSufix}";
+                        string dependencyEntityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}{ModelGenerator.EntityNameSufix}";
 
                         if (_namespacesMap.ContainsKey(namespaceDependency) &&
                             (generatedEntityClass.Contains(dependencyIdentityClassName) || generatedEntityClass.Contains(dependencyEntityClassName)))
@@ -1156,19 +1459,18 @@ namespace {0}
             foreach (KeyValuePair<string, SchemaInformationTableMapping> schemaInformationTableMapping in _schemaInformation.SchemaTableMappings.OrderBy(kp => kp.Value.Order))
             {
                 string tableName = schemaInformationTableMapping.Key.ToLower();
-                string dataTransferIndeitityObjectClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}IdentityDto";
-                string dataAdapterClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}DataAdapter";
+                string dataAdapterClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}{DataAdapterNameSufix}";
                 _dataAdapterClassNamesMap.Add(tableName, dataAdapterClassName);
 
-                string identityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}Identity";
-                string entityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}Entity";
-                string identityDataTransferObjectClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}IdentityDto";
-                string dataTransferObjectClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}Dto";
+                string identityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}{ModelGenerator.IdentityNameSufix}";
+                string entityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}{ModelGenerator.EntityNameSufix}";
+                string identityDataTransferObjectClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}{IdentityDataTransferObjectNameSufix}";
+                string dataTransferObjectClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}{DataTransferObjectNameSufix}";
 
                 string classNameSpace =
                     !string.IsNullOrEmpty(nameSpace)
-                    ? $"{nameSpace}.{ApplicationProjectSufix}.DataTransferObjects.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}"
-                    : $"{ApplicationProjectSufix}.DataTransferObjects.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}";
+                    ? $"{nameSpace}.{ApplicationProjectSufix}.{DataTransferObjectsNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}"
+                    : $"{ApplicationProjectSufix}.{DataTransferObjectsNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}";
 
                 if (!_namespacesMap.ContainsKey(tableName.ToLower()))
                     _namespacesMap.Add(tableName.ToLower(), classNameSpace);
@@ -1209,13 +1511,14 @@ namespace {0}
                         string titleCasePrimaryKeyColumnName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(primaryKeyColumn.Name);
 
                         string columnType = primaryKeyColumn.ResolveSystemTypeName();
-                        if (_identityClassPropertiesMap.ContainsKey(identityDataTransferObjectClassName))
+                        if (_identityDataTransferObjectClassPropertiesMap.ContainsKey(identityDataTransferObjectClassName))
                         {
                             ForeignKeyValueColletion foreignKeyValueColletion = schemaInformationTableMapping.Value.ForeignKeyValues
                                 .FirstOrDefault(fkv => fkv.ForeignKeyValueList
                                     .Where(fkv => fkv.ForeignColunmnsToReferencedColumns
                                         .Any(fctrc => fctrc.ForeignColumn == primaryKeyColumn.Name.ToLower())).Any());
 
+                            // Remove da lista primaryKeyColumns, colunas que compôem chave estrangeira referenciada pela chave primária da tabela atual
                             foreach (ForeignKeyValue foreignKeyValue in foreignKeyValueColletion.ForeignKeyValueList)
                             {
                                 foreach (ForeignColunmnToReferencedColumn foreignColunmnToReferencedColumn in foreignKeyValue.ForeignColunmnsToReferencedColumns)
@@ -1254,7 +1557,12 @@ namespace {0}
                     string columnType = entityColumn.ResolveSystemTypeName();
                     string titleCaseEntityColumnName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(entityColumn.Name); ;
 
-                    ForeignKeyValueColletion foreignKeyValueColletion = schemaInformationTableMapping.Value.ForeignKeyValues.FirstOrDefault(fkv => fkv.ForeignKeyValueList.Where(fkv => fkv.ForeignColunmnsToReferencedColumns.Any(fctrc => fctrc.ForeignColumn == entityColumn.Name.ToLower())).Any());
+                    ForeignKeyValueColletion foreignKeyValueColletion = schemaInformationTableMapping.Value.ForeignKeyValues
+                        .FirstOrDefault(fkv => fkv.ForeignKeyValueList
+                            .Where(fkv => fkv.ForeignColunmnsToReferencedColumns
+                                .Any(fctrc => fctrc.ForeignColumn == entityColumn.Name.ToLower()))
+                            .Any());
+
                     if (foreignKeyValueColletion != null)
                     {
                         foreach (ForeignKeyValue foreignKeyValue1 in foreignKeyValueColletion.ForeignKeyValueList)
@@ -1328,7 +1636,7 @@ namespace {0}
                 {
                     foreach (string namespaceDependency in _namespaceDependenciesMap[tableName.ToLower()])
                     {
-                        namespaceDependenciesList.Add($"{projectName}.Application.DataTransferObjects.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}");
+                        namespaceDependenciesList.Add($"{projectName}.{ApplicationProjectSufix}.{DataTransferObjectsNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}");
                         namespaceDependenciesList.Add($"{projectName}.Model.Models.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}");
                     }
                 }
@@ -1350,6 +1658,257 @@ namespace {0}
             }
         }
 
+        private void GenerateCrudServiceClasses(string projectName, string nameSpace)
+        {
+            foreach (KeyValuePair<string, SchemaInformationTableMapping> schemaInformationTableMapping in _schemaInformation.SchemaTableMappings.OrderBy(kp => kp.Value.Order))
+            {
+                string tableName = schemaInformationTableMapping.Key.ToLower();
+                string identityGeneratorType = string.Empty;
+                string identityFieldType = string.Empty;
+                string parentDataTransferObjectName = string.Empty;
+                string parentIdentityDataTransferObjectName = string.Empty;
+
+                string crudServiceClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}{CrudServiceNameSufix}";
+                _crudServiceClassNamesMap.Add(tableName, crudServiceClassName);
+
+                bool containsPrimaryKeyColumns = schemaInformationTableMapping.Value.Columns.Where(col => col.IsPrimaryKey).Any();
+                List<ColumnInfo> entityColumns = new List<ColumnInfo>(
+                    schemaInformationTableMapping.Value.Columns
+                        .Where(col =>
+                            !col.IsPrimaryKey ||
+                            schemaInformationTableMapping.Value.ForeignKeyValues
+                                .Any(fkvc => fkvc.ForeignKeyValueList
+                                    .Any(fkv => fkv.ForeignColunmnsToReferencedColumns
+                                        .Any(fkctrc => fkctrc.ForeignColumn.ToLower() == col.Name.ToLower())))));
+
+                List<string> parentPrimaryKeys = new List<string>();
+
+                List<ColumnInfo> primaryKeyColumns = new List<ColumnInfo>(schemaInformationTableMapping.Value.Columns.Where(col => col.IsPrimaryKey));
+                int primaryKeyColumnsCount = primaryKeyColumns.Count;
+
+                if (containsPrimaryKeyColumns)
+                {
+                    ColumnInfo primaryKeyColumn = primaryKeyColumns[0];
+                    primaryKeyColumns.RemoveAt(0);
+
+                    parentPrimaryKeys.Add(primaryKeyColumn.Name);
+                    string columnType = primaryKeyColumn.ResolveSystemTypeName();
+                    if (IsColumnNumeric(primaryKeyColumn) && string.IsNullOrEmpty(identityFieldType))
+                    {
+                        identityFieldType = columnType;
+                        identityGeneratorType = $"IDatabase{primaryKeyColumn.DbType}IdentityGenerator";
+                    }
+
+                    if (primaryKeyColumns.Count > 0)
+                    {
+                        primaryKeyColumn = primaryKeyColumns[0];
+                        primaryKeyColumns.RemoveAt(0);
+                        string titleCasePrimaryKeyColumnName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(primaryKeyColumn.Name);
+
+                        parentPrimaryKeys.Add(primaryKeyColumn.Name);
+
+                        ForeignKeyValueColletion foreignKeyValueColletion = schemaInformationTableMapping.Value.ForeignKeyValues
+                            .FirstOrDefault(fkv => fkv.ForeignKeyValueList
+                                .Where(fkv => fkv.ForeignColunmnsToReferencedColumns
+                                    .Any(fctrc => fctrc.ForeignColumn == primaryKeyColumn.Name.ToLower()))
+                                .Any());
+
+                        if (foreignKeyValueColletion != null)
+                        {
+                            foreach (ForeignKeyValue foreignKeyValue1 in foreignKeyValueColletion.ForeignKeyValueList)
+                            {
+                                foreach (ForeignColunmnToReferencedColumn foreignColunmnToReferencedColumn in foreignKeyValue1.ForeignColunmnsToReferencedColumns)
+                                {
+                                    ColumnInfo foreignKeyColumnInfo = entityColumns.FirstOrDefault(pkColumn => pkColumn.Name.ToUpper() == foreignColunmnToReferencedColumn.ForeignColumn.ToUpper());
+                                    if (!string.IsNullOrEmpty(foreignKeyColumnInfo.Name))
+                                        entityColumns.Remove(foreignKeyColumnInfo);
+                                }
+                            }
+
+                            ForeignKeyValue foreignKeyValue =
+                                foreignKeyValueColletion.ForeignKeyValueList.FirstOrDefault(fkv => fkv.ForeignColunmnsToReferencedColumns.Any(fctrc => fctrc.ForeignColumn == primaryKeyColumn.Name.ToLower()));
+
+                            if (foreignKeyValue != null)
+                            {
+                                string referencedTableName = foreignKeyValue.ForeignColunmnsToReferencedColumns.Select(fctrc => fctrc.ReferencedTableName).FirstOrDefault()?.ToLower();
+                                if (referencedTableName != null && _schemaInformation.SchemaTableMappings.ContainsKey(referencedTableName.ToLower()))
+                                {
+                                    string titleCaseReferencedTable = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(referencedTableName);
+                                    parentDataTransferObjectName = $"{titleCaseReferencedTable}{DataTransferObjectNameSufix}";
+                                    parentIdentityDataTransferObjectName = $"{titleCaseReferencedTable}{IdentityDataTransferObjectNameSufix}";
+
+                                    if (!_namespaceDependenciesMap.ContainsKey(tableName.ToLower()))
+                                        _namespaceDependenciesMap.Add(tableName.ToLower(), new List<string>());
+
+                                    if (!_namespaceDependenciesMap[tableName.ToLower()].Contains(referencedTableName.ToLower()))
+                                        _namespaceDependenciesMap[tableName.ToLower()].Add(referencedTableName.ToLower());
+                                }
+                            }
+                        }
+                    }
+                }
+
+                List<string> namespaceDependenciesList = new List<string>(
+                    new string[]
+                    {
+                        "Crud.Abstractions.Application.Services",
+                        "Database.IdentityGeneration",
+                        "Domain.Model.DataQuery",
+                        "Domain.Model.Messaging",
+                        "Framework.Diagnostics",
+                        "System.Threading.Tasks",
+                    });
+
+                string tableNameTitleCase = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName);
+
+                string classNameSpace =
+                    !string.IsNullOrEmpty(nameSpace)
+                    ? $"{nameSpace}.{ApplicationProjectSufix}.{ServicesNamespaceSufix}.{tableNameTitleCase}"
+                    : $"{ApplicationProjectSufix}.{ServicesNamespaceSufix}.{tableNameTitleCase}";
+
+                namespaceDependenciesList.Add($"{projectName}.{ApplicationProjectSufix}.{DataTransferObjectsNamespaceSufix}.{tableNameTitleCase}");
+                namespaceDependenciesList.Add($"{projectName}.{ApplicationProjectSufix}.{DataTransferObjectsNamespaceSufix}.{tableNameTitleCase}.{EventsNamespaceSufix}");
+                namespaceDependenciesList.Add($"{projectName}.Model.Models.{tableNameTitleCase}");
+
+                if (_namespaceDependenciesMap.ContainsKey(tableName.ToLower()))
+                {
+                    foreach (string namespaceDependency in _namespaceDependenciesMap[tableName.ToLower()])
+                    {
+                        string namespaceDependencyTitleCase = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency);
+
+                        namespaceDependenciesList.Add($"{projectName}.{ApplicationProjectSufix}.{DataTransferObjectsNamespaceSufix}.{namespaceDependencyTitleCase}");
+                        namespaceDependenciesList.Add($"{projectName}.{ApplicationProjectSufix}.{DataTransferObjectsNamespaceSufix}.{namespaceDependencyTitleCase}.{EventsNamespaceSufix}");
+                        namespaceDependenciesList.Add($"{projectName}.Model.Models.{namespaceDependencyTitleCase}");
+                    }
+                }
+
+                string dataTransferObjectClassName = $"{tableNameTitleCase}{DataTransferObjectNameSufix}";
+                string identityDataTransferObjectClassName = $"{tableNameTitleCase}{IdentityDataTransferObjectNameSufix}";
+                string insertedEventClassName = $"{tableNameTitleCase}{InsertedEventNameSufix}";
+                string updatedEventClassName = $"{tableNameTitleCase}{UpdatedEventNameSufix}";
+                string deletedEventClassName = $"{tableNameTitleCase}{DeletedEventNameSufix}";
+                string identityClassName = $"{tableNameTitleCase}{ModelGenerator.IdentityNameSufix}";
+                string entityClassName = $"{tableNameTitleCase}{ModelGenerator.EntityNameSufix}";
+                string entityDatabaseRepositoryClassName = $"{tableNameTitleCase}{ModelGenerator.EntityNameSufix}{ModelGenerator.DatabaseRepositoryNameSufix}";
+                string entityDatabaseRepositoryFieldNameName = $"{tableName}{ModelGenerator.EntityNameSufix}{ModelGenerator.DatabaseRepositoryNameSufix}";
+                string dataAdapterClassName = $"{tableNameTitleCase}{DataAdapterNameSufix}";
+
+                string generatedCrudServiceClass = string.Empty;
+
+                if (string.IsNullOrEmpty(parentDataTransferObjectName))
+                {
+                    /// 0  - {crud service class name}
+                    /// 1  - {data transfer object type}
+                    /// 2  - {data transfer object identity type}
+                    /// 3  - {inserted event type}
+                    /// 4  - {updated event type}
+                    /// 5  - {deleted event type}
+                    /// 6  - {entity type}
+                    /// 7  - {identity type}
+                    /// 8  - {identity filed type}
+                    /// 9  - {identity generator type}
+                    /// 10 - {repository type}
+                    /// 11 - {repository field name}
+                    /// 12 - {data adapter type}
+                    
+                    generatedCrudServiceClass =
+                        string.Format(
+                            crudServiceTemplate,
+                            crudServiceClassName, // 0
+                            dataTransferObjectClassName,// 1
+                            identityDataTransferObjectClassName,// 2
+                            insertedEventClassName,// 3
+                            updatedEventClassName,// 4
+                            deletedEventClassName,// 5
+                            identityClassName,// 6
+                            entityClassName,// 7
+                            identityFieldType,//8
+                            identityGeneratorType,//9
+                            entityDatabaseRepositoryClassName,//10
+                            entityDatabaseRepositoryFieldNameName,//11
+                            dataAdapterClassName);//12
+                }
+                else
+                {
+                    /// 0  - {crud service class name}
+                    /// 1  - {data transfer object type}
+                    /// 2  - {data transfer object identity type}
+                    /// 3  - {parent data transfer object type}
+                    /// 4  - {inserted event type}
+                    /// 5  - {updated event type}
+                    /// 6  - {deleted event type}
+                    /// 7  - {entity type}
+                    /// 8  - {identity type}
+                    /// 9  - {identity filed type}
+                    /// 10  - {identity generator type}
+                    /// 11 - {repository type}
+                    /// 12 - {repository field name}
+                    /// 13 - {data adapter type}
+                    /// 14 - {create new identity with scope parameter}
+                    /// 15 - {parent filter path}
+
+                    List<string> parentFilterPaths = new List<string>();
+                    if (_identityDataTransferObjectClassPrimaryKeysPropertyMap.ContainsKey(identityDataTransferObjectClassName))
+                    {
+                        int numberOfPaths = _identityDataTransferObjectClassPrimaryKeysPropertyMap[identityDataTransferObjectClassName].Count();
+                        if (numberOfPaths > 0)
+                        {
+                            List<string> pathList = _identityDataTransferObjectClassPrimaryKeysPropertyMap[identityDataTransferObjectClassName].ToList();
+                            for (int pathIndex = 0; pathIndex < numberOfPaths; pathIndex++)
+                            {
+                                if (pathIndex == 0)
+                                    parentFilterPaths.Add($"{dataTransferObjectClassName}.{pathList.First()}");
+                                else
+                                    parentFilterPaths.Add($"{parentFilterPaths[pathIndex - 1]}.{pathList.First()}");
+
+                                pathList.RemoveAt(0);
+                            }
+
+                            parentFilterPaths.Add($"{parentFilterPaths[parentFilterPaths.Count - 1]}.Id");
+                        }
+                    }
+
+                    generatedCrudServiceClass =
+                        string.Format(
+                            crudServiceWithParentTemplate,
+                            crudServiceClassName, // 0
+                            dataTransferObjectClassName,// 1
+                            identityDataTransferObjectClassName,// 2
+                            parentDataTransferObjectName, // 3
+                            insertedEventClassName,// 4
+                            updatedEventClassName,// 5
+                            deletedEventClassName,// 6
+                            identityClassName,// 7
+                            entityClassName,// 8
+                            identityFieldType,//9
+                            identityGeneratorType,//10
+                            entityDatabaseRepositoryClassName,//11
+                            entityDatabaseRepositoryFieldNameName,//12
+                            dataAdapterClassName,//13
+                            _identityDataTransferObjectClassPrimaryKeysPropertyMap.ContainsKey(identityDataTransferObjectClassName) &&
+                            _identityDataTransferObjectClassPrimaryKeysPropertyMap[identityDataTransferObjectClassName].Count > 1
+                                ? $"entity.Identity.{_identityDataTransferObjectClassPrimaryKeysPropertyMap[identityDataTransferObjectClassName][1]}"
+                                : string.Empty,//14
+                            string.Join(".", parentFilterPaths.Select(parentFilterPath => $"nameof({parentFilterPath})")));//15
+                }
+
+                _generatedCrudServiceClassesDictionary.Add(
+                    tableName,
+                    string.Format(
+                        nameSpaceTemplate,
+                        classNameSpace,
+                        generatedCrudServiceClass,
+                        string.Join("\r\n", namespaceDependenciesList.OrderBy(ns => ns).Select(dependencyNamespace => $"using {dependencyNamespace};"))));
+
+                _generatedClassesList.Add(new GeneratedClassFromSchemaInformationTableMapping(
+                    schemaInformationTableMapping.Value,
+                    classNameSpace,
+                    crudServiceClassName,
+                    namespaceDependenciesList.OrderBy(ns => ns).ToList(),
+                    _generatedCrudServiceClassesDictionary[tableName.ToLower()]));
+            }
+        }
+
         private void GenerateDataTransferObjectEventsClasses(string nameSpace)
         {
             foreach (KeyValuePair<string, SchemaInformationTableMapping> schemaInformationTableMapping in _schemaInformation.SchemaTableMappings.OrderBy(kp => kp.Value.Order))
@@ -1358,8 +1917,8 @@ namespace {0}
 
                 string classNameSpace =
                     !string.IsNullOrEmpty(nameSpace)
-                    ? $"{nameSpace}.{ApplicationProjectSufix}.DataTransferObjects.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}.Events"
-                    : $"{ApplicationProjectSufix}.DataTransferObjects.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}.Events";
+                    ? $"{nameSpace}.{ApplicationProjectSufix}.{DataTransferObjectsNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}.{EventsNamespaceSufix}"
+                    : $"{ApplicationProjectSufix}.{DataTransferObjectsNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}.{EventsNamespaceSufix}";
 
                 List<string> namespaceDependenciesList = new List<string>(
                     new string[]
@@ -1486,6 +2045,11 @@ namespace {0}
                     string.Format(createContainerBuilderTemplate, containerBuilderClassName, containerRegistrationsClassName),
                     string.Join("\r\n", namespaceDependenciesList.OrderBy(ns => ns).Select(dependencyNamespace => $"using {dependencyNamespace};")));
 
+            if (_generatedDependencyInversionClassesDictionary.ContainsKey(containerBuilderClassName))
+                _generatedDependencyInversionClassesDictionary[containerBuilderClassName] = generatedContainerBuilderClass;
+            else
+                _generatedDependencyInversionClassesDictionary.Add(containerBuilderClassName, generatedContainerBuilderClass);
+
             _generatedClassesList.Add(new GeneratedClass(
                 classNameSpace,
                 containerBuilderClassName,
@@ -1558,6 +2122,7 @@ namespace {0}
                     /// 4 - {updated event type}
                     /// 5 - {deleted event type}
                     /// 6 - {crud service type}
+
                     crudServiceRegistrations.Add(
                         string.Format(
                             crudServiceWithParentRegistrationTemplate,
@@ -1570,9 +2135,9 @@ namespace {0}
                             $"{titleCaseTableName}{CrudServiceNameSufix}")); // 6
                 }
 
-                namespaceDependenciesList.Add($"{projectName}.Application.DataTransferObjects.{titleCaseTableName}");
-                namespaceDependenciesList.Add($"{projectName}.Application.DataTransferObjects.{titleCaseTableName}.Events");
-                namespaceDependenciesList.Add($"{projectName}.Application.Services.{titleCaseTableName}");
+                namespaceDependenciesList.Add($"{projectName}.{ApplicationProjectSufix}.{DataTransferObjectsNamespaceSufix}.{titleCaseTableName}");
+                namespaceDependenciesList.Add($"{projectName}.{ApplicationProjectSufix}.{DataTransferObjectsNamespaceSufix}.{titleCaseTableName}.{EventsNamespaceSufix}");
+                namespaceDependenciesList.Add($"{projectName}.{ApplicationProjectSufix}.{ServicesNamespaceSufix}.{titleCaseTableName}");
                 namespaceDependenciesList.Add($"{projectName}.Model.Models.{titleCaseTableName}");
             }
 
@@ -1586,6 +2151,11 @@ namespace {0}
                         string.Join("\r\n", crudServiceRegistrations),
                         string.Empty),
                     string.Join("\r\n", namespaceDependenciesList.OrderBy(ns => ns).Select(dependencyNamespace => $"using {dependencyNamespace};")));
+
+            if (_generatedDependencyInversionClassesDictionary.ContainsKey(containerRegistrationsClassName))
+                _generatedDependencyInversionClassesDictionary[containerRegistrationsClassName] = generatedContainerRegistrationClass;
+            else
+                _generatedDependencyInversionClassesDictionary.Add(containerRegistrationsClassName, generatedContainerRegistrationClass);
 
             _generatedClassesList.Add(new GeneratedClass(
                 classNameSpace,
@@ -1735,17 +2305,17 @@ namespace {0}
 
         private string GetDependencyPropertyPath(ref string parameterPath, string columnType, string referencedColumnName)
         {
-            if (_identityClassPropertiesMap.ContainsKey(columnType))
+            if (_identityDataTransferObjectClassPropertiesMap.ContainsKey(columnType))
             {
-                (string PropertyName, string PropertyType)? dependencyPropertyTuple = _identityClassPropertiesMap[columnType]?.FirstOrDefault(p => p.PropertyName.ToLower() == referencedColumnName.ToLower());
+                (string PropertyName, string PropertyType)? dependencyPropertyTuple = _identityDataTransferObjectClassPropertiesMap[columnType]?.FirstOrDefault(p => p.PropertyName.ToLower() == referencedColumnName.ToLower());
                 if (dependencyPropertyTuple == (null, null))
-                    dependencyPropertyTuple = _identityClassPropertiesMap[columnType]?.FirstOrDefault();
+                    dependencyPropertyTuple = _identityDataTransferObjectClassPropertiesMap[columnType]?.FirstOrDefault();
 
                 if (dependencyPropertyTuple != (null, null))
                 {
                     parameterPath = $"{parameterPath}.{dependencyPropertyTuple.Value.PropertyName}";
                     string dependencyPropertyType = dependencyPropertyTuple.Value.PropertyType;
-                    if (_identityClassPropertiesMap.ContainsKey(dependencyPropertyType))
+                    if (_identityDataTransferObjectClassPropertiesMap.ContainsKey(dependencyPropertyType))
                         GetDependencyPropertyPath(ref parameterPath, dependencyPropertyType, dependencyPropertyTuple.Value.PropertyName.ToLower());
                 }
             }
