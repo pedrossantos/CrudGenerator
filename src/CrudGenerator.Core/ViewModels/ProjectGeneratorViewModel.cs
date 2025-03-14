@@ -6,6 +6,7 @@ using Database.Sqlite.DataAccess;
 using Database.SqlServer.DataAccess;
 using DependencyInversion;
 using Framework.Collections;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -38,6 +39,7 @@ namespace CrudGenerator.Core.ViewModels
         private string _projectFolder;
         private string _projectName;
         private ModelGenerator _modelGenerator;
+        private ApplicationGenerator _applicationGenerator;
         private GeneratedClass _selectedGenerated;
 
         public ProjectGeneratorViewModel()
@@ -214,17 +216,32 @@ namespace CrudGenerator.Core.ViewModels
             set => PropertyChangedDispatcher.SetProperty(ref _modelGenerator, value);
         }
 
+        public ApplicationGenerator ApplicationGenerator
+        {
+            get => _applicationGenerator;
+            set => PropertyChangedDispatcher.SetProperty(ref _applicationGenerator, value);
+        }
+
         public GeneratedClass SelectedGeneratedClass
         {
             get => _selectedGenerated;
             set => PropertyChangedDispatcher.SetProperty(ref _selectedGenerated, value);
         }
 
-        public List<GeneratedClassGroupedByNamespace> GeneratedModelClasses =>
+        public List<GeneratedClassGroupedByNamespace> GeneratedClasses =>
             new List<GeneratedClassGroupedByNamespace>(
-                ModelGenerator?.GeneratedClasses?
+                GeneratedModelClasses
+                    .Concat(GeneratedApplicationClasses));
+
+        public IEnumerable<GeneratedClassGroupedByNamespace> GeneratedModelClasses =>
+            ModelGenerator?.GeneratedClasses?
                 .GroupBy(gc => gc.ClassNameSpace)
-                .Select(g => new GeneratedClassGroupedByNamespace(g)) ?? new GeneratedClassGroupedByNamespace[0]);
+                .Select(g => new GeneratedClassGroupedByNamespace(g)) ?? new GeneratedClassGroupedByNamespace[0];
+
+        public IEnumerable<GeneratedClassGroupedByNamespace> GeneratedApplicationClasses =>
+            ApplicationGenerator?.GeneratedClasses?
+                .GroupBy(gc => gc.ClassNameSpace)
+                .Select(g => new GeneratedClassGroupedByNamespace(g)) ?? new GeneratedClassGroupedByNamespace[0];
 
         public void SelectProjectFolder()
         {
@@ -251,6 +268,12 @@ namespace CrudGenerator.Core.ViewModels
             ModelGenerator = new ModelGenerator(SchemaInformation);
             PropertyChangedDispatcher.Notify(nameof(ModelGenerator));
 
+            if (ApplicationGenerator != null)
+                ApplicationGenerator.Dispose();
+
+            ApplicationGenerator = new ApplicationGenerator(SchemaInformation);
+            PropertyChangedDispatcher.Notify(nameof(ApplicationGenerator));
+
             GeneratingClasses = true;
             _threadGenerateProject = new Thread(new ParameterizedThreadStart(DoGenerateClasses));
             _threadGenerateProject.Start(
@@ -259,6 +282,7 @@ namespace CrudGenerator.Core.ViewModels
                     _projectName,
                     _defaultNamespace,
                     _modelGenerator,
+                    _applicationGenerator,
                 });
         }
 
@@ -291,6 +315,7 @@ namespace CrudGenerator.Core.ViewModels
                     _projectName,
                     _defaultNamespace,
                     ModelGenerator.GeneratedClasses,
+                    ApplicationGenerator.GeneratedClasses,
                 });
         }
 
@@ -301,13 +326,18 @@ namespace CrudGenerator.Core.ViewModels
                 object[] argsArray = args as object[];
                 string projectName = argsArray[0]?.ToString();
                 string nameSpace = argsArray[1]?.ToString();
-                ModelGenerator entityGenerator = argsArray[2] as ModelGenerator;
+                ModelGenerator modelGenerator = argsArray[2] as ModelGenerator;
+                ApplicationGenerator applicationGenerator = argsArray[3] as ApplicationGenerator;
 
-                entityGenerator.GenerateClasses(projectName, string.IsNullOrEmpty(nameSpace) ? projectName : $"{projectName}.{nameSpace}");
+                modelGenerator.GenerateClasses(projectName, string.IsNullOrEmpty(nameSpace) ? projectName : $"{projectName}.{nameSpace}");
+                applicationGenerator.GenerateClasses(projectName, string.IsNullOrEmpty(nameSpace) ? projectName : $"{projectName}.{nameSpace}");
             }
             finally
             {
+                PropertyChangedDispatcher.Notify(nameof(SelectedGeneratedClass));
                 PropertyChangedDispatcher.Notify(nameof(GeneratedModelClasses));
+                PropertyChangedDispatcher.Notify(nameof(GeneratedApplicationClasses));
+
                 GeneratingClasses = false;
             }
         }
@@ -324,6 +354,9 @@ namespace CrudGenerator.Core.ViewModels
                 ObservableCollection<GeneratedClass> generatedModelClasses =
                     argsArray[3] as ObservableCollection<GeneratedClass> ?? new ObservableCollection<GeneratedClass>();
 
+                ObservableCollection<GeneratedClass> generatedApplicationClasses =
+                    argsArray[4] as ObservableCollection<GeneratedClass> ?? new ObservableCollection<GeneratedClass>();
+
                 string solutionPath = Path.Combine(projectFolder, projectName);
                 if (Directory.Exists(solutionPath))
                     Directory.Delete(solutionPath, true);
@@ -336,75 +369,173 @@ namespace CrudGenerator.Core.ViewModels
 
                 Directory.CreateDirectory(srcPath);
 
-                #region Models Project
-                string modelProjectPath = string.IsNullOrEmpty(nameSpace)
-                    ? Path.Combine(srcPath, $"{projectName}.{ModelGenerator.ModelProjectSufix}")
-                    : Path.Combine(srcPath, $"{projectName}.{nameSpace}.{ModelGenerator.ModelProjectSufix}");
+                GenerateModelProject(
+                    srcPath,
+                    nameSpace,
+                    projectName,
+                    generatedModelClasses);
 
-                if (Directory.Exists(modelProjectPath))
-                    Directory.Delete(modelProjectPath, true);
-
-                Directory.CreateDirectory(modelProjectPath);
-
-                TreeList<string> namespaceModelTreeList = new TreeList<string>(projectName);
-
-                string modelClassesNamespace = string.IsNullOrEmpty(nameSpace)
-                    ? $"{projectName}.{ModelGenerator.ModelProjectSufix}"
-                    : $"{projectName}.{nameSpace}.{ModelGenerator.ModelProjectSufix}";
-
-                foreach (GeneratedClass generatedClass in generatedModelClasses)
-                {
-                    string modelsProjectFolderPath = modelProjectPath;
-
-                    List<string> partialNamespaceList = new List<string>(generatedClass.ClassNameSpace.Replace($"{modelClassesNamespace}.","").Split('.'));
-                    TreeNode<string> currentTreeNode = namespaceModelTreeList.Root;
-                    while (partialNamespaceList.Count > 0)
-                    {
-                        string partialNamespace = partialNamespaceList[0];
-                        TreeNode<string> treeNode = currentTreeNode.Find(partialNamespace);
-                        if (treeNode == null)
-                        {
-                            currentTreeNode = currentTreeNode.AddOrGet(partialNamespace);
-
-                        }
-                        else
-                            currentTreeNode = treeNode;
-
-                        modelsProjectFolderPath = Path.Combine(modelsProjectFolderPath, partialNamespace);
-                        if (!Directory.Exists(modelsProjectFolderPath))
-                            Directory.CreateDirectory(modelsProjectFolderPath);
-
-                        partialNamespaceList.RemoveAt(0);
-                    }
-
-                    StreamWriter streamWriterClass = new StreamWriter(Path.Combine(modelsProjectFolderPath, $"{generatedClass.ClassName}.cs"));
-                    streamWriterClass.Write(generatedClass.ClassContent);
-                    streamWriterClass.Close();
-                    streamWriterClass.Dispose();
-                }
-
-                StreamWriter streamWriterProject = 
-                    string.IsNullOrEmpty(nameSpace)
-                    ? new StreamWriter(Path.Combine(modelProjectPath, $"{projectName}.{ModelGenerator.ModelProjectSufix}.csproj"))
-                    : new StreamWriter(Path.Combine(modelProjectPath, $"{projectName}.{nameSpace}.{ModelGenerator.ModelProjectSufix}.csproj"));
-                streamWriterProject.Write(
-    @"<Project Sdk=""Microsoft.NET.Sdk"">
-
-  <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
-    <Nullable>disable</Nullable>
-    <LangVersion>9.0</LangVersion>
-  </PropertyGroup>
-
-</Project>");
-                streamWriterProject.Close();
-                streamWriterProject.Dispose();
-                #endregion
+                GenerateApplicationProject(
+                    srcPath,
+                    nameSpace,
+                    projectName,
+                    generatedApplicationClasses);
             }
             finally
             {
                 GeneratingProject = false;
             }
+        }
+
+        private void GenerateModelProject(
+            string srcPath,
+            string nameSpace,
+            string projectName,
+            ObservableCollection<GeneratedClass> modelClasses)
+        {
+            #region Models Project
+            string modelProjectPath = string.IsNullOrEmpty(nameSpace)
+                ? Path.Combine(srcPath, $"{projectName}.{ModelGenerator.ModelProjectSufix}")
+                : Path.Combine(srcPath, $"{projectName}.{nameSpace}.{ModelGenerator.ModelProjectSufix}");
+
+            if (Directory.Exists(modelProjectPath))
+                Directory.Delete(modelProjectPath, true);
+
+            Directory.CreateDirectory(modelProjectPath);
+
+            TreeList<string> namespaceModelTreeList = new TreeList<string>(projectName);
+
+            string modelClassesNamespace = string.IsNullOrEmpty(nameSpace)
+                ? $"{projectName}.{ModelGenerator.ModelProjectSufix}"
+                : $"{projectName}.{nameSpace}.{ModelGenerator.ModelProjectSufix}";
+
+            foreach (GeneratedClass generatedClass in modelClasses)
+            {
+                string modelsProjectFolderPath = modelProjectPath;
+
+                List<string> partialNamespaceList = new List<string>(
+                    generatedClass.ClassNameSpace == modelClassesNamespace
+                        ? Enumerable.Empty<string>()
+                        : generatedClass.ClassNameSpace.Replace($"{modelClassesNamespace}.", "").Split('.'));
+
+                TreeNode<string> currentTreeNode = namespaceModelTreeList.Root;
+                while (partialNamespaceList.Count > 0)
+                {
+                    string partialNamespace = partialNamespaceList[0];
+                    TreeNode<string> treeNode = currentTreeNode.Find(partialNamespace);
+                    if (treeNode == null)
+                    {
+                        currentTreeNode = currentTreeNode.AddOrGet(partialNamespace);
+
+                    }
+                    else
+                        currentTreeNode = treeNode;
+
+                    modelsProjectFolderPath = Path.Combine(modelsProjectFolderPath, partialNamespace);
+                    if (!Directory.Exists(modelsProjectFolderPath))
+                        Directory.CreateDirectory(modelsProjectFolderPath);
+
+                    partialNamespaceList.RemoveAt(0);
+                }
+
+                StreamWriter streamWriterClass = new StreamWriter(Path.Combine(modelsProjectFolderPath, $"{generatedClass.ClassName}.cs"));
+                streamWriterClass.Write(generatedClass.ClassContent);
+                streamWriterClass.Close();
+                streamWriterClass.Dispose();
+            }
+
+            StreamWriter streamWriterProject =
+                string.IsNullOrEmpty(nameSpace)
+                ? new StreamWriter(Path.Combine(modelProjectPath, $"{projectName}.{ModelGenerator.ModelProjectSufix}.csproj"))
+                : new StreamWriter(Path.Combine(modelProjectPath, $"{projectName}.{nameSpace}.{ModelGenerator.ModelProjectSufix}.csproj"));
+            streamWriterProject.Write(
+@"<Project Sdk=""Microsoft.NET.Sdk"">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net461;net462</TargetFrameworks>
+    <Nullable>disable</Nullable>
+    <LangVersion>10.0</LangVersion>
+  </PropertyGroup>
+
+</Project>");
+            streamWriterProject.Close();
+            streamWriterProject.Dispose();
+            #endregion
+        }
+
+        private void GenerateApplicationProject(
+            string srcPath,
+            string nameSpace,
+            string projectName,
+            ObservableCollection<GeneratedClass> applicationClasses)
+        {
+            #region Applications Project
+            string applicationProjectPath = string.IsNullOrEmpty(nameSpace)
+                ? Path.Combine(srcPath, $"{projectName}.{ApplicationGenerator.ApplicationProjectSufix}")
+                : Path.Combine(srcPath, $"{projectName}.{nameSpace}.{ApplicationGenerator.ApplicationProjectSufix}");
+
+            if (Directory.Exists(applicationProjectPath))
+                Directory.Delete(applicationProjectPath, true);
+
+            Directory.CreateDirectory(applicationProjectPath);
+
+            TreeList<string> namespaceApplicationTreeList = new TreeList<string>(projectName);
+
+            string applicationClassesNamespace = string.IsNullOrEmpty(nameSpace)
+                ? $"{projectName}.{ApplicationGenerator.ApplicationProjectSufix}"
+                : $"{projectName}.{nameSpace}.{ApplicationGenerator.ApplicationProjectSufix}";
+
+            foreach (GeneratedClass generatedClass in applicationClasses)
+            {
+                string applicationsProjectFolderPath = applicationProjectPath;
+
+                List<string> partialNamespaceList = new List<string>(
+                    generatedClass.ClassNameSpace == applicationClassesNamespace
+                        ? Enumerable.Empty<string>()
+                        : generatedClass.ClassNameSpace.Replace($"{applicationClassesNamespace}.", "").Split('.'));
+
+                TreeNode<string> currentTreeNode = namespaceApplicationTreeList.Root;
+                while (partialNamespaceList.Count > 0)
+                {
+                    string partialNamespace = partialNamespaceList[0];
+                    TreeNode<string> treeNode = currentTreeNode.Find(partialNamespace);
+                    if (treeNode == null)
+                    {
+                        currentTreeNode = currentTreeNode.AddOrGet(partialNamespace);
+                    }
+                    else
+                        currentTreeNode = treeNode;
+
+                    applicationsProjectFolderPath = Path.Combine(applicationsProjectFolderPath, partialNamespace);
+                    if (!Directory.Exists(applicationsProjectFolderPath))
+                        Directory.CreateDirectory(applicationsProjectFolderPath);
+
+                    partialNamespaceList.RemoveAt(0);
+                }
+
+                StreamWriter streamWriterClass = new StreamWriter(Path.Combine(applicationsProjectFolderPath, $"{generatedClass.ClassName}.cs"));
+                streamWriterClass.Write(generatedClass.ClassContent);
+                streamWriterClass.Close();
+                streamWriterClass.Dispose();
+            }
+
+            StreamWriter streamWriterProject =
+                string.IsNullOrEmpty(nameSpace)
+                ? new StreamWriter(Path.Combine(applicationProjectPath, $"{projectName}.{ApplicationGenerator.ApplicationProjectSufix}.csproj"))
+                : new StreamWriter(Path.Combine(applicationProjectPath, $"{projectName}.{nameSpace}.{ApplicationGenerator.ApplicationProjectSufix}.csproj"));
+            streamWriterProject.Write(
+@"<Project Sdk=""Microsoft.NET.Sdk"">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net461;net462</TargetFrameworks>
+    <Nullable>disable</Nullable>
+    <LangVersion>10.0</LangVersion>
+  </PropertyGroup>
+
+</Project>");
+            streamWriterProject.Close();
+            streamWriterProject.Dispose();
+            #endregion
         }
 
         private void SchemaTableMappingsObservableCollectionCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -413,6 +544,9 @@ namespace CrudGenerator.Core.ViewModels
             {
                 if ((_modelGenerator != null) && (_modelGenerator.GeneratedClasses != null))
                     _modelGenerator.GeneratedClasses.Clear();
+
+                if ((_applicationGenerator != null) && (_applicationGenerator.GeneratedClasses != null))
+                    _applicationGenerator.GeneratedClasses.Clear();
             }
         }
 

@@ -18,13 +18,20 @@ namespace CrudGenerator.Core
         public const string ModelNamespaceSufix = "Models";
         public const string DependencyInversionNamespaceSufix = "DependencyInversion";
 
+        public const string TableMappingNameSufix = "TableMapping";
+        public const string EntityNameSufix = "Entity";
+        public const string IdentityNameSufix = "Identity";
+        public const string DatabaseRepositoryNameSufix = "DatabaseRepository";
+
         /// <summary>
-        /// {field type},{field name}
+        /// {field type}
+        /// {field name}
         /// </summary>
         private const string fieldTemplate =
 @"        private {0} _{1};";
 
-        // {parameter type},{parameter name}
+        // {parameter type}
+        // {parameter name}
         private const string constructorParameterTemplate =
 @"            {0} {1}";
 
@@ -35,13 +42,16 @@ namespace CrudGenerator.Core
 @"            Framework.Validation.Requires.NotNull({0}, nameof({0}));";
 
         /// <summary>
-        /// {field name}, {parametername}
+        /// {field name}
+        /// {parametername}
         /// </summary>
         private const string fieldAssignmentTemplate =
 @"            _{0} = {0};";
 
         /// <summary>
-        /// {property type},{property name},{field name}
+        /// {property type}
+        /// {property name}
+        /// {field name}
         /// </summary>
         private const string propertyTemplate = @"
         public {0} {1}
@@ -51,7 +61,10 @@ namespace CrudGenerator.Core
         }}";
 
         /// <summary>
-        /// {identity class name},  {equality confition}, {hashcode properties list}, { toString properties list}
+        /// {identity class name}
+        /// {equality condition}
+        /// {hashcode properties list}
+        /// {toString properties list}
         /// </summary>
         private const string equatableImplementationTemplate =
 @"        public bool Equals({0} other)
@@ -85,7 +98,8 @@ namespace CrudGenerator.Core
         }}";
 
         /// <summary>
-        /// {identity class name}, {comparasion condition}
+        /// {identity class name}
+        /// {comparasion condition}
         /// </summary>
         private const string comparableImplementationTemplate =
 @"        int IComparable.CompareTo(object obj)
@@ -107,7 +121,14 @@ namespace CrudGenerator.Core
         }}";
 
         /// <summary>
-        /// {class name}, {class fields}, {constructor parameters}, {parameters validation}, {field assignments}, {class properties}, {equatable implementation}, {comparable implementation}
+        /// {class name}
+        /// {class fields}
+        /// {constructor parameters}
+        /// {parameters validation}
+        /// {field assignments}
+        /// {class properties}
+        /// {equatable implementation}
+        /// {comparable implementation}
         /// </summary>
         private const string identityClassTemplate = @"
     public class {0}
@@ -138,7 +159,15 @@ namespace CrudGenerator.Core
     }}";
 
         /// <summary>
-        /// {class name}, {identity class name}, {class fields}, {identity parameter name}, {constructor parameters}, {constructor parameters validation}, {field assignments}, {class properties}, {update field functions}
+        /// {class name}
+        /// {identity class name}
+        /// {class fields}
+        /// {identity parameter name}
+        /// {constructor parameters}
+        /// {constructor parameters validation}
+        /// {field assignments}
+        /// {class properties}
+        /// {update field functions}
         /// </summary>
         private const string entityClassTemplate = @"
     public class {0} : EntityBase<{1}>
@@ -160,13 +189,20 @@ namespace CrudGenerator.Core
     }}";
 
         /// <summary>
-        /// {field column name}, {column name},
+        /// {field column name}
+        /// {column name},
         /// </summary>
         private const string tableMappingFieldColumnNameTemplate = @"
         public const string {0} = ""{1}"";";
 
         /// <summary>
-        /// {field column name}, {column database type}, {is primary key column}, {is auto incremented column}, {is not null}, {default value}, {max length}
+        /// {field column name}
+        /// {column database type}
+        /// {is primary key column}
+        /// {is auto incremented column}
+        /// {is not null}
+        /// {default value}
+        /// {max length}
         /// </summary>
         private const string tableMappingColumnInfoTemplate = @"
             yield return new ColumnInfo(
@@ -182,13 +218,16 @@ namespace CrudGenerator.Core
             return Enumerable.Empty<IndexInfo>();";
 
         /// <summary>
-        /// {table name}, {field column name}
+        /// {table name}
+        /// {field column name}
         /// </summary>
         private const string tableMappingIndexInfosTemplate = @"
             yield return new IndexInfo(""idx_"" + {0} + ""_"" + {1}, unique: true, new IndexColumnInfo({1}));";
 
         /// <summary>
-        /// {foreign field column name}, {referenced table name}, {referenced field column name}
+        /// {foreign field column name}
+        /// {referenced table name}
+        /// {referenced field column name}
         /// </summary>
         private const string tableMappingAssociationInfoTemplate = @"
                 new AssociationColumnInfo({0}, {1}TableMapping.{2})";
@@ -197,7 +236,8 @@ namespace CrudGenerator.Core
             return Enumerable.Empty<AssociationInfo>();";
 
         /// <summary>
-        /// {referenced table name}, {association infos list}
+        /// {referenced table name}
+        /// {association infos list}
         /// </summary>
         private const string tableMappingAssociationInfoListTemplate = @"
             yield return new AssociationInfo(
@@ -205,7 +245,12 @@ namespace CrudGenerator.Core
 {1});";
 
         /// <summary>
-        /// {table mapping name},  {table name}, {field column names list}, {column infos list}, {index infos list}, {association infos list}, 
+        /// {table mapping name}
+        /// {table name}
+        /// {field column names list}
+        /// {column infos list}
+        /// {index infos list}
+        /// {association infos list}
         /// </summary>
         private const string tableMappingTemplate = @"
     public sealed class {0}
@@ -313,7 +358,11 @@ namespace CrudGenerator.Core
     }}";
 
         /// <summary>
-        /// {entity type}, {identity type}, {identity filed type}, {identity generator type}, {create identity function}
+        /// {entity type}
+        /// {identity type}
+        /// {identity filed type}
+        /// {identity generator type}
+        /// {create identity function}
         /// </summary>
         private const string noVersionedDatabaseRepositoryWithIdentityTemplate = @"
     public class {0}DatabaseRepository
@@ -337,7 +386,7 @@ namespace CrudGenerator.Core
             DeleteOneFactory<{0}, {1}> deleteOneFactory,
             CountAllFactory<{0}> countAllFactory,
             CountAllByDynamicCriteriaFactory<{0}> countAllByDynamicCriteriaFactory,
-            DataModelToDatabaseAdapter<{0}> dataModelToDatabaseAdapter,
+            DataTransferObjectToDatabaseAdapter<{0}> dataTransferObjectToDatabaseAdapter,
             ConnectionManager connectionManager)
             : base(
                   identityGenerator,
@@ -351,7 +400,7 @@ namespace CrudGenerator.Core
                   deleteOneFactory,
                   countAllFactory,
                   countAllByDynamicCriteriaFactory,
-                  dataModelToDatabaseAdapter,
+                  dataTransferObjectToDatabaseAdapter,
                   connectionManager)
         {{
             findOneQuery = findOneJoinedFactory.Create();
@@ -360,7 +409,8 @@ namespace CrudGenerator.Core
     }}";
 
         /// <summary>
-        /// {entity type}, {identity type}
+        /// {entity type}
+        /// {identity type}
         /// </summary>
         private const string noVersionedDatabaseRepositoryTemplate = @"
     public class {0}DatabaseRepository
@@ -381,7 +431,7 @@ namespace CrudGenerator.Core
             DeleteOneFactory<{0}, {1}> deleteOneFactory,
             CountAllFactory<{0}> countAllFactory,
             CountAllByDynamicCriteriaFactory<{0}> countAllByDynamicCriteriaFactory,
-            DataModelToDatabaseAdapter<{0}> dataModelToDatabaseAdapter,
+            DataTransferObjectToDatabaseAdapter<{0}> dataTransferObjectToDatabaseAdapter,
             ConnectionManager connectionManager)
             : base(
                   createTableFactory,
@@ -394,7 +444,7 @@ namespace CrudGenerator.Core
                   deleteOneFactory,
                   countAllFactory,
                   countAllByDynamicCriteriaFactory,
-                  dataModelToDatabaseAdapter,
+                  dataTransferObjectToDatabaseAdapter,
                   connectionManager)
         {{
             findOneQuery = findOneJoinedFactory.Create();
@@ -403,7 +453,8 @@ namespace CrudGenerator.Core
     }}";
 
         /// <summary>
-        /// {identity type}, {identity field type}
+        /// {identity type}
+        /// {identity field type}
         /// </summary>
         private const string createDatabaseIdentityFunctionTemplate = @"
         public async Task<{0}> CreateNewIdentity(IWorkContext context = null)
@@ -416,7 +467,11 @@ namespace CrudGenerator.Core
         }}";
 
         /// <summary>
-        /// {dependency identity class type}, {dependency entity class type}, {dependency identity parameter}, {identity type}, {identity field type}
+        /// {dependency identity class type}
+        /// {dependency entity class type}
+        /// {dependency identity parameter}
+        /// {identity type}
+        /// {identity field type}
         /// </summary>
         private const string createDatabaseIdentityWithScopeFunctionTemplate = @"
         public async Task<{3}> CreateNewIdentity(
@@ -431,7 +486,8 @@ namespace CrudGenerator.Core
         }}";
 
         /// <summary>
-        /// {container builder class name}, {container registrations class name}
+        /// {container builder class name}
+        /// {container registrations class name}
         /// </summary>
         private const string createContainerBuilderTemplate = @"
     public class {0} : ImmutableContainerBuilder
@@ -571,7 +627,9 @@ namespace CrudGenerator.Core
     }}";
 
         /// <summary>
-        /// {namespace}, {class implementation}, {namespace dependencies}
+        /// {namespace}
+        /// {class implementation}
+        /// {namespace dependencies}
         /// </summary>
         private const string nameSpaceTemplate =
 @"{2}
@@ -703,7 +761,7 @@ namespace {0}
             foreach (KeyValuePair<string, SchemaInformationTableMapping> schemaInformationTableMapping in _schemaInformation.SchemaTableMappings.OrderBy(kp => kp.Value.Order))
             {
                 string tableName = schemaInformationTableMapping.Key.ToLower();
-                string identityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}Identity";
+                string identityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}{IdentityNameSufix}";
                 _identityClassNamesMap.Add(tableName, identityClassName);
 
                 string classNameSpace =
@@ -842,8 +900,8 @@ namespace {0}
                 {
                     foreach (string namespaceDependency in _namespaceDependenciesMap[tableName.ToLower()])
                     {
-                        string dependencyIdentityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}Identity";
-                        string dependencyEntityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}Entity";
+                        string dependencyIdentityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}{IdentityNameSufix}";
+                        string dependencyEntityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}{EntityNameSufix}";
 
                         if (_namespacesMap.ContainsKey(namespaceDependency) &&
                             (generatedIdentityClass.Contains(dependencyIdentityClassName) || generatedIdentityClass.Contains(dependencyEntityClassName)))
@@ -875,8 +933,8 @@ namespace {0}
             foreach (KeyValuePair<string, SchemaInformationTableMapping> schemaInformationTableMapping in _schemaInformation.SchemaTableMappings.OrderBy(kp => kp.Value.Order))
             {
                 string tableName = schemaInformationTableMapping.Key.ToLower();
-                string identityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}Identity";
-                string entityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}Entity";
+                string identityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}{IdentityNameSufix}";
+                string entityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}{EntityNameSufix}";
                 _entityClassNamesMap.Add(tableName, entityClassName);
 
                 string classNameSpace =
@@ -929,7 +987,7 @@ namespace {0}
                         string.Format(
                             propertyTemplate,
                             columnType,
-                            CultureInfo.CurrentCulture.TextInfo.ToTitleCase($"{tableName}Identity"),
+                            identityClassName,
                             $"{tableName}Identity"));
 
                     fieldAssignments.Add(
@@ -1065,8 +1123,8 @@ namespace {0}
                 {
                     foreach (string namespaceDependency in _namespaceDependenciesMap[tableName.ToLower()])
                     {
-                        string dependencyIdentityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}Identity";
-                        string dependencyEntityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}Entity";
+                        string dependencyIdentityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}{IdentityNameSufix}";
+                        string dependencyEntityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}{EntityNameSufix}";
 
                         if (_namespacesMap.ContainsKey(namespaceDependency) &&
                             (generatedEntityClass.Contains(dependencyIdentityClassName) || generatedEntityClass.Contains(dependencyEntityClassName)))
@@ -1099,7 +1157,7 @@ namespace {0}
             {
                 SchemaInformationTableMapping schemaInformationTableMapping = schemaInformationTableMappingPair.Value;
                 string tableName = schemaInformationTableMappingPair.Key.ToLower();
-                string tableMappintClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}TableMapping";
+                string tableMappintClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}{TableMappingNameSufix}";
                 _tableMappingClassNamesMap.Add(tableName, tableMappintClassName);
 
                 string classNameSpace =
@@ -1285,7 +1343,7 @@ namespace {0}
                 {
                     foreach (string namespaceDependency in _namespaceDependenciesMap[tableName.ToLower()])
                     {
-                        string dependencyTableMappingClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}TableMapping";
+                        string dependencyTableMappingClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}{TableMappingNameSufix}";
                         if (_namespacesMap.ContainsKey(namespaceDependency) && generatedTableMappingClass.Contains(dependencyTableMappingClassName))
                             namespaceDependenciesList.Add(_namespacesMap[namespaceDependency]);
                     }
@@ -1554,7 +1612,7 @@ namespace {0}
             {
                 SchemaInformationTableMapping schemaInformationTableMapping = schemaInformationTableMappingPair.Value;
                 string tableName = schemaInformationTableMappingPair.Key.ToLower();
-                string databaseRepositoryClassName = $"{_entityClassNamesMap[tableName]}DatabaseRepository";
+                string databaseRepositoryClassName = $"{_entityClassNamesMap[tableName]}{DatabaseRepositoryNameSufix}";
                 _databaseRepositoryClassNamesMap.Add(tableName, databaseRepositoryClassName);
 
                 string classNameSpace =
@@ -1574,7 +1632,7 @@ namespace {0}
                 List<ColumnInfo> primaryKeyColumns = new List<ColumnInfo>(schemaInformationTableMapping.Columns.Where(col => col.IsPrimaryKey));
                 int primaryKeyColumnsCount = primaryKeyColumns.Count;
 
-                if (primaryKeyColumns.Count <= 2)
+                if (primaryKeyColumns.Count > 0)
                 {
                     while (primaryKeyColumns.Count > 0)
                     {
@@ -1582,7 +1640,10 @@ namespace {0}
                         primaryKeyColumns.RemoveAt(0);
 
                         string columnType = primaryKeyColumn.ResolveSystemTypeName();
-                        ForeignKeyValueColletion foreignKeyValueColletion = schemaInformationTableMapping.ForeignKeyValues.FirstOrDefault(fkv => fkv.ForeignKeyValueList.Where(fkv => fkv.ForeignColunmnsToReferencedColumns.Any(fctrc => fctrc.ForeignColumn == primaryKeyColumn.Name.ToLower())).Any());
+                        ForeignKeyValueColletion foreignKeyValueColletion = schemaInformationTableMapping.ForeignKeyValues
+                            .FirstOrDefault(fkv => fkv.ForeignKeyValueList
+                                .Where(fkv => fkv.ForeignColunmnsToReferencedColumns
+                                    .Any(fctrc => fctrc.ForeignColumn == primaryKeyColumn.Name.ToLower())).Any());
 
                         if (foreignKeyValueColletion == null)
                         {
@@ -1594,6 +1655,17 @@ namespace {0}
                         }
                         else if (foreignKeyValueColletion != null)
                         {
+                            // Remove da lista primaryKeyColumns, colunas que compôem chave estrangeira referenciada pela chave primária da tabela atual
+                            foreach (ForeignKeyValue foreignKeyValue1 in foreignKeyValueColletion.ForeignKeyValueList)
+                            {
+                                foreach (ForeignColunmnToReferencedColumn foreignColunmnToReferencedColumn in foreignKeyValue1.ForeignColunmnsToReferencedColumns)
+                                {
+                                    ColumnInfo foreignKeyColumnInfo = primaryKeyColumns.FirstOrDefault(pkColumn => pkColumn.Name.ToUpper() == foreignColunmnToReferencedColumn.ForeignColumn.ToUpper());
+                                    if (!string.IsNullOrEmpty(foreignKeyColumnInfo.Name))
+                                        primaryKeyColumns.Remove(foreignKeyColumnInfo);
+                                }
+                            }
+
                             ForeignKeyValue foreignKeyValue =
                                 foreignKeyValueColletion.ForeignKeyValueList.FirstOrDefault(fkv => fkv.ForeignColunmnsToReferencedColumns.Any(fctrc => fctrc.IsPrimaryKey && fctrc.ForeignColumn == primaryKeyColumn.Name.ToLower()));
 
@@ -1698,8 +1770,8 @@ namespace {0}
                 {
                     foreach (string namespaceDependency in _namespaceDependenciesMap[tableName.ToLower()])
                     {
-                        string dependencyIdentityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}Identity";
-                        string dependencyEntityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}Entity";
+                        string dependencyIdentityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}{IdentityNameSufix}";
+                        string dependencyEntityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}{EntityNameSufix}";
                         if (_namespacesMap.ContainsKey(namespaceDependency) &&
                             (generatedDatabaseRepositoryClass.Contains(dependencyIdentityClassName) || generatedDatabaseRepositoryClass.Contains(dependencyEntityClassName)))
                             namespaceDependenciesList.Add(_namespacesMap[namespaceDependency]);

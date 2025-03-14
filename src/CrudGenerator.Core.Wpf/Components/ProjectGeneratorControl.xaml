@@ -182,39 +182,79 @@
                     Grid.Row="0"
                     Margin="10,5"
                     FontSize="16"
-                    FontWeight="Bold">
-                    <TextBlock.Inlines>
-                        <Run Text="{x:Static messages:Messages.GeneratedClasses}" />
-                        <LineBreak />
-                        <Run Text=" - Model Classes (" />
-                        <Run Text="{Binding Path=ProjectGeneratorViewModel.GeneratedModelClasses.Count, ElementName=projectGeneratorControl, Mode=OneWay}" />
-                        <Run Text=")" />
-                    </TextBlock.Inlines>
-                </TextBlock>
+                    FontWeight="Bold"
+                    Text="{x:Static messages:Messages.GeneratedClasses}" />
+
                 <Border
                     Grid.Row="1"
                     Margin="10,5"
                     BorderBrush="Black"
                     BorderThickness="1">
-                    <TreeView
-                        HorizontalAlignment="Stretch"
-                        VerticalAlignment="Stretch"
-                        ItemsSource="{Binding Path=ProjectGeneratorViewModel.GeneratedModelClasses, ElementName=projectGeneratorControl, UpdateSourceTrigger=PropertyChanged}"
-                        SelectedItemChanged="TreeViewSelectedItemChanged">
-                        <TreeView.Resources>
-                            <HierarchicalDataTemplate DataType="{x:Type classGeneratorCore:GeneratedClassGroupedByNamespace}" ItemsSource="{Binding Path=GeneratedClasses}">
-                                <TextBlock Text="{Binding Path=NameSpace}" />
-                            </HierarchicalDataTemplate>
+                    <TabControl Margin="5">
+                        <TabItem>
+                            <TabItem.Header>
+                                <TextBlock FontSize="12" FontWeight="Bold">
+                                    <TextBlock.Inlines>
+                                        <Run Text="Model (" />
+                                        <Run Text="{Binding Path=ProjectGeneratorViewModel.ModelGenerator.GeneratedClasses.Count, ElementName=projectGeneratorControl, Mode=OneWay}" />
+                                        <Run Text=")" />
+                                    </TextBlock.Inlines>
+                                </TextBlock>
+                            </TabItem.Header>
 
-                            <HierarchicalDataTemplate DataType="{x:Type classGeneratorCore:GeneratedClassFromSchemaInformationTableMapping}">
-                                <TextBlock Text="{Binding Path=ClassName}" />
-                            </HierarchicalDataTemplate>
+                            <TreeView
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch"
+                                ItemsSource="{Binding Path=ProjectGeneratorViewModel.GeneratedModelClasses, ElementName=projectGeneratorControl, UpdateSourceTrigger=PropertyChanged}"
+                                SelectedItemChanged="TreeViewSelectedItemChanged">
+                                <TreeView.Resources>
+                                    <HierarchicalDataTemplate DataType="{x:Type classGeneratorCore:GeneratedClassGroupedByNamespace}" ItemsSource="{Binding Path=GeneratedClasses, Mode=OneWay}">
+                                        <TextBlock Text="{Binding Path=NameSpace}" />
+                                    </HierarchicalDataTemplate>
 
-                            <HierarchicalDataTemplate DataType="{x:Type classGeneratorCore:GeneratedClass}">
-                                <TextBlock Text="{Binding Path=ClassName}" />
-                            </HierarchicalDataTemplate>
-                        </TreeView.Resources>
-                    </TreeView>
+                                    <HierarchicalDataTemplate DataType="{x:Type classGeneratorCore:GeneratedClassFromSchemaInformationTableMapping}">
+                                        <TextBlock Text="{Binding Path=ClassName}" />
+                                    </HierarchicalDataTemplate>
+
+                                    <HierarchicalDataTemplate DataType="{x:Type classGeneratorCore:GeneratedClass}">
+                                        <TextBlock Text="{Binding Path=ClassName}" />
+                                    </HierarchicalDataTemplate>
+                                </TreeView.Resources>
+                            </TreeView>
+                        </TabItem>
+
+                        <TabItem>
+                            <TabItem.Header>
+                                <TextBlock FontSize="12" FontWeight="Bold">
+                                    <TextBlock.Inlines>
+                                        <Run Text="Application (" />
+                                        <Run Text="{Binding Path=ProjectGeneratorViewModel.ApplicationGenerator.GeneratedClasses.Count, ElementName=projectGeneratorControl, Mode=OneWay}" />
+                                        <Run Text=")" />
+                                    </TextBlock.Inlines>
+                                </TextBlock>
+                            </TabItem.Header>
+
+                            <TreeView
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch"
+                                ItemsSource="{Binding Path=ProjectGeneratorViewModel.GeneratedApplicationClasses, ElementName=projectGeneratorControl, UpdateSourceTrigger=PropertyChanged}"
+                                SelectedItemChanged="TreeViewSelectedItemChanged">
+                                <TreeView.Resources>
+                                    <HierarchicalDataTemplate DataType="{x:Type classGeneratorCore:GeneratedClassGroupedByNamespace}" ItemsSource="{Binding Path=GeneratedClasses, Mode=OneWay}">
+                                        <TextBlock Text="{Binding Path=NameSpace}" />
+                                    </HierarchicalDataTemplate>
+
+                                    <HierarchicalDataTemplate DataType="{x:Type classGeneratorCore:GeneratedClassFromSchemaInformationTableMapping}">
+                                        <TextBlock Text="{Binding Path=ClassName}" />
+                                    </HierarchicalDataTemplate>
+
+                                    <HierarchicalDataTemplate DataType="{x:Type classGeneratorCore:GeneratedClass}">
+                                        <TextBlock Text="{Binding Path=ClassName}" />
+                                    </HierarchicalDataTemplate>
+                                </TreeView.Resources>
+                            </TreeView>
+                        </TabItem>
+                    </TabControl>
                 </Border>
             </Grid>
         </Border>
