@@ -18,6 +18,7 @@ namespace CrudGenerator.Core
         public const string ModelNamespaceSufix = "Models";
         public const string DependencyInversionNamespaceSufix = "DependencyInversion";
 
+        public const string TableMappingNameSufix = "TableMapping";
         public const string EntityNameSufix = "Entity";
         public const string IdentityNameSufix = "Identity";
         public const string DatabaseRepositoryNameSufix = "DatabaseRepository";
@@ -61,7 +62,7 @@ namespace CrudGenerator.Core
 
         /// <summary>
         /// {identity class name}
-        /// {equality confition}
+        /// {equality condition}
         /// {hashcode properties list}
         /// {toString properties list}
         /// </summary>
@@ -385,7 +386,7 @@ namespace CrudGenerator.Core
             DeleteOneFactory<{0}, {1}> deleteOneFactory,
             CountAllFactory<{0}> countAllFactory,
             CountAllByDynamicCriteriaFactory<{0}> countAllByDynamicCriteriaFactory,
-            DataModelToDatabaseAdapter<{0}> dataModelToDatabaseAdapter,
+            DataTransferObjectToDatabaseAdapter<{0}> dataTransferObjectToDatabaseAdapter,
             ConnectionManager connectionManager)
             : base(
                   identityGenerator,
@@ -399,7 +400,7 @@ namespace CrudGenerator.Core
                   deleteOneFactory,
                   countAllFactory,
                   countAllByDynamicCriteriaFactory,
-                  dataModelToDatabaseAdapter,
+                  dataTransferObjectToDatabaseAdapter,
                   connectionManager)
         {{
             findOneQuery = findOneJoinedFactory.Create();
@@ -430,7 +431,7 @@ namespace CrudGenerator.Core
             DeleteOneFactory<{0}, {1}> deleteOneFactory,
             CountAllFactory<{0}> countAllFactory,
             CountAllByDynamicCriteriaFactory<{0}> countAllByDynamicCriteriaFactory,
-            DataModelToDatabaseAdapter<{0}> dataModelToDatabaseAdapter,
+            DataTransferObjectToDatabaseAdapter<{0}> dataTransferObjectToDatabaseAdapter,
             ConnectionManager connectionManager)
             : base(
                   createTableFactory,
@@ -443,7 +444,7 @@ namespace CrudGenerator.Core
                   deleteOneFactory,
                   countAllFactory,
                   countAllByDynamicCriteriaFactory,
-                  dataModelToDatabaseAdapter,
+                  dataTransferObjectToDatabaseAdapter,
                   connectionManager)
         {{
             findOneQuery = findOneJoinedFactory.Create();
@@ -760,7 +761,7 @@ namespace {0}
             foreach (KeyValuePair<string, SchemaInformationTableMapping> schemaInformationTableMapping in _schemaInformation.SchemaTableMappings.OrderBy(kp => kp.Value.Order))
             {
                 string tableName = schemaInformationTableMapping.Key.ToLower();
-                string identityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}Identity";
+                string identityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}{IdentityNameSufix}";
                 _identityClassNamesMap.Add(tableName, identityClassName);
 
                 string classNameSpace =
@@ -986,7 +987,7 @@ namespace {0}
                         string.Format(
                             propertyTemplate,
                             columnType,
-                            CultureInfo.CurrentCulture.TextInfo.ToTitleCase($"{tableName}Identity"),
+                            identityClassName,
                             $"{tableName}Identity"));
 
                     fieldAssignments.Add(
@@ -1156,7 +1157,7 @@ namespace {0}
             {
                 SchemaInformationTableMapping schemaInformationTableMapping = schemaInformationTableMappingPair.Value;
                 string tableName = schemaInformationTableMappingPair.Key.ToLower();
-                string tableMappintClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}TableMapping";
+                string tableMappintClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}{TableMappingNameSufix}";
                 _tableMappingClassNamesMap.Add(tableName, tableMappintClassName);
 
                 string classNameSpace =
@@ -1342,7 +1343,7 @@ namespace {0}
                 {
                     foreach (string namespaceDependency in _namespaceDependenciesMap[tableName.ToLower()])
                     {
-                        string dependencyTableMappingClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}TableMapping";
+                        string dependencyTableMappingClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}{TableMappingNameSufix}";
                         if (_namespacesMap.ContainsKey(namespaceDependency) && generatedTableMappingClass.Contains(dependencyTableMappingClassName))
                             namespaceDependenciesList.Add(_namespacesMap[namespaceDependency]);
                     }

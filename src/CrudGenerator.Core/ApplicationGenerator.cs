@@ -23,10 +23,14 @@ namespace CrudGenerator.Core
         private const string DataTransferObjectNameSufix = "Dto";
         private const string IdentityDataTransferObjectNameSufix = "IdentityDto";
 
+        private const string LogStoragetaNameSufix = "LogStorage";
+        private const string ApplicationMetadataNameSufix = "ApplicationMetadata";
+
         private const string InsertedEventNameSufix = "Inserted";
         private const string UpdatedEventNameSufix = "Updated";
         private const string DeletedEventNameSufix = "Deleted";
         private const string DataAdapterNameSufix = "DataAdapter";
+        private const string DataTransferObjectToDatabaseAdapterNameSufix = "DataTransferObjectToDadatabseAdapter";
         private const string CrudServiceNameSufix = "CrudService";
 
         /// <summary>
@@ -93,7 +97,7 @@ namespace CrudGenerator.Core
                 {{
                     _{2} = value;
                     if (_{2} != null)
-                        Id = new {3}(Identity, {2}.Id);
+                        Id = new {3}(Identity, _{2}.Id);
 
                     PropertyChangedDispatcher.Notify(nameof({1}));
                     PropertyChangedDispatcher.Notify(nameof(Id));
@@ -135,12 +139,46 @@ namespace CrudGenerator.Core
         }}";
 
         /// <summary>
-        /// {identity class name}
-        /// {equality confition}
+        /// {property type}
+        /// {field name}
+        /// {property name}
+        /// {foreign group field name}
+        /// {identity data transfer object type}
+        /// {foreign group attribute}
+        /// {custom display attribute}
+        /// </summary>
+        private const string foreignPropertyTemplate = @"
+        [Required]
+        {5}
+        {6}
+        public {0} {2}
+        {{
+            get 
+            {{
+                return _{1};
+            }}
+
+            set
+            {{
+                if (_{1} != value)
+                {{
+                    _{1} = value;
+                    if (_{1} != null)
+                        Id = new {4}(Identity, _{1}.Id);
+
+                    PropertyChangedDispatcher.Notify(nameof({2}));
+                    PropertyChangedDispatcher.Notify(nameof(Id));
+                }}
+            }}
+        }}";
+
+        /// <summary>
+        /// {data transfer object class name}
+        /// {equality condition}
         /// {hashcode properties list}
         /// {toString properties list}
         /// </summary>
-        private const string equatableImplementationTemplate =
+        private const string identityDataTransferObjectEquatableImplementationTemplate =
 @"        public bool Equals({0} other)
         {{
             if (other is null)
@@ -168,7 +206,45 @@ namespace CrudGenerator.Core
 
         public override string ToString()
         {{
-            return {3};
+            return $""{3}"";
+        }}";
+
+        /// <summary>
+        /// {data transfer object class name}
+        /// {equality condition}
+        /// {hashcode properties list}
+        /// {toString properties list}
+        /// </summary>
+        private const string dataTransferObjectEquatableImplementationTemplate =
+@"        public bool Equals({0} other)
+        {{
+            if (other is null)
+            {{
+                return false;
+            }}
+
+            if (ReferenceEquals(this, other))
+            {{
+                return true;
+            }}
+
+            return base.Equals(this){1};
+        }}
+
+        public override bool Equals(object obj)
+        {{
+            return ReferenceEquals(this, obj) || (obj is {0} other && Equals(other));
+        }}
+
+        public override int GetHashCode()
+        {{
+            return HashCode.Combine(
+                base.GetHashCode(){2});
+        }}
+
+        public override string ToString()
+        {{
+            return $""{{Id}}{3}"";
         }}";
 
         /// <summary>
@@ -182,6 +258,7 @@ namespace CrudGenerator.Core
         /// {class properties}
         /// {equatable implementation}
         /// {serialization write properties}
+        /// {clone parameters}
         /// </summary>
         private const string identityClassTemplate = @"
     [Serializable]
@@ -217,12 +294,12 @@ namespace CrudGenerator.Core
         public static bool operator !=({0} left, {0} right) => !Equals(left, right);
 
         public static bool operator ==({0} left, {0} right) => Equals(left, right);
-
 {8}
 
         public {0} Clone()
         {{
-            return this;
+            return new {0}(
+{10});
         }}
 
         object ICloneable.Clone()
@@ -255,10 +332,15 @@ namespace CrudGenerator.Core
         /// {serialization read properties assignments}
         /// {class properties}
         /// {serialization write properties}
+        /// {class custom display name}
+        /// {class custom display order}
+        /// {equatable implementation}
+        /// {clone parameters}
         /// </summary>
         private const string dataTransferObjectClassTemplate = @"
     [Serializable]
-    public class {0} : 
+    [CustomDisplay(""{11}"", Order = {12}, GroupName = ""CRUD"")]
+    public class {0}
         : DtoBase<{0}, {1}, {2}>, IEquatable<{0}>
     {{
 {3}
@@ -290,6 +372,17 @@ namespace CrudGenerator.Core
             set => Id.Id = value;
         }}
 {9}
+
+        public static bool operator !=({0} left, {0} right) => !Equals(left, right);
+
+        public static bool operator ==({0} left, {0} right) => Equals(left, right);
+
+        public override {0} Clone()
+        {{
+            return new {0}(
+                Id.Clone(){14});
+        }}
+{13}
 
         protected override void GetObjectData(SerializationInfo info, StreamingContext context)
         {{
@@ -357,6 +450,58 @@ namespace CrudGenerator.Core
     }}";
 
         /// <summary>
+        /// {data transfer object property path}
+        /// {table mapping property path}
+        /// </summary>
+        private const string dataTransferObjectPropertyToTableMappingPropertyTemplate = @"
+                {{
+                    {0},
+                    {1}
+                }}";
+
+        /// <summary>
+        /// {data transfer object to database adapter class name}
+        /// {entity type}
+        /// {database adapter field name}
+        /// {object to database adapter field name}
+        /// {data transfer object properties to table mapping properties map list}
+        /// </summary>
+        private const string dataTransferObjectToDatabaseAdapterTemplate = @"
+    public class {0} : DataTransferObjectToDatabaseAdapter<{1}>
+    {{
+        private readonly IDatabaseAdapter<{1}> _{2};
+        private readonly IObjectToDatabaseAdapter<{1}> _{3};
+
+        public {0}(
+            IDatabaseAdapter<{1}> {2},
+            IObjectToDatabaseAdapter<{1}> {3})
+        {{
+            Requires.NotNull({2}, nameof({2}));
+            Requires.NotNull({3}, nameof({3}));
+
+            _{2} = {2};
+            _{3} = {3};
+
+            // TODO: Validar se mapeamento para propriedades que compôem chave primário está completo
+            DtoPropertyNameAndColumnNameMap = new Map<string, string>
+            {{{4}
+            }};
+        }}
+
+        protected override Map<string, string> DtoPropertyNameAndColumnNameMap {{ get; }}
+
+        public override {1} FromDataReader(MappedDbDataReader reader, string columnAlias = null)
+        {{
+            return _{2}.FromDataReader(reader, columnAlias);
+        }}
+
+        public override IEnumerable<DbParameterDefinition> ToDbParameters({1} value)
+        {{
+            return _{3}.ToDbParameters(value);
+        }}
+    }}";
+
+        /// <summary>
         /// {crud service class name}
         /// {data transfer object type}
         /// {data transfer object identity type}
@@ -386,7 +531,7 @@ namespace CrudGenerator.Core
     {{
         {10} _{11};
 
-        public EmpresaCrudService(
+        public {0}(
             IBus bus,
             IEventPublisher eventPublisher,
             ILogStorage logStorage,
@@ -398,7 +543,7 @@ namespace CrudGenerator.Core
 
         public override async Task GenerateIdentity({6} entity)
         {{
-            entity.Identity = await _{11}.CreateNewIdentity();
+            entity.{7} = await _{11}.CreateNewIdentity();
         }}
 
         public override bool HasDefaultIdentity({6} entity)
@@ -492,6 +637,16 @@ namespace CrudGenerator.Core
     }}";
 
         /// <summary>
+        /// {data transfer object property path}
+        /// {data transfer object property value}
+        /// </summary>
+        private const string parentMatchCriteriaOperatorTemplate = @"
+                new MatchCriteriaOperator(
+                    $""{0}"",
+                    OperatorType.Equals,
+                    {1})";
+
+        /// <summary>
         /// {crud service class name}
         /// {data transfer object type}
         /// {data transfer object identity type}
@@ -507,7 +662,7 @@ namespace CrudGenerator.Core
         /// {repository field name}
         /// {data adapter type}
         /// {create new identity with scope parameter}
-        /// {parent filter path}
+        /// {parent filter MatchCriteriaOperator's}
         /// </summary>
         private const string crudServiceWithParentTemplate = @"
     internal class {0}
@@ -525,7 +680,7 @@ namespace CrudGenerator.Core
     {{
         {11} _{12};
 
-        public EmpresaCrudService(
+        public {0}(
             IBus bus,
             IEventPublisher eventPublisher,
             ILogStorage logStorage,
@@ -537,7 +692,7 @@ namespace CrudGenerator.Core
 
         public override async Task GenerateIdentity({7} entity)
         {{
-            entity.Identity = await _{11}.CreateNewIdentity({14});
+            entity.{8} = await _{12}.CreateNewIdentity({14});
         }}
 
         public override bool HasDefaultIdentity({7} entity)
@@ -565,25 +720,19 @@ namespace CrudGenerator.Core
             return {13}.ConvertEntityToDataTransferObject(entity);
         }}
 
-        protected override {7} ConvertIdentityDtoToIdentity({2} identityDto)
+        protected override {8} ConvertIdentityDtoToIdentity({2} identityDto)
         {{
             return {13}.ConvertIdDtoToIdentity(identityDto);
         }}
 
-        protected override {2} ConvertIdentityToIdentiyDto({7} identity)
+        protected override {2} ConvertIdentityToIdentiyDto({8} identity)
         {{
             return {13}.ConvertIdentityToIdDto(identity);
         }}
 
-
         protected override MatchCriteriaCollection CreateParentIdentityFilter({3} parentDto)
         {{
-            // TODO: Corrigir criação de MatchCriteriaOperator abaixo
-            return new MatchCriteriaCollection(
-                new MatchCriteriaOperator(
-                    $""{15}"",
-                    OperatorType.Equals,
-                    parentDto.Id.Id));
+            return new MatchCriteriaCollection({15});
         }}
 
         protected override Task DataInserted({1} dto)
@@ -676,7 +825,7 @@ namespace CrudGenerator.Core
                     {3},
                     {4}>,
                 {5}>()
-                .WithAbstractions()";
+                .WithAbstractions();";
 
         /// <summary>
         /// {data transfer object type}
@@ -697,12 +846,14 @@ namespace CrudGenerator.Core
                     {4},
                     {5}>,
                 {6}>()
-                .WithAbstractions()";
+                .WithAbstractions();";
 
         /// <summary>
         /// {container registrations class name}
         /// {crud services reg's}
-        /// {dataModelToDatabaseAdapter reg's}
+        /// {logStorage class name}
+        /// {applicationMetadata class name}
+        /// {dataTransferObjectToDatabaseAdapter reg's}
         /// </summary>
         private const string createContainerRegistrationsTemplate = @"
     public class {0} : ImmutableContainerBuilder
@@ -715,20 +866,20 @@ namespace CrudGenerator.Core
         private static IEnumerable<ContainerRegistration> GetRegistrations()
         {{
             return RegisterApplicationServices()
-                .Concat(RegisterDataModelToDatabaseAdapters());
+                .Concat(RegisterDataTransferObjectToDatabaseAdapters());
         }}
 
         private static IEnumerable<ContainerRegistration> RegisterApplicationServices()
         {{
             {1}
 
-            yield return CreateSingleton<ApplicationLogStorage>().WithAbstractions();
-            yield return CreateSingleton<IApplicationMetadata, TesteCrudGeneratorApplicationMetadata>();
+            yield return CreateSingleton<{2}>().WithAbstractions();
+            yield return CreateSingleton<IApplicationMetadata, {3}>();
         }}
 
-        public static IEnumerable<ContainerRegistration> RegisterDataModelToDatabaseAdapters()
+        public static IEnumerable<ContainerRegistration> RegisterDataTransferObjectToDatabaseAdapters()
         {{
-            {2}
+{4}
         }}
     }}";
 
@@ -837,6 +988,9 @@ namespace {0}
         private Dictionary<string, string> _dataAdapterClassNamesMap;
         private Dictionary<string, string> _generatedDataAdapterClassesDictionary;
 
+        private Dictionary<string, string> _dataTransferToDatabaseAdapterClassNamesMap;
+        private Dictionary<string, string> _generatedDataTransferToDatabaseClassesDictionary;
+
         private Dictionary<string, string> _crudServiceClassNamesMap;
         private Dictionary<string, string> _generatedCrudServiceClassesDictionary;
 
@@ -865,6 +1019,9 @@ namespace {0}
             _dataAdapterClassNamesMap = new Dictionary<string, string>();
             _generatedDataAdapterClassesDictionary = new Dictionary<string, string>();
 
+            _dataTransferToDatabaseAdapterClassNamesMap = new Dictionary<string, string>();
+            _generatedDataTransferToDatabaseClassesDictionary = new Dictionary<string, string>();
+
             _crudServiceClassNamesMap = new Dictionary<string, string>();
             _generatedCrudServiceClassesDictionary = new Dictionary<string, string>();
 
@@ -891,6 +1048,8 @@ namespace {0}
             GenerateDataTransferObjectClasses(nameSpace);
             GenerateDataTransferObjectEventsClasses(nameSpace);
             GenerateDataAdapterClasses(projectName, nameSpace);
+            GenerateDataTransferObjectToDatabaseAdapterClasses(projectName, nameSpace);
+
             GenerateCrudServiceClasses(projectName, nameSpace);
 
             GenerateDependencyInversionClasses(projectName, nameSpace);
@@ -946,6 +1105,7 @@ namespace {0}
 
                 List<string> primaryKeysFields = new List<string>();
                 List<string> primaryKeysFieldNames = new List<string>();
+                List<string> primaryKeysCloneParameters = new List<string>();
                 List<string> constructorParameters = new List<string>();
                 List<string> primaryKeysProperties = new List<string>();
                 List<string> fieldValidations = new List<string>();
@@ -998,10 +1158,14 @@ namespace {0}
                                         _namespaceDependenciesMap[tableName.ToLower()].Add(referencedTableName.ToLower());
 
                                     nonParameterlessConstructorParameters.Add($"            {propertyName} = new {columnType}();");
+                                    primaryKeysCloneParameters.Add($"                _{primaryKeyColumn.Name}.Clone()");
                                 }
                             }
                         }
                     }
+
+                    if (primaryKeysCloneParameters.FirstOrDefault(pkcp => pkcp.Trim().StartsWith($"_{primaryKeyColumn.Name}")) == null)
+                        primaryKeysCloneParameters.Add($"                _{primaryKeyColumn.Name}");
 
                     primaryKeysFields.Add(
                         string.Format(
@@ -1053,12 +1217,11 @@ namespace {0}
 
                 string generatedEqualityImplementation =
                     string.Format(
-                        equatableImplementationTemplate,
+                        identityDataTransferObjectEquatableImplementationTemplate,
                         identityDtoClassName,
                         string.Join(" && ", primaryKeysFieldNames.Select(pkfn => $"{pkfn} == other.{pkfn}")),
                         string.Join(", ", primaryKeysFieldNames),
-                        $"$\"{string.Join(" - ", primaryKeysFieldNames.Select(pkfn => "{" + pkfn + "}"))}\"");
-
+                        $"{string.Join(" - ", primaryKeysFieldNames.Select(pkfn => "{" + pkfn + "}"))}");
 
                 string generatedIdentityClass =
                     string.Format(
@@ -1072,14 +1235,16 @@ namespace {0}
                         string.Join("\r\n", serializationInfoGetValueCalls),
                         string.Join("\r\n", primaryKeysProperties),
                         $"\r\n{generatedEqualityImplementation}",
-                        string.Join("\r\n", serializationInfoAddValueCalls));
+                        string.Join("\r\n", serializationInfoAddValueCalls),
+                        string.Join(",\r\n", primaryKeysCloneParameters.Select(pkcp => $"{pkcp}")));
 
                 List<string> namespaceDependenciesList = new List<string>(
                     new string[]
                     {
                         "Framework",
-                        "Framework.NotifyChanges",
+                        "Framework.Extensions",
                         "Framework.Validation",
+                        "Framework.NotifyChanges",
                         "System",
                         "System.Runtime.Serialization",
                     });
@@ -1155,6 +1320,8 @@ namespace {0}
                 List<string> fieldValidations = new List<string>();
                 List<string> fieldAssignments = new List<string>();
                 List<string> nonParameterlessConstructorParameters = new List<string>();
+                List<string> dataTransferObjectCloneParameters = new List<string>();
+                List<string> dependencyDataTransferObjectCloneParameters = new List<string>();
 
                 List<string> serializationInfoGetValueCalls = new List<string>();
                 List<string> serializationInfoAddValueCalls = new List<string>();
@@ -1229,7 +1396,6 @@ namespace {0}
                                 string dependencyPropertyName = string.Empty;
                                 string foreignFieldName = referencedTableName;
 
-                                // TODO: Criar recursão para realizar busca em profundidade e gerar todas as propriedades dependentes
                                 foreach (ForeignColunmnToReferencedColumn foreignColunmnToReferencedColumn in foreignKeyValue.ForeignColunmnsToReferencedColumns)
                                 {
                                     if (_schemaInformation.SchemaTableMappings.ContainsKey(referencedTableName))
@@ -1251,15 +1417,6 @@ namespace {0}
 
                                             string dependencyColumnType = _dataTransferObjectClassNamesMap[dependencyReferencedTable];
 
-                                            string teste = string.Format(
-                                                    dependencyPropertyTemplate,
-                                                    dependencyColumnType,
-                                                    dependencyPropertyName,
-                                                    foreignFieldName,
-                                                    _dataTransferIdentityObjectClassNamesMap[tableName],
-                                                    $"[ForeignGroup(typeof({_dataTransferObjectClassNamesMap[referencedTableName]}))]",
-                                                    $"[CustomDisplay(\"{dependencyPropertyName}\", Order = {dataTransferObjectProperties.Count + dependencyDataTransferObjectProperties.Count}, GroupName = \"{tableName}\")])");
-
                                             dependencyDataTransferObjectProperties.Add(
                                                 string.Format(
                                                     dependencyPropertyTemplate,
@@ -1268,13 +1425,31 @@ namespace {0}
                                                     foreignFieldName,
                                                     _dataTransferIdentityObjectClassNamesMap[tableName],
                                                     $"[ForeignGroup(typeof({_dataTransferObjectClassNamesMap[referencedTableName]}))]",
-                                                    $"[CustomDisplay(\"{dependencyPropertyName}\", Order = {dataTransferObjectProperties.Count + dependencyDataTransferObjectProperties.Count}, GroupName = \"{tableName}\")])"));
+                                                    $"[CustomDisplay(\"{dependencyPropertyName}\", Order = {dataTransferObjectProperties.Count + dependencyDataTransferObjectProperties.Count}, GroupName = \"{tableName}\")]"));
 
                                             if (!_namespaceDependenciesMap.ContainsKey(tableName.ToLower()))
                                                 _namespaceDependenciesMap.Add(tableName.ToLower(), new List<string>());
 
                                             if (!_namespaceDependenciesMap[tableName.ToLower()].Contains(dependencyReferencedTable.ToLower()))
                                                 _namespaceDependenciesMap[tableName.ToLower()].Add(dependencyReferencedTable.ToLower());
+                                        }
+                                        else
+                                        {
+                                            dependencySchemaTableMapping = _schemaInformation.SchemaTableMappings[tableName];
+                                            dependencyForeignColunmnToReferencedColumn = dependencySchemaTableMapping.ForeignKeyValues
+                                                .Select(fkvc => fkvc.ForeignKeyValueList
+                                                    .Where(fkv => fkv.ForeignColunmnsToReferencedColumns
+                                                        .Where(fctrc => fctrc.ForeignColumn == foreignColunmnToReferencedColumn.ReferencedColumn) != null)
+                                                    .FirstOrDefault())
+                                                .FirstOrDefault()?
+                                                .ForeignColunmnsToReferencedColumns
+                                                .FirstOrDefault(fctrc => fctrc.ReferencedColumn == foreignColunmnToReferencedColumn.ReferencedColumn);
+
+                                            if (dependencyForeignColunmnToReferencedColumn != null)
+                                            {
+                                                string dependencyReferencedTable = dependencyForeignColunmnToReferencedColumn.ReferencedTableName;
+                                                dependencyPropertyName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(dependencyReferencedTable);
+                                            }
                                         }
                                     }
 
@@ -1300,17 +1475,18 @@ namespace {0}
                                         columnType,
                                         fieldName));
 
-                                if (string.IsNullOrEmpty(dependencyPropertyName))
+                                if ((string.IsNullOrEmpty(dependencyPropertyName)) || (dependencyPropertyName.ToUpper() == referencedTableName.ToUpper()))
                                 {
                                     dependencyDataTransferObjectProperties.Add(
                                         string.Format(
-                                            propertyTemplate,
+                                            foreignPropertyTemplate,
                                             columnType,
-                                            propertyName,
                                             fieldName,
-                                            foreignColumnIsPrimaryKey ? "\r\n        [Required]" : string.Empty,
-                                            $"\r\n        [ForeignGroup(typeof({_dataTransferObjectClassNamesMap[referencedTableName]}))]",
-                                            $"\r\n        [CustomDisplay(\"{propertyName}\", Order = {dataTransferObjectProperties.Count + dependencyDataTransferObjectProperties.Count}, GroupName = \"{tableName}\")])"));
+                                            dependencyPropertyName,
+                                            foreignFieldName,
+                                            _dataTransferIdentityObjectClassNamesMap[tableName],
+                                            $"[ForeignGroup(typeof({_dataTransferObjectClassNamesMap[referencedTableName]}))]",
+                                            $"[CustomDisplay(\"{dependencyPropertyName}\", Order = {dataTransferObjectProperties.Count + dependencyDataTransferObjectProperties.Count}, GroupName = \"{tableName}\")]"));
                                 }
                                 else
                                 {
@@ -1324,7 +1500,7 @@ namespace {0}
                                             foreignColumnIsPrimaryKey ? "\r\n        [Required]" : string.Empty,
                                             $"\r\n        [ForeignGroup(typeof({_dataTransferObjectClassNamesMap[referencedTableName]}))]",
                                             !string.IsNullOrEmpty(dependencyPropertyName) ? $"\r\n        [Dependency(typeof({_dataTransferObjectClassNamesMap[dependencyPropertyName.ToLower()]}), nameof({dependencyPropertyName}))]" : string.Empty,
-                                            $"\r\n        [CustomDisplay(\"{propertyName}\", Order = {dataTransferObjectProperties.Count + dependencyDataTransferObjectProperties.Count}, GroupName = \"{tableName}\")])"));
+                                            $"\r\n        [CustomDisplay(\"{propertyName}\", Order = {dataTransferObjectProperties.Count + dependencyDataTransferObjectProperties.Count}, GroupName = \"{tableName}\")]"));
                                 }
 
                                 dependencyFieldAssignments.Add(
@@ -1338,11 +1514,16 @@ namespace {0}
                                 if (!_namespaceDependenciesMap[tableName.ToLower()].Contains(referencedTableName.ToLower()))
                                     _namespaceDependenciesMap[tableName.ToLower()].Add(referencedTableName.ToLower());
 
-                                nonParameterlessConstructorParameters.Add($"            {propertyName} = new {columnType}();");
+                                nonParameterlessConstructorParameters.Add($"            _{fieldName} = new {columnType}();");
+                                dependencyDataTransferObjectCloneParameters.Add($"_{fieldName}");
 
                                 continue;
                             }
                         }
+                    }
+                    else
+                    {
+                        dataTransferObjectCloneParameters.Add($"_{entityColumn.Name}");
                     }
 
                     if (string.IsNullOrEmpty(propertyName))
@@ -1368,12 +1549,15 @@ namespace {0}
                             entityColumn.Name,
                             entityColumn.EnforceNotNull ? "\r\n        [Required]" : string.Empty,
                             string.Empty,
-                            $"\r\n        [CustomDisplay(\"{propertyName}\", Order = {dataTransferObjectProperties.Count + dependencyDataTransferObjectProperties.Count}, GroupName = \"{tableName}\")])"));
+                            $"\r\n        [CustomDisplay(\"{propertyName}\", Order = {dataTransferObjectProperties.Count + dependencyDataTransferObjectProperties.Count}, GroupName = \"{tableName}\")]"));
 
                     fieldAssignments.Add(
                         string.Format(
                             fieldAssignmentTemplate,
                             entityColumn.Name));
+
+                    if (entityColumn.ResolveSystemType() == typeof(DateTime))
+                        nonParameterlessConstructorParameters.Add($"            _{entityColumn.Name} = DateTime.Now;");
 
                     serializationInfoGetValueCalls.Add($"            info.GetNotNullValue<{columnType}>(nameof({propertyName}));");
                     serializationInfoAddValueCalls.Add($"            info.AddValue<{columnType}>(nameof({propertyName}), {propertyName});");
@@ -1384,6 +1568,38 @@ namespace {0}
                 string fieldsValidation = string.Empty;
                 if (fieldValidations.Any(fv => fv != null))
                     fieldsValidation = string.Join("\r\n", fieldValidations.Concat(dependencyFieldValidations).Where(fv => fv != null)) + "\r\n";
+
+                /// 0 - {data transfer object class name}
+                /// 1 - {equality condition}
+                /// 2 - {hashcode properties list}
+                /// 3 - {toString properties list}
+
+                List<string> getHashCodeParameters = new List<string>();
+                IEnumerable<string> hashCodeParametersToFormat = dataTransferObjectCloneParameters.Concat(dependencyDataTransferObjectCloneParameters);
+                if (hashCodeParametersToFormat.Count() >= 8)
+                {
+                    while (hashCodeParametersToFormat.Any())
+                    {
+                        getHashCodeParameters.Add(
+                            string.Format(
+                                "\r\n                HashCode.Combine(\r\n                    {0})",
+                                string.Join(",\r\n                    ", hashCodeParametersToFormat.Take(8))));
+
+                        hashCodeParametersToFormat = hashCodeParametersToFormat.Skip(8);
+                    }
+                }
+                else
+                {
+                    getHashCodeParameters.AddRange(hashCodeParametersToFormat);
+                }
+
+                string generatedEqualityImplementation =
+                    string.Format(
+                        dataTransferObjectEquatableImplementationTemplate,
+                        dataTransferObjectClassName,
+                        string.Join("", dataTransferObjectCloneParameters.Concat(dependencyDataTransferObjectCloneParameters).Select(ddtocp => $"\r\n                && {ddtocp} == other.{ddtocp}")),
+                        string.Join("", getHashCodeParameters.Select(ddtocp => $",\r\n                {ddtocp}")),
+                        $"{string.Join("", dataTransferObjectCloneParameters.Concat(dependencyDataTransferObjectCloneParameters).Select(ddtocp => " - {" + ddtocp + "}"))}");
 
                 /// 0  - {class name}
                 /// 1  - {data transfer identity object class name}
@@ -1396,6 +1612,10 @@ namespace {0}
                 /// 8  - {serialization read properties assignments}
                 /// 9  - {class properties}
                 /// 10 - {serialization write properties}
+                /// 11 - {class custom display name}
+                /// 12 - {class custom display order}
+                /// 13 - {equatable implementation}
+                /// 14 - {clone parameters}
 
                 string generatedEntityClass =
                     string.Format(
@@ -1408,26 +1628,38 @@ namespace {0}
                         string.Join(",\r\n", constructorParameters.Concat(dependencyConstructorParameters)),// 5
                                                                                                             //fieldsValidation,
                         string.Join("\r\n", fieldAssignments.Skip(1).Concat(dependencyFieldAssignments)),// 6
-                        string.Join("\r\n", nonParameterlessConstructorParameters.Skip(1)),// 7
+                        string.Join("\r\n", nonParameterlessConstructorParameters),// 7
                         string.Join("\r\n", serializationInfoGetValueCalls.Skip(1)),// 8
                         string.Join("\r\n", dependencyDataTransferObjectProperties.Concat(dataTransferObjectProperties.Skip(1))),// 9
-                        string.Join("\r\n", serializationInfoAddValueCalls.Skip(1)));// 10
+                        string.Join("\r\n", serializationInfoAddValueCalls.Skip(1)),// 10
+                        CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName),// 11
+                        _generatedDataTransferObjectClassesDictionary.Count + 1,// 12
+                        $"\r\n{generatedEqualityImplementation}",//13
+                        string.Join(
+                            "",
+                            dataTransferObjectCloneParameters
+                                .Concat(dependencyDataTransferObjectCloneParameters.Select(ddtocp => $"{ddtocp}.Clone()"))
+                                .Select(dtocp => $",\r\n                {dtocp}")));// 14
 
                 List<string> namespaceDependenciesList = new List<string>(
                     new string[]
                     {
-                        "Domain.Model",
+                        "Crud.Abstractions.Application.Attributes",
+                        "Crud.Abstractions.Application.DataTransferObjects",
+                        "Framework.Extensions",
+                        "Framework.UserInterface",
+                        "Framework.Validation",
+                        "System",
+                        "System.ComponentModel.DataAnnotations",
+                        "System.Runtime.Serialization",
                     });
-
-                if (schemaInformationTableMapping.Value.Columns.Any(col => new DbType[] { DbType.Date, DbType.DateTime, DbType.DateTime2, DbType.DateTimeOffset, DbType.Time, DbType.Time }.Contains(col.DbType)))
-                    namespaceDependenciesList.Add("System");
 
                 if (_namespaceDependenciesMap.ContainsKey(tableName.ToLower()))
                 {
                     foreach (string namespaceDependency in _namespaceDependenciesMap[tableName.ToLower()])
                     {
-                        string dependencyIdentityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}{ModelGenerator.IdentityNameSufix}";
-                        string dependencyEntityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}{ModelGenerator.EntityNameSufix}";
+                        string dependencyIdentityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}{IdentityDataTransferObjectNameSufix}";
+                        string dependencyEntityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}{DataTransferObjectNameSufix}";
 
                         if (_namespacesMap.ContainsKey(namespaceDependency) &&
                             (generatedEntityClass.Contains(dependencyIdentityClassName) || generatedEntityClass.Contains(dependencyEntityClassName)))
@@ -1497,8 +1729,8 @@ namespace {0}
 
                 if (containsPrimaryKeyColumns)
                 {
-                    entityToDataTransferObjectParameters.Add($"                {tableName}Entity.Identity.ConvertIdentityToIdDto()");
-                    dataTransferObjectToEntityParameters.Add($"                {tableName}Dto.Id.ConvertIdDtoToIdentity()");
+                    entityToDataTransferObjectParameters.Add($"                entity.Identity.ConvertIdentityToIdDto()");
+                    dataTransferObjectToEntityParameters.Add($"                dataTransferObject.Id.ConvertIdDtoToIdentity()");
 
                     identityToIdentityDataTransferObjectParameters.Add($"                identity.Id");
                     identityDataTransferObjectToIdentityParameters.Add($"                dataTransferIdentityObject.Id");
@@ -1630,6 +1862,7 @@ namespace {0}
                         "Framework.Communication",
                         "Framework.Extensions",
                         "System",
+                        $"{projectName}.Model.Models.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}",
                     });
 
                 if (_namespaceDependenciesMap.ContainsKey(tableName.ToLower()))
@@ -1658,6 +1891,210 @@ namespace {0}
             }
         }
 
+        private void GenerateDataTransferObjectToDatabaseAdapterClasses(string projectName, string nameSpace)
+        {
+            foreach (KeyValuePair<string, SchemaInformationTableMapping> schemaInformationTableMapping in _schemaInformation.SchemaTableMappings.OrderBy(kp => kp.Value.Order))
+            {
+                string tableName = schemaInformationTableMapping.Key.ToLower();
+                string dataTransferObjectToDatabaseAdapterClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}{DataTransferObjectToDatabaseAdapterNameSufix}";
+                _dataTransferToDatabaseAdapterClassNamesMap.Add(tableName, dataTransferObjectToDatabaseAdapterClassName);
+
+                string entityClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}{ModelGenerator.EntityNameSufix}";
+                string identityDataTransferObjectClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}{IdentityDataTransferObjectNameSufix}";
+                string dataTransferObjectClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}{DataTransferObjectNameSufix}";
+                string tableMappingClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}{ModelGenerator.TableMappingNameSufix}";
+
+                string classNameSpace =
+                    !string.IsNullOrEmpty(nameSpace)
+                    ? $"{nameSpace}.{ApplicationProjectSufix}.{DataTransferObjectsNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}"
+                    : $"{ApplicationProjectSufix}.{DataTransferObjectsNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}";
+
+                if (!_namespacesMap.ContainsKey(tableName.ToLower()))
+                    _namespacesMap.Add(tableName.ToLower(), classNameSpace);
+
+                bool containsPrimaryKeyColumns = schemaInformationTableMapping.Value.Columns.Where(col => col.IsPrimaryKey).Any();
+                List<ColumnInfo> entityColumns = new List<ColumnInfo>(
+                    schemaInformationTableMapping.Value.Columns
+                        .Where(col =>
+                            !col.IsPrimaryKey &&
+                            !schemaInformationTableMapping.Value.ForeignKeyValues
+                                .Any(fkvc => fkvc.ForeignKeyValueList
+                                    .Any(fkv => fkv.ForeignColunmnsToReferencedColumns
+                                        .Any(fkctrc => fkctrc.ForeignColumn.ToLower() == col.Name.ToLower())))));
+
+                List<string> dataTransferObjectPropertiesToTableMappingColumnsMap = new List<string>();
+                List<ColumnInfo> primaryKeyColumns = new List<ColumnInfo>(schemaInformationTableMapping.Value.Columns.Where(col => col.IsPrimaryKey));
+                int primaryKeyColumnsCount = primaryKeyColumns.Count;
+
+                if (containsPrimaryKeyColumns)
+                {
+                    ColumnInfo primaryKeyColumn = primaryKeyColumns[0];
+                    primaryKeyColumns.RemoveAt(0);
+
+                    string titleCasePrimaryKeyColumnName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(primaryKeyColumn.Name);
+
+                    dataTransferObjectPropertiesToTableMappingColumnsMap.Add(
+                        string.Format(
+                            dataTransferObjectPropertyToTableMappingPropertyTemplate,
+                            $"nameof({dataTransferObjectClassName}.{titleCasePrimaryKeyColumnName})",
+                            $"{tableMappingClassName}.{titleCasePrimaryKeyColumnName}"));
+
+                    while (primaryKeyColumns.Count > 0)
+                    {
+                        primaryKeyColumn = primaryKeyColumns[0];
+                        primaryKeyColumns.RemoveAt(0);
+                        titleCasePrimaryKeyColumnName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(primaryKeyColumn.Name);
+
+                        if (_identityDataTransferObjectClassPropertiesMap.ContainsKey(identityDataTransferObjectClassName))
+                        {
+                            List<string> parentFilterPaths = new List<string>();
+                            if (_identityDataTransferObjectClassPrimaryKeysPropertyMap.ContainsKey(identityDataTransferObjectClassName))
+                            {
+                                int numberOfPaths = _identityDataTransferObjectClassPrimaryKeysPropertyMap[identityDataTransferObjectClassName].Count();
+                                if (numberOfPaths > 0)
+                                {
+                                    List<string> pathList = _identityDataTransferObjectClassPrimaryKeysPropertyMap[identityDataTransferObjectClassName].ToList();
+                                    for (int pathIndex = 0; pathIndex < numberOfPaths; pathIndex++)
+                                    {
+                                        if (pathIndex == 0)
+                                            parentFilterPaths.Add($"{dataTransferObjectClassName}.{pathList.First()}");
+                                        else
+                                            parentFilterPaths.Add($"{parentFilterPaths[pathIndex - 1]}.{pathList.First()}");
+
+                                        pathList.RemoveAt(0);
+                                    }
+                                }
+                            }
+
+                            string foreignKeysOnPrimaryKeyPath =
+                                string.Join(
+                                    ".",
+                                    parentFilterPaths
+                                        .Concat(new[] { $"{parentFilterPaths[parentFilterPaths.Count - 1]}.Id" })
+                                        .Select(parentFilterPath => $"{{nameof({parentFilterPath})}}"));
+
+                            dataTransferObjectPropertiesToTableMappingColumnsMap.Add(
+                                string.Format(
+                                    dataTransferObjectPropertyToTableMappingPropertyTemplate,
+                                    $"$\"{foreignKeysOnPrimaryKeyPath}\"",
+                                    $"{tableMappingClassName}.{titleCasePrimaryKeyColumnName}"));
+
+                            string baseForeignKeyPropertyName = titleCasePrimaryKeyColumnName;
+
+                            ForeignKeyValueColletion foreignKeyValueColletion = schemaInformationTableMapping.Value.ForeignKeyValues
+                                .FirstOrDefault(fkv => fkv.ForeignKeyValueList
+                                    .Where(fkv => fkv.ForeignColunmnsToReferencedColumns
+                                        .Any(fctrc => fctrc.ForeignColumn == primaryKeyColumn.Name.ToLower())).Any());
+
+                            // Remove da lista primaryKeyColumns, colunas que compôem chave estrangeira referenciada pela chave primária da tabela atual
+                            foreach (ForeignKeyValue foreignKeyValue in foreignKeyValueColletion.ForeignKeyValueList)
+                            {
+                                foreach (ForeignColunmnToReferencedColumn foreignColunmnToReferencedColumn in foreignKeyValue.ForeignColunmnsToReferencedColumns)
+                                {
+                                    ColumnInfo foreignKeyColumnInfo = primaryKeyColumns.FirstOrDefault(pkColumn => pkColumn.Name.ToUpper() == foreignColunmnToReferencedColumn.ForeignColumn.ToUpper());
+                                    if (!string.IsNullOrEmpty(foreignKeyColumnInfo.Name))
+                                        primaryKeyColumns.Remove(foreignKeyColumnInfo);
+                                }
+                            }
+
+                            if (foreignKeyValueColletion != null)
+                            {
+                                ForeignKeyValue foreignKeyValue = foreignKeyValueColletion.ForeignKeyValueList
+                                    .FirstOrDefault(fkv => fkv.ForeignColunmnsToReferencedColumns
+                                        .Any(fctrc => fctrc.ForeignColumn == primaryKeyColumn.Name.ToLower()));
+
+                                if ((foreignKeyValue != null) && (foreignKeyValue.ForeignColunmnsToReferencedColumns.Count > 1))
+                                {
+                                    List<string> foreignColumnNamePaths = new List<string>();
+                                    foreach (ForeignColunmnToReferencedColumn foreignColunmnToReferencedColumn in foreignKeyValue.ForeignColunmnsToReferencedColumns.Skip(1))
+                                    {
+                                        titleCasePrimaryKeyColumnName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(foreignColunmnToReferencedColumn.ForeignColumn);
+                                        if (titleCasePrimaryKeyColumnName == baseForeignKeyPropertyName)
+                                            continue;
+
+                                        foreignKeysOnPrimaryKeyPath =
+                                            string.Join(
+                                                ".",
+                                                parentFilterPaths
+                                                    .Concat(new[]
+                                                    {
+                                                        $"{parentFilterPaths[parentFilterPaths.Count - 1]}.{titleCasePrimaryKeyColumnName}",
+                                                        $"{parentFilterPaths[parentFilterPaths.Count - 1]}.{titleCasePrimaryKeyColumnName}.Id",
+                                                    })
+                                                    .Select(parentFilterPath => $"{{nameof({parentFilterPath})}}"));
+                                        dataTransferObjectPropertiesToTableMappingColumnsMap.Add(
+                                            string.Format(
+                                                dataTransferObjectPropertyToTableMappingPropertyTemplate,
+                                                $"$\"{foreignKeysOnPrimaryKeyPath}\"",
+                                                $"{tableMappingClassName}.{titleCasePrimaryKeyColumnName}"));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                while (entityColumns.Count > 0)
+                {
+                    ColumnInfo entityColumn = entityColumns[0];
+                    entityColumns.RemoveAt(0);
+
+                    string titleCasePrimaryKeyColumnName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(entityColumn.Name);
+
+                    dataTransferObjectPropertiesToTableMappingColumnsMap.Add(
+                        string.Format(
+                            dataTransferObjectPropertyToTableMappingPropertyTemplate,
+                            $"nameof({dataTransferObjectClassName}.{titleCasePrimaryKeyColumnName})",
+                            $"{tableMappingClassName}.{titleCasePrimaryKeyColumnName}"));
+                }
+
+                /// 0 - {data transfer object to database adapter class name}
+                /// 1 - {entity type}
+                /// 2 - {database adapter field name}
+                /// 3 - {object to database adapter field name}
+                /// 4 - {data transfer object properties to table mapping properties map list}
+                string generatedDataAdapterClass =
+                    string.Format(
+                        dataTransferObjectToDatabaseAdapterTemplate.TrimStart('\r', '\n'),
+                        dataTransferObjectToDatabaseAdapterClassName, // 0
+                        entityClassName,// 1
+                        $"{tableName}DatabaseAdapter",// 2
+                        $"{tableName}ObjectToDatabaseAdapter",// 3
+                        string.Join(",", dataTransferObjectPropertiesToTableMappingColumnsMap));// 5
+
+                List<string> namespaceDependenciesList = new List<string>(
+                    new string[]
+                    {
+                        "Database.DataTransfer",
+                        "Framework.Collections",
+                        "Framework.Validation",
+                        "System.Collections.Generic",
+                        $"{projectName}.Model.Models.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}",
+                    });
+
+                if (_namespaceDependenciesMap.ContainsKey(tableName.ToLower()))
+                {
+                    foreach (string namespaceDependency in _namespaceDependenciesMap[tableName.ToLower()])
+                        namespaceDependenciesList.Add($"{projectName}.Model.Models.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}");
+                }
+
+                _generatedDataTransferToDatabaseClassesDictionary.Add(
+                    tableName,
+                    string.Format(
+                        nameSpaceTemplate,
+                        classNameSpace,
+                        generatedDataAdapterClass,
+                        string.Join("\r\n", namespaceDependenciesList.OrderBy(ns => ns).Select(dependencyNamespace => $"using {dependencyNamespace};"))));
+
+                _generatedClassesList.Add(new GeneratedClassFromSchemaInformationTableMapping(
+                    schemaInformationTableMapping.Value,
+                    classNameSpace,
+                    dataTransferObjectToDatabaseAdapterClassName,
+                    namespaceDependenciesList.OrderBy(ns => ns).ToList(),
+                    _generatedDataTransferToDatabaseClassesDictionary[tableName.ToLower()]));
+            }
+        }
+
         private void GenerateCrudServiceClasses(string projectName, string nameSpace)
         {
             foreach (KeyValuePair<string, SchemaInformationTableMapping> schemaInformationTableMapping in _schemaInformation.SchemaTableMappings.OrderBy(kp => kp.Value.Order))
@@ -1671,6 +2108,10 @@ namespace {0}
                 string crudServiceClassName = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName)}{CrudServiceNameSufix}";
                 _crudServiceClassNamesMap.Add(tableName, crudServiceClassName);
 
+                string tableNameTitleCase = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName);
+                string dataTransferObjectClassName = $"{tableNameTitleCase}{DataTransferObjectNameSufix}";
+                string identityDataTransferObjectClassName = $"{tableNameTitleCase}{IdentityDataTransferObjectNameSufix}";
+
                 bool containsPrimaryKeyColumns = schemaInformationTableMapping.Value.Columns.Where(col => col.IsPrimaryKey).Any();
                 List<ColumnInfo> entityColumns = new List<ColumnInfo>(
                     schemaInformationTableMapping.Value.Columns
@@ -1682,6 +2123,7 @@ namespace {0}
                                         .Any(fkctrc => fkctrc.ForeignColumn.ToLower() == col.Name.ToLower())))));
 
                 List<string> parentPrimaryKeys = new List<string>();
+                List<string> parentMatchCriteriaOperators = new List<string>();
 
                 List<ColumnInfo> primaryKeyColumns = new List<ColumnInfo>(schemaInformationTableMapping.Value.Columns.Where(col => col.IsPrimaryKey));
                 int primaryKeyColumnsCount = primaryKeyColumns.Count;
@@ -1746,6 +2188,102 @@ namespace {0}
                             }
                         }
                     }
+
+                    primaryKeyColumns = new List<ColumnInfo>(schemaInformationTableMapping.Value.Columns.Where(col => col.IsPrimaryKey).Skip(1));
+                    while (primaryKeyColumns.Count > 0)
+                    {
+                        primaryKeyColumn = primaryKeyColumns[0];
+                        primaryKeyColumns.RemoveAt(0);
+                        string titleCasePrimaryKeyColumnName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(primaryKeyColumn.Name);
+
+                        if (_identityDataTransferObjectClassPropertiesMap.ContainsKey(identityDataTransferObjectClassName))
+                        {
+                            List<string> parentFilterPaths = new List<string>();
+                            if (_identityDataTransferObjectClassPrimaryKeysPropertyMap.ContainsKey(identityDataTransferObjectClassName))
+                            {
+                                int numberOfPaths = _identityDataTransferObjectClassPrimaryKeysPropertyMap[identityDataTransferObjectClassName].Count();
+                                if (numberOfPaths > 0)
+                                {
+                                    List<string> pathList = _identityDataTransferObjectClassPrimaryKeysPropertyMap[identityDataTransferObjectClassName].ToList();
+                                    for (int pathIndex = 0; pathIndex < numberOfPaths; pathIndex++)
+                                    {
+                                        if (pathIndex == 0)
+                                            parentFilterPaths.Add($"{dataTransferObjectClassName}.{pathList.First()}");
+                                        else
+                                            parentFilterPaths.Add($"{parentFilterPaths[pathIndex - 1]}.{pathList.First()}");
+
+                                        pathList.RemoveAt(0);
+                                    }
+                                }
+                            }
+
+                            string foreignKeysOnPrimaryKeyPath =
+                                string.Join(
+                                    ".",
+                                    parentFilterPaths
+                                        .Concat(new[] { $"{parentFilterPaths[parentFilterPaths.Count - 1]}.Id" })
+                                        .Select(parentFilterPath => $"{{nameof({parentFilterPath})}}"));
+
+                            parentMatchCriteriaOperators.Add(
+                                string.Format(
+                                    parentMatchCriteriaOperatorTemplate,
+                                    $"{foreignKeysOnPrimaryKeyPath}",
+                                    $"parentDto.Id.Id"));
+
+                            string baseForeignKeyPropertyName = titleCasePrimaryKeyColumnName;
+
+                            ForeignKeyValueColletion foreignKeyValueColletion = schemaInformationTableMapping.Value.ForeignKeyValues
+                                .FirstOrDefault(fkv => fkv.ForeignKeyValueList
+                                    .Where(fkv => fkv.ForeignColunmnsToReferencedColumns
+                                        .Any(fctrc => fctrc.ForeignColumn == primaryKeyColumn.Name.ToLower())).Any());
+
+                            // Remove da lista primaryKeyColumns, colunas que compôem chave estrangeira referenciada pela chave primária da tabela atual
+                            foreach (ForeignKeyValue foreignKeyValue in foreignKeyValueColletion.ForeignKeyValueList)
+                            {
+                                foreach (ForeignColunmnToReferencedColumn foreignColunmnToReferencedColumn in foreignKeyValue.ForeignColunmnsToReferencedColumns)
+                                {
+                                    ColumnInfo foreignKeyColumnInfo = primaryKeyColumns.FirstOrDefault(pkColumn => pkColumn.Name.ToUpper() == foreignColunmnToReferencedColumn.ForeignColumn.ToUpper());
+                                    if (!string.IsNullOrEmpty(foreignKeyColumnInfo.Name))
+                                        primaryKeyColumns.Remove(foreignKeyColumnInfo);
+                                }
+                            }
+
+                            if (foreignKeyValueColletion != null)
+                            {
+                                ForeignKeyValue foreignKeyValue = foreignKeyValueColletion.ForeignKeyValueList
+                                    .FirstOrDefault(fkv => fkv.ForeignColunmnsToReferencedColumns
+                                        .Any(fctrc => fctrc.ForeignColumn == primaryKeyColumn.Name.ToLower()));
+
+                                if ((foreignKeyValue != null) && (foreignKeyValue.ForeignColunmnsToReferencedColumns.Count > 1))
+                                {
+                                    List<string> foreignColumnNamePaths = new List<string>();
+                                    foreach (ForeignColunmnToReferencedColumn foreignColunmnToReferencedColumn in foreignKeyValue.ForeignColunmnsToReferencedColumns.Skip(1))
+                                    {
+                                        titleCasePrimaryKeyColumnName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(foreignColunmnToReferencedColumn.ForeignColumn);
+                                        if (titleCasePrimaryKeyColumnName == baseForeignKeyPropertyName)
+                                            continue;
+
+                                        foreignKeysOnPrimaryKeyPath =
+                                            string.Join(
+                                                ".",
+                                                parentFilterPaths
+                                                    .Concat(new[]
+                                                    {
+                                                        $"{parentFilterPaths[parentFilterPaths.Count - 1]}.{titleCasePrimaryKeyColumnName}",
+                                                        $"{parentFilterPaths[parentFilterPaths.Count - 1]}.{titleCasePrimaryKeyColumnName}.Id",
+                                                    })
+                                                    .Select(parentFilterPath => $"{{nameof({parentFilterPath})}}"));
+
+                                        parentMatchCriteriaOperators.Add(
+                                            string.Format(
+                                                parentMatchCriteriaOperatorTemplate,
+                                                $"{foreignKeysOnPrimaryKeyPath}",
+                                                $"parentDto.Id.{titleCasePrimaryKeyColumnName}.Id"));
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
 
                 List<string> namespaceDependenciesList = new List<string>(
@@ -1753,13 +2291,10 @@ namespace {0}
                     {
                         "Crud.Abstractions.Application.Services",
                         "Database.IdentityGeneration",
-                        "Domain.Model.DataQuery",
                         "Domain.Model.Messaging",
                         "Framework.Diagnostics",
                         "System.Threading.Tasks",
                     });
-
-                string tableNameTitleCase = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tableName);
 
                 string classNameSpace =
                     !string.IsNullOrEmpty(nameSpace)
@@ -1773,17 +2308,9 @@ namespace {0}
                 if (_namespaceDependenciesMap.ContainsKey(tableName.ToLower()))
                 {
                     foreach (string namespaceDependency in _namespaceDependenciesMap[tableName.ToLower()])
-                    {
-                        string namespaceDependencyTitleCase = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency);
-
-                        namespaceDependenciesList.Add($"{projectName}.{ApplicationProjectSufix}.{DataTransferObjectsNamespaceSufix}.{namespaceDependencyTitleCase}");
-                        namespaceDependenciesList.Add($"{projectName}.{ApplicationProjectSufix}.{DataTransferObjectsNamespaceSufix}.{namespaceDependencyTitleCase}.{EventsNamespaceSufix}");
-                        namespaceDependenciesList.Add($"{projectName}.Model.Models.{namespaceDependencyTitleCase}");
-                    }
+                        namespaceDependenciesList.Add($"{projectName}.{ApplicationProjectSufix}.{DataTransferObjectsNamespaceSufix}.{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(namespaceDependency)}");
                 }
 
-                string dataTransferObjectClassName = $"{tableNameTitleCase}{DataTransferObjectNameSufix}";
-                string identityDataTransferObjectClassName = $"{tableNameTitleCase}{IdentityDataTransferObjectNameSufix}";
                 string insertedEventClassName = $"{tableNameTitleCase}{InsertedEventNameSufix}";
                 string updatedEventClassName = $"{tableNameTitleCase}{UpdatedEventNameSufix}";
                 string deletedEventClassName = $"{tableNameTitleCase}{DeletedEventNameSufix}";
@@ -1810,7 +2337,7 @@ namespace {0}
                     /// 10 - {repository type}
                     /// 11 - {repository field name}
                     /// 12 - {data adapter type}
-                    
+
                     generatedCrudServiceClass =
                         string.Format(
                             crudServiceTemplate,
@@ -1820,8 +2347,8 @@ namespace {0}
                             insertedEventClassName,// 3
                             updatedEventClassName,// 4
                             deletedEventClassName,// 5
-                            identityClassName,// 6
-                            entityClassName,// 7
+                            entityClassName,// 6
+                            identityClassName,// 7
                             identityFieldType,//8
                             identityGeneratorType,//9
                             entityDatabaseRepositoryClassName,//10
@@ -1878,8 +2405,8 @@ namespace {0}
                             insertedEventClassName,// 4
                             updatedEventClassName,// 5
                             deletedEventClassName,// 6
-                            identityClassName,// 7
-                            entityClassName,// 8
+                            entityClassName,// 7
+                            identityClassName,// 8
                             identityFieldType,//9
                             identityGeneratorType,//10
                             entityDatabaseRepositoryClassName,//11
@@ -1889,7 +2416,9 @@ namespace {0}
                             _identityDataTransferObjectClassPrimaryKeysPropertyMap[identityDataTransferObjectClassName].Count > 1
                                 ? $"entity.Identity.{_identityDataTransferObjectClassPrimaryKeysPropertyMap[identityDataTransferObjectClassName][1]}"
                                 : string.Empty,//14
-                            string.Join(".", parentFilterPaths.Select(parentFilterPath => $"nameof({parentFilterPath})")));//15
+                            string.Join(",", parentMatchCriteriaOperators));//15
+
+                    namespaceDependenciesList.Add("Domain.Model.DataQuery");
                 }
 
                 _generatedCrudServiceClassesDictionary.Add(
@@ -1994,7 +2523,7 @@ namespace {0}
                 ? $"{nameSpace}.{ApplicationProjectSufix}"
                 : $"{ApplicationProjectSufix}";
 
-            string applicationMetadaClassName = $"{projectName}ApplicationMetadata";
+            string applicationMetadaClassName = $"{projectName}{ApplicationMetadataNameSufix}";
             string generatedApplicationMetadataClass = string.Format(applicationMetadataClassTemplate, applicationMetadaClassName);
             _generatedClassesList.Add(new GeneratedClass(
                 classNameSpace,
@@ -2006,7 +2535,7 @@ namespace {0}
                     generatedApplicationMetadataClass,
                     string.Join("\r\n", new[] { "Framework", "System" }.OrderBy(ns => ns).OrderBy(ns => ns).Select(dependencyNamespace => $"using {dependencyNamespace};")))));
 
-            string logStorageClassName = $"{projectName}LogStorage";
+            string logStorageClassName = $"{projectName}{LogStoragetaNameSufix}";
             string generatedLogStorageClass = string.Format(logStorageClassTemplate, logStorageClassName);
             _generatedClassesList.Add(new GeneratedClass(
                 classNameSpace,
@@ -2141,6 +2670,15 @@ namespace {0}
                 namespaceDependenciesList.Add($"{projectName}.Model.Models.{titleCaseTableName}");
             }
 
+            string applicationMetadaClassName = $"{projectName}{ApplicationMetadataNameSufix}";
+            string logStorageClassName = $"{projectName}{LogStoragetaNameSufix}";
+
+            IEnumerable<string> dataTransferObjectToDatabaseAdapterRegistrations =
+                _dataTransferToDatabaseAdapterClassNamesMap.Count == 0
+                    ? Enumerable.Empty<string>()
+                    : _dataTransferToDatabaseAdapterClassNamesMap
+                    .Select(dtodba => $"            yield return CreateSingleton<DataTransferObjectToDatabaseAdapter<{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(dtodba.Key)}{ModelGenerator.EntityNameSufix}>, {dtodba.Value}>();");
+
             string generatedContainerRegistrationClass =
                 string.Format(
                     nameSpaceTemplate,
@@ -2149,7 +2687,9 @@ namespace {0}
                         createContainerRegistrationsTemplate,
                         containerRegistrationsClassName,
                         string.Join("\r\n", crudServiceRegistrations),
-                        string.Empty),
+                        logStorageClassName,
+                        applicationMetadaClassName,
+                        string.Join("\r\n", dataTransferObjectToDatabaseAdapterRegistrations)),
                     string.Join("\r\n", namespaceDependenciesList.OrderBy(ns => ns).Select(dependencyNamespace => $"using {dependencyNamespace};")));
 
             if (_generatedDependencyInversionClassesDictionary.ContainsKey(containerRegistrationsClassName))

@@ -355,7 +355,7 @@ namespace CrudGenerator.Core.ViewModels
                     argsArray[3] as ObservableCollection<GeneratedClass> ?? new ObservableCollection<GeneratedClass>();
 
                 ObservableCollection<GeneratedClass> generatedApplicationClasses =
-                    argsArray[3] as ObservableCollection<GeneratedClass> ?? new ObservableCollection<GeneratedClass>();
+                    argsArray[4] as ObservableCollection<GeneratedClass> ?? new ObservableCollection<GeneratedClass>();
 
                 string solutionPath = Path.Combine(projectFolder, projectName);
                 if (Directory.Exists(solutionPath))
@@ -374,6 +374,12 @@ namespace CrudGenerator.Core.ViewModels
                     nameSpace,
                     projectName,
                     generatedModelClasses);
+
+                GenerateApplicationProject(
+                    srcPath,
+                    nameSpace,
+                    projectName,
+                    generatedApplicationClasses);
             }
             finally
             {
@@ -407,7 +413,11 @@ namespace CrudGenerator.Core.ViewModels
             {
                 string modelsProjectFolderPath = modelProjectPath;
 
-                List<string> partialNamespaceList = new List<string>(generatedClass.ClassNameSpace.Replace($"{modelClassesNamespace}.", "").Split('.'));
+                List<string> partialNamespaceList = new List<string>(
+                    generatedClass.ClassNameSpace == modelClassesNamespace
+                        ? Enumerable.Empty<string>()
+                        : generatedClass.ClassNameSpace.Replace($"{modelClassesNamespace}.", "").Split('.'));
+
                 TreeNode<string> currentTreeNode = namespaceModelTreeList.Root;
                 while (partialNamespaceList.Count > 0)
                 {
@@ -442,9 +452,84 @@ namespace CrudGenerator.Core.ViewModels
 @"<Project Sdk=""Microsoft.NET.Sdk"">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net461;net462</TargetFrameworks>
     <Nullable>disable</Nullable>
-    <LangVersion>9.0</LangVersion>
+    <LangVersion>10.0</LangVersion>
+  </PropertyGroup>
+
+</Project>");
+            streamWriterProject.Close();
+            streamWriterProject.Dispose();
+            #endregion
+        }
+
+        private void GenerateApplicationProject(
+            string srcPath,
+            string nameSpace,
+            string projectName,
+            ObservableCollection<GeneratedClass> applicationClasses)
+        {
+            #region Applications Project
+            string applicationProjectPath = string.IsNullOrEmpty(nameSpace)
+                ? Path.Combine(srcPath, $"{projectName}.{ApplicationGenerator.ApplicationProjectSufix}")
+                : Path.Combine(srcPath, $"{projectName}.{nameSpace}.{ApplicationGenerator.ApplicationProjectSufix}");
+
+            if (Directory.Exists(applicationProjectPath))
+                Directory.Delete(applicationProjectPath, true);
+
+            Directory.CreateDirectory(applicationProjectPath);
+
+            TreeList<string> namespaceApplicationTreeList = new TreeList<string>(projectName);
+
+            string applicationClassesNamespace = string.IsNullOrEmpty(nameSpace)
+                ? $"{projectName}.{ApplicationGenerator.ApplicationProjectSufix}"
+                : $"{projectName}.{nameSpace}.{ApplicationGenerator.ApplicationProjectSufix}";
+
+            foreach (GeneratedClass generatedClass in applicationClasses)
+            {
+                string applicationsProjectFolderPath = applicationProjectPath;
+
+                List<string> partialNamespaceList = new List<string>(
+                    generatedClass.ClassNameSpace == applicationClassesNamespace
+                        ? Enumerable.Empty<string>()
+                        : generatedClass.ClassNameSpace.Replace($"{applicationClassesNamespace}.", "").Split('.'));
+
+                TreeNode<string> currentTreeNode = namespaceApplicationTreeList.Root;
+                while (partialNamespaceList.Count > 0)
+                {
+                    string partialNamespace = partialNamespaceList[0];
+                    TreeNode<string> treeNode = currentTreeNode.Find(partialNamespace);
+                    if (treeNode == null)
+                    {
+                        currentTreeNode = currentTreeNode.AddOrGet(partialNamespace);
+                    }
+                    else
+                        currentTreeNode = treeNode;
+
+                    applicationsProjectFolderPath = Path.Combine(applicationsProjectFolderPath, partialNamespace);
+                    if (!Directory.Exists(applicationsProjectFolderPath))
+                        Directory.CreateDirectory(applicationsProjectFolderPath);
+
+                    partialNamespaceList.RemoveAt(0);
+                }
+
+                StreamWriter streamWriterClass = new StreamWriter(Path.Combine(applicationsProjectFolderPath, $"{generatedClass.ClassName}.cs"));
+                streamWriterClass.Write(generatedClass.ClassContent);
+                streamWriterClass.Close();
+                streamWriterClass.Dispose();
+            }
+
+            StreamWriter streamWriterProject =
+                string.IsNullOrEmpty(nameSpace)
+                ? new StreamWriter(Path.Combine(applicationProjectPath, $"{projectName}.{ApplicationGenerator.ApplicationProjectSufix}.csproj"))
+                : new StreamWriter(Path.Combine(applicationProjectPath, $"{projectName}.{nameSpace}.{ApplicationGenerator.ApplicationProjectSufix}.csproj"));
+            streamWriterProject.Write(
+@"<Project Sdk=""Microsoft.NET.Sdk"">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net461;net462</TargetFrameworks>
+    <Nullable>disable</Nullable>
+    <LangVersion>10.0</LangVersion>
   </PropertyGroup>
 
 </Project>");
